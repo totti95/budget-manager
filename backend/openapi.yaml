@@ -1,0 +1,1081 @@
+openapi: 3.0.3
+info:
+  title: Budget Manager API
+  description: API REST pour la gestion de budget personnel
+  version: 1.0.0
+  contact:
+    name: Budget Manager Support
+    email: support@budgetmanager.local
+
+servers:
+  - url: http://localhost:8080/api
+    description: Serveur de développement local
+
+tags:
+  - name: Auth
+    description: Authentification et gestion utilisateur
+  - name: Templates
+    description: Gestion des templates de budget
+  - name: Budgets
+    description: Gestion des budgets mensuels
+  - name: Expenses
+    description: Gestion des dépenses
+  - name: Stats
+    description: Statistiques et rapports
+  - name: Assets
+    description: Gestion du patrimoine
+  - name: Savings
+    description: Plans d'épargne
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BudgetTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        name:
+          type: string
+        isDefault:
+          type: boolean
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateCategory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TemplateCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        budgetTemplateId:
+          type: integer
+        name:
+          type: string
+        sortOrder:
+          type: integer
+        plannedAmountCents:
+          type: integer
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateSubcategory'
+
+    TemplateSubcategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        templateCategoryId:
+          type: integer
+        name:
+          type: string
+        plannedAmountCents:
+          type: integer
+        sortOrder:
+          type: integer
+
+    Budget:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        month:
+          type: string
+          format: date
+          description: Premier jour du mois (YYYY-MM-01)
+        name:
+          type: string
+        generatedFromTemplateId:
+          type: integer
+          nullable: true
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetCategory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BudgetCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        budgetId:
+          type: integer
+        name:
+          type: string
+        sortOrder:
+          type: integer
+        plannedAmountCents:
+          type: integer
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetSubcategory'
+
+    BudgetSubcategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        budgetCategoryId:
+          type: integer
+        name:
+          type: string
+        plannedAmountCents:
+          type: integer
+        sortOrder:
+          type: integer
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        budgetId:
+          type: integer
+        budgetSubcategoryId:
+          type: integer
+        date:
+          type: string
+          format: date
+        label:
+          type: string
+        amountCents:
+          type: integer
+        paymentMethod:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        subcategory:
+          $ref: '#/components/schemas/BudgetSubcategory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        type:
+          type: string
+          enum: [immobilier, épargne, investissement, autre]
+        label:
+          type: string
+        institution:
+          type: string
+          nullable: true
+        valueCents:
+          type: integer
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SavingsPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        month:
+          type: string
+          format: date
+        plannedCents:
+          type: integer
+        actualCents:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Créer un nouveau compte utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                password_confirmation:
+                  type: string
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '422':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Se connecter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '422':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Obtenir les informations de l'utilisateur connecté
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Informations utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Non authentifié
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Se déconnecter
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Déconnexion réussie
+        '401':
+          description: Non authentifié
+
+  /templates:
+    get:
+      tags: [Templates]
+      summary: Lister les templates de budget
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetTemplate'
+
+    post:
+      tags: [Templates]
+      summary: Créer un nouveau template
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                isDefault:
+                  type: boolean
+                categories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      plannedAmountCents:
+                        type: integer
+                      sortOrder:
+                        type: integer
+                      subcategories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            plannedAmountCents:
+                              type: integer
+                            sortOrder:
+                              type: integer
+      responses:
+        '201':
+          description: Template créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetTemplate'
+
+  /templates/{id}:
+    get:
+      tags: [Templates]
+      summary: Obtenir un template
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails du template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetTemplate'
+
+    put:
+      tags: [Templates]
+      summary: Modifier un template
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                isDefault:
+                  type: boolean
+      responses:
+        '200':
+          description: Template modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetTemplate'
+
+    delete:
+      tags: [Templates]
+      summary: Supprimer un template
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Template supprimé
+
+  /templates/{id}/set-default:
+    post:
+      tags: [Templates]
+      summary: Définir un template comme défaut
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Template défini comme défaut
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetTemplate'
+
+  /budgets:
+    get:
+      tags: [Budgets]
+      summary: Lister les budgets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Liste des budgets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Budget'
+
+  /budgets/generate:
+    post:
+      tags: [Budgets]
+      summary: Générer un budget depuis le template par défaut
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [month]
+              properties:
+                month:
+                  type: string
+                  pattern: '^\d{4}-\d{2}$'
+                  example: '2025-01'
+      responses:
+        '201':
+          description: Budget généré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '404':
+          description: Aucun template par défaut trouvé
+        '409':
+          description: Budget déjà existant pour ce mois
+
+  /budgets/{id}:
+    get:
+      tags: [Budgets]
+      summary: Obtenir un budget
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails du budget
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+
+  /budgets/{budgetId}/expenses:
+    get:
+      tags: [Expenses]
+      summary: Lister les dépenses d'un budget
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: subcatId
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          description: Recherche dans les libellés
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Liste des dépenses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Expense'
+
+    post:
+      tags: [Expenses]
+      summary: Créer une dépense
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [budget_subcategory_id, date, label, amount_cents]
+              properties:
+                budget_subcategory_id:
+                  type: integer
+                date:
+                  type: string
+                  format: date
+                label:
+                  type: string
+                amount_cents:
+                  type: integer
+                  minimum: 1
+                payment_method:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Dépense créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+
+  /budgets/{budgetId}/expenses/import-csv:
+    post:
+      tags: [Expenses]
+      summary: Importer des dépenses depuis un CSV
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import terminé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imported:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+  /budgets/{budgetId}/expenses/export-csv:
+    get:
+      tags: [Expenses]
+      summary: Exporter les dépenses en CSV
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Fichier CSV
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /expenses/{id}:
+    put:
+      tags: [Expenses]
+      summary: Modifier une dépense
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                budget_subcategory_id:
+                  type: integer
+                date:
+                  type: string
+                  format: date
+                label:
+                  type: string
+                amount_cents:
+                  type: integer
+                payment_method:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Dépense modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+
+    delete:
+      tags: [Expenses]
+      summary: Supprimer une dépense
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Dépense supprimée
+
+  /budgets/{budgetId}/stats/summary:
+    get:
+      tags: [Stats]
+      summary: Résumé statistique du budget
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Statistiques
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPlannedCents:
+                    type: integer
+                  totalActualCents:
+                    type: integer
+                  varianceCents:
+                    type: integer
+                  variancePercentage:
+                    type: number
+                    nullable: true
+                  expenseCount:
+                    type: integer
+
+  /budgets/{budgetId}/stats/by-category:
+    get:
+      tags: [Stats]
+      summary: Statistiques par catégorie
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Stats par catégorie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    plannedAmountCents:
+                      type: integer
+                    actualAmountCents:
+                      type: integer
+                    varianceCents:
+                      type: integer
+                    variancePercentage:
+                      type: number
+                      nullable: true
+                    expenseCount:
+                      type: integer
+
+  /budgets/{budgetId}/stats/by-subcategory:
+    get:
+      tags: [Stats]
+      summary: Statistiques par sous-catégorie
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Stats par sous-catégorie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /assets:
+    get:
+      tags: [Assets]
+      summary: Lister les actifs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [immobilier, épargne, investissement, autre]
+      responses:
+        '200':
+          description: Liste des actifs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+                  totalValueCents:
+                    type: integer
+
+    post:
+      tags: [Assets]
+      summary: Créer un actif
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, label, value_cents]
+              properties:
+                type:
+                  type: string
+                  enum: [immobilier, épargne, investissement, autre]
+                label:
+                  type: string
+                institution:
+                  type: string
+                value_cents:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Actif créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+
+  /assets/{id}:
+    get:
+      tags: [Assets]
+      summary: Obtenir un actif
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails de l'actif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+
+    put:
+      tags: [Assets]
+      summary: Modifier un actif
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                label:
+                  type: string
+                institution:
+                  type: string
+                value_cents:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Actif modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+
+    delete:
+      tags: [Assets]
+      summary: Supprimer un actif
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Actif supprimé
+
+  /savings:
+    get:
+      tags: [Savings]
+      summary: Lister les plans d'épargne
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Liste des plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavingsPlan'
+
+  /savings/{id}:
+    get:
+      tags: [Savings]
+      summary: Obtenir un plan d'épargne
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails du plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsPlan'
+
+    put:
+      tags: [Savings]
+      summary: Modifier un plan d'épargne
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planned_cents]
+              properties:
+                planned_cents:
+                  type: integer
+      responses:
+        '200':
+          description: Plan modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsPlan'
