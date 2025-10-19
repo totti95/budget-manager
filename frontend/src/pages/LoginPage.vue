@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4"
+  >
     <div class="max-w-md w-full">
       <div class="card">
         <h2 class="text-3xl font-bold text-center mb-6">Connexion</h2>
@@ -16,7 +18,9 @@
               :class="{ 'border-red-500': errors.email }"
               placeholder="votre@email.com"
             />
-            <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
+            <p v-if="errors.email" class="mt-1 text-sm text-red-600">
+              {{ errors.email }}
+            </p>
           </div>
 
           <div>
@@ -30,7 +34,9 @@
               :class="{ 'border-red-500': errors.password }"
               placeholder="••••••••"
             />
-            <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
+            <p v-if="errors.password" class="mt-1 text-sm text-red-600">
+              {{ errors.password }}
+            </p>
           </div>
 
           <div v-if="authStore.error" class="text-red-600 text-sm">
@@ -42,12 +48,19 @@
             :disabled="authStore.loading || isSubmitting"
             class="w-full btn btn-primary"
           >
-            {{ authStore.loading || isSubmitting ? 'Connexion...' : 'Se connecter' }}
+            {{
+              authStore.loading || isSubmitting
+                ? "Connexion..."
+                : "Se connecter"
+            }}
           </button>
         </form>
 
         <div class="mt-4 text-center text-sm">
-          <router-link to="/register" class="text-primary-600 hover:text-primary-700">
+          <router-link
+            to="/register"
+            class="text-primary-600 hover:text-primary-700"
+          >
             Pas encore de compte ? S'inscrire
           </router-link>
         </div>
@@ -63,28 +76,28 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import { loginSchema } from '@/schemas/auth'
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import { loginSchema } from "@/schemas/auth";
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
 const { errors, defineField, handleSubmit, isSubmitting } = useForm({
-  validationSchema: toTypedSchema(loginSchema)
-})
+  validationSchema: toTypedSchema(loginSchema),
+});
 
-const [email, emailAttrs] = defineField('email')
-const [password, passwordAttrs] = defineField('password')
+const [email, emailAttrs] = defineField("email");
+const [password, passwordAttrs] = defineField("password");
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await authStore.login(values)
-    router.push('/')
+    await authStore.login(values);
+    router.push("/");
   } catch (error) {
     // Error is already handled in the store
   }
-})
+});
 </script>

@@ -10,7 +10,9 @@
         class="input"
         :class="{ 'border-red-500': errors.date }"
       />
-      <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
+      <p v-if="errors.date" class="mt-1 text-sm text-red-600">
+        {{ errors.date }}
+      </p>
     </div>
 
     <!-- Catégorie -->
@@ -23,11 +25,18 @@
         :class="{ 'border-red-500': !selectedCategoryId && hasTriedSubmit }"
       >
         <option value="">Sélectionner une catégorie</option>
-        <option v-for="category in categories" :key="category.id" :value="category.id">
+        <option
+          v-for="category in categories"
+          :key="category.id"
+          :value="category.id"
+        >
           {{ category.name }}
         </option>
       </select>
-      <p v-if="!selectedCategoryId && hasTriedSubmit" class="mt-1 text-sm text-red-600">
+      <p
+        v-if="!selectedCategoryId && hasTriedSubmit"
+        class="mt-1 text-sm text-red-600"
+      >
         Veuillez sélectionner une catégorie
       </p>
     </div>
@@ -41,7 +50,11 @@
           @click="showNewSubcategoryInput = !showNewSubcategoryInput"
           class="text-sm text-blue-600 hover:text-blue-700"
         >
-          {{ showNewSubcategoryInput ? '↩ Choisir existante' : '+ Nouvelle sous-catégorie' }}
+          {{
+            showNewSubcategoryInput
+              ? "↩ Choisir existante"
+              : "+ Nouvelle sous-catégorie"
+          }}
         </button>
       </div>
 
@@ -63,7 +76,10 @@
             {{ subcategory.name }}
           </option>
         </select>
-        <p v-if="errors.budget_subcategory_id" class="mt-1 text-sm text-red-600">
+        <p
+          v-if="errors.budget_subcategory_id"
+          class="mt-1 text-sm text-red-600"
+        >
           {{ errors.budget_subcategory_id }}
         </p>
       </div>
@@ -93,7 +109,9 @@
         >
           Ajouter la sous-catégorie
         </button>
-        <p v-if="subcategoryError" class="text-sm text-red-600">{{ subcategoryError }}</p>
+        <p v-if="subcategoryError" class="text-sm text-red-600">
+          {{ subcategoryError }}
+        </p>
       </div>
     </div>
 
@@ -108,7 +126,9 @@
         :class="{ 'border-red-500': errors.label }"
         placeholder="Description de la dépense"
       />
-      <p v-if="errors.label" class="mt-1 text-sm text-red-600">{{ errors.label }}</p>
+      <p v-if="errors.label" class="mt-1 text-sm text-red-600">
+        {{ errors.label }}
+      </p>
     </div>
 
     <div>
@@ -124,11 +144,15 @@
         :class="{ 'border-red-500': errors.amount_cents }"
         placeholder="0.00"
       />
-      <p v-if="errors.amount_cents" class="mt-1 text-sm text-red-600">{{ errors.amount_cents }}</p>
+      <p v-if="errors.amount_cents" class="mt-1 text-sm text-red-600">
+        {{ errors.amount_cents }}
+      </p>
     </div>
 
     <div>
-      <label for="payment_method" class="label">Moyen de paiement (optionnel)</label>
+      <label for="payment_method" class="label"
+        >Moyen de paiement (optionnel)</label
+      >
       <select
         id="payment_method"
         v-model="paymentMethod"
@@ -163,7 +187,13 @@
         :disabled="isSubmitting || isCreatingSubcategory"
         class="flex-1 btn btn-primary"
       >
-        {{ isSubmitting ? 'Enregistrement...' : (expense ? 'Modifier' : 'Ajouter la dépense') }}
+        {{
+          isSubmitting
+            ? "Enregistrement..."
+            : expense
+              ? "Modifier"
+              : "Ajouter la dépense"
+        }}
       </button>
       <button
         v-if="onCancel"
@@ -178,124 +208,137 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import { expenseSchema } from '@/schemas/expense'
-import type { Expense, BudgetCategory } from '@/types'
-import apiClient from '@/api/axios'
+import { computed, ref, watch } from "vue";
+import { useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import { expenseSchema } from "@/schemas/expense";
+import type { Expense, BudgetCategory } from "@/types";
+import apiClient from "@/api/axios";
 
 interface Props {
-  expense?: Expense
-  categories: BudgetCategory[]
-  budgetId?: number
-  onCancel?: () => void
+  expense?: Expense;
+  categories: BudgetCategory[];
+  budgetId?: number;
+  onCancel?: () => void;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  submit: [values: {
-    budget_subcategory_id: number
-    date: string
-    label: string
-    amount_cents: number
-    payment_method?: string
-    notes?: string
-  }]
-  categoryUpdated: []
-}>()
+  submit: [
+    values: {
+      budget_subcategory_id: number;
+      date: string;
+      label: string;
+      amount_cents: number;
+      payment_method?: string;
+      notes?: string;
+    },
+  ];
+  categoryUpdated: [];
+}>();
 
 // State
-const selectedCategoryId = ref<number | ''>('')
-const showNewSubcategoryInput = ref(false)
-const newSubcategoryName = ref('')
-const newSubcategoryAmount = ref(0)
-const hasTriedSubmit = ref(false)
-const subcategoryError = ref('')
-const isCreatingSubcategory = ref(false)
+const selectedCategoryId = ref<number | "">("");
+const showNewSubcategoryInput = ref(false);
+const newSubcategoryName = ref("");
+const newSubcategoryAmount = ref(0);
+const hasTriedSubmit = ref(false);
+const subcategoryError = ref("");
+const isCreatingSubcategory = ref(false);
 
 // Convert euros to cents
-const amountToCents = (value: number) => Math.round(value * 100)
-const centsToAmount = (cents: number) => cents / 100
+const amountToCents = (value: number) => Math.round(value * 100);
+const centsToAmount = (cents: number) => cents / 100;
 
-const { errors, defineField, handleSubmit, isSubmitting, setFieldValue } = useForm({
+const { errors, defineField, handleSubmit, isSubmitting } = useForm({
   validationSchema: toTypedSchema(expenseSchema),
-  initialValues: props.expense ? {
-    budget_subcategory_id: props.expense.budgetSubcategoryId,
-    date: props.expense.date,
-    label: props.expense.label,
-    amount_cents: props.expense.amountCents,
-    payment_method: props.expense.paymentMethod || '',
-    notes: props.expense.notes || ''
-  } : {
-    date: new Date().toISOString().split('T')[0],
-    budget_subcategory_id: '',
-    label: '',
-    amount_cents: 0,
-    payment_method: '',
-    notes: ''
-  }
-})
+  initialValues: props.expense
+    ? {
+        budget_subcategory_id: props.expense.budgetSubcategoryId,
+        date: props.expense.date,
+        label: props.expense.label,
+        amount_cents: props.expense.amountCents,
+        payment_method: props.expense.paymentMethod || "",
+        notes: props.expense.notes || "",
+      }
+    : {
+        date: new Date().toISOString().split("T")[0],
+        budget_subcategory_id: "",
+        label: "",
+        amount_cents: 0,
+        payment_method: "",
+        notes: "",
+      },
+});
 
-const [date, dateAttrs] = defineField('date')
-const [budgetSubcategoryId, budgetSubcategoryIdAttrs] = defineField('budget_subcategory_id')
-const [label, labelAttrs] = defineField('label')
-const [paymentMethod, paymentMethodAttrs] = defineField('payment_method')
-const [notes, notesAttrs] = defineField('notes')
+const [date, dateAttrs] = defineField("date");
+const [budgetSubcategoryId, budgetSubcategoryIdAttrs] = defineField(
+  "budget_subcategory_id",
+);
+const [label, labelAttrs] = defineField("label");
+const [paymentMethod, paymentMethodAttrs] = defineField("payment_method");
+const [notes, notesAttrs] = defineField("notes");
 
 // Handle amount separately to convert between euros and cents
-const [amountCents, amountAttrs] = defineField('amount_cents')
+const [amountCents, amountAttrs] = defineField("amount_cents");
 const amount = computed({
-  get: () => amountCents.value ? centsToAmount(amountCents.value as number) : 0,
+  get: () =>
+    amountCents.value ? centsToAmount(amountCents.value as number) : 0,
   set: (value) => {
-    amountCents.value = amountToCents(Number(value))
-  }
-})
+    amountCents.value = amountToCents(Number(value));
+  },
+});
 
 // Computed: Sous-catégories disponibles pour la catégorie sélectionnée
 const availableSubcategories = computed(() => {
-  if (!selectedCategoryId.value) return []
-  const category = props.categories.find(c => c.id === selectedCategoryId.value)
-  return category?.subcategories || []
-})
+  if (!selectedCategoryId.value) return [];
+  const category = props.categories.find(
+    (c) => c.id === selectedCategoryId.value,
+  );
+  return category?.subcategories || [];
+});
 
 // Si édition, pré-sélectionner la catégorie
-watch(() => props.expense, (expense) => {
-  if (expense) {
-    const category = props.categories.find(c =>
-      c.subcategories?.some(s => s.id === expense.budgetSubcategoryId)
-    )
-    if (category) {
-      selectedCategoryId.value = category.id
+watch(
+  () => props.expense,
+  (expense) => {
+    if (expense) {
+      const category = props.categories.find((c) =>
+        c.subcategories?.some((s) => s.id === expense.budgetSubcategoryId),
+      );
+      if (category) {
+        selectedCategoryId.value = category.id;
+      }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+);
 
 // Reset subcategory quand on change de catégorie
 watch(selectedCategoryId, () => {
   if (!props.expense) {
-    budgetSubcategoryId.value = ''
+    budgetSubcategoryId.value = "";
   }
-  showNewSubcategoryInput.value = false
-  newSubcategoryName.value = ''
-  newSubcategoryAmount.value = 0
-  subcategoryError.value = ''
-})
+  showNewSubcategoryInput.value = false;
+  newSubcategoryName.value = "";
+  newSubcategoryAmount.value = 0;
+  subcategoryError.value = "";
+});
 
 // Ajouter une nouvelle sous-catégorie
 async function addNewSubcategory() {
   if (!newSubcategoryName.value || newSubcategoryAmount.value <= 0) {
-    subcategoryError.value = 'Nom et montant requis'
-    return
+    subcategoryError.value = "Nom et montant requis";
+    return;
   }
 
   if (!selectedCategoryId.value || !props.budgetId) {
-    subcategoryError.value = 'Catégorie ou budget manquant'
-    return
+    subcategoryError.value = "Catégorie ou budget manquant";
+    return;
   }
 
-  isCreatingSubcategory.value = true
-  subcategoryError.value = ''
+  isCreatingSubcategory.value = true;
+  subcategoryError.value = "";
 
   try {
     const response = await apiClient.post(
@@ -303,34 +346,34 @@ async function addNewSubcategory() {
       {
         name: newSubcategoryName.value,
         planned_amount_cents: Math.round(newSubcategoryAmount.value * 100),
-        sort_order: availableSubcategories.value.length
-      }
-    )
+        sort_order: availableSubcategories.value.length,
+      },
+    );
 
     // Informer le parent que les catégories ont changé
-    emit('categoryUpdated')
+    emit("categoryUpdated");
 
     // Sélectionner automatiquement la nouvelle sous-catégorie
-    budgetSubcategoryId.value = response.data.id
+    budgetSubcategoryId.value = response.data.id;
 
     // Reset et retour au mode sélection
-    newSubcategoryName.value = ''
-    newSubcategoryAmount.value = 0
-    showNewSubcategoryInput.value = false
-  } catch (error: any) {
-    subcategoryError.value = error.response?.data?.message || 'Erreur lors de la création'
+    newSubcategoryName.value = "";
+    newSubcategoryAmount.value = 0;
+    showNewSubcategoryInput.value = false;
+  } catch (error) {
+    subcategoryError.value = "Erreur lors de la création";
   } finally {
-    isCreatingSubcategory.value = false
+    isCreatingSubcategory.value = false;
   }
 }
 
 const onSubmit = handleSubmit((values) => {
-  hasTriedSubmit.value = true
+  hasTriedSubmit.value = true;
   if (!selectedCategoryId.value) {
-    return
+    return;
   }
-  emit('submit', values)
-})
+  emit("submit", values);
+});
 </script>
 
 <style scoped>

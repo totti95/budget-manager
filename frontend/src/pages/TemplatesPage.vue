@@ -8,11 +8,17 @@
     </div>
 
     <!-- Liste des templates -->
-    <div v-if="templateStore.loading && !showCreateForm" class="text-center py-12">
+    <div
+      v-if="templateStore.loading && !showCreateForm"
+      class="text-center py-12"
+    >
       <p>Chargement...</p>
     </div>
 
-    <div v-else-if="templateStore.templates.length === 0 && !showCreateForm" class="card text-center py-12">
+    <div
+      v-else-if="templateStore.templates.length === 0 && !showCreateForm"
+      class="card text-center py-12"
+    >
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Vous n'avez pas encore de template de budget.
       </p>
@@ -23,15 +29,20 @@
 
     <div v-else class="space-y-4">
       <!-- Formulaire de création/édition -->
-      <div v-if="showCreateForm || editingTemplate" class="card bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800">
+      <div
+        v-if="showCreateForm || editingTemplate"
+        class="card bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800"
+      >
         <h2 class="text-xl font-bold mb-4">
-          {{ editingTemplate ? 'Modifier le template' : 'Nouveau template' }}
+          {{ editingTemplate ? "Modifier le template" : "Nouveau template" }}
         </h2>
 
         <form @submit.prevent="handleSubmit">
           <!-- Nom du template -->
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Nom du template</label>
+            <label class="block text-sm font-medium mb-2"
+              >Nom du template</label
+            >
             <input
               v-model="formData.name"
               type="text"
@@ -66,11 +77,18 @@
               </button>
             </div>
 
-            <p v-if="formData.categories.length === 0" class="text-sm text-gray-500 italic py-4 text-center">
+            <p
+              v-if="formData.categories.length === 0"
+              class="text-sm text-gray-500 italic py-4 text-center"
+            >
               Cliquez sur "+ Ajouter une catégorie" pour commencer
             </p>
 
-            <div v-for="(category, catIndex) in formData.categories" :key="catIndex" class="mb-4 p-4 bg-white dark:bg-gray-800 rounded border">
+            <div
+              v-for="(category, catIndex) in formData.categories"
+              :key="catIndex"
+              class="mb-4 p-4 bg-white dark:bg-gray-800 rounded border"
+            >
               <div class="flex gap-3 mb-3">
                 <input
                   v-model="category.name"
@@ -108,7 +126,11 @@
                   + Ajouter une sous-catégorie
                 </button>
 
-                <div v-for="(subcategory, subIndex) in category.subcategories" :key="subIndex" class="flex gap-2 mb-2">
+                <div
+                  v-for="(subcategory, subIndex) in category.subcategories"
+                  :key="subIndex"
+                  class="flex gap-2 mb-2"
+                >
                   <input
                     v-model="subcategory.name"
                     type="text"
@@ -140,14 +162,14 @@
 
           <!-- Actions -->
           <div class="flex gap-3">
-            <button type="submit" class="btn btn-primary" :disabled="templateStore.loading">
-              {{ editingTemplate ? 'Mettre à jour' : 'Créer le template' }}
-            </button>
             <button
-              type="button"
-              @click="cancelForm"
-              class="btn btn-secondary"
+              type="submit"
+              class="btn btn-primary"
+              :disabled="templateStore.loading"
             >
+              {{ editingTemplate ? "Mettre à jour" : "Créer le template" }}
+            </button>
+            <button type="button" @click="cancelForm" class="btn btn-secondary">
               Annuler
             </button>
           </div>
@@ -155,12 +177,19 @@
       </div>
 
       <!-- Templates existants -->
-      <div v-for="template in templateStore.templates" :key="template.id" class="card">
+      <div
+        v-for="template in templateStore.templates"
+        :key="template.id"
+        class="card"
+      >
         <div class="flex justify-between items-start mb-4">
           <div>
             <h3 class="text-xl font-bold flex items-center gap-2">
               {{ template.name }}
-              <span v-if="template.isDefault" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+              <span
+                v-if="template.isDefault"
+                class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded"
+              >
                 Par défaut
               </span>
             </h3>
@@ -195,22 +224,37 @@
         </div>
 
         <!-- Détails des catégories -->
-        <div v-if="template.categories && template.categories.length > 0" class="mt-4">
-          <div v-for="category in template.categories" :key="category.id" class="mb-3">
+        <div
+          v-if="template.categories && template.categories.length > 0"
+          class="mt-4"
+        >
+          <div
+            v-for="category in template.categories"
+            :key="category.id"
+            class="mb-3"
+          >
             <div class="flex justify-between items-center py-2 border-b">
               <span class="font-medium">{{ category.name }}</span>
               <span class="text-gray-600">
                 {{ (category.plannedAmountCents / 100).toFixed(2) }} €
               </span>
             </div>
-            <div v-if="category.subcategories && category.subcategories.length > 0" class="ml-4 mt-2">
+            <div
+              v-if="category.subcategories && category.subcategories.length > 0"
+              class="ml-4 mt-2"
+            >
               <div
                 v-for="subcategory in category.subcategories"
                 :key="subcategory.id"
                 class="flex justify-between py-1 text-sm text-gray-600 dark:text-gray-400"
               >
                 <span>{{ subcategory.name }}</span>
-                <span>{{ (subcategory.plannedAmountCents / 100).toFixed(2) }} €</span>
+                <span
+                  >{{
+                    (subcategory.plannedAmountCents / 100).toFixed(2)
+                  }}
+                  €</span
+                >
               </div>
             </div>
           </div>
@@ -221,73 +265,73 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
-import { useTemplateStore } from '@/stores/template'
-import type { BudgetTemplate } from '@/types'
+import { ref, onMounted, reactive } from "vue";
+import { useTemplateStore } from "@/stores/template";
+import type { BudgetTemplate } from "@/types";
 
-const templateStore = useTemplateStore()
+const templateStore = useTemplateStore();
 
-const showCreateForm = ref(false)
-const editingTemplate = ref<BudgetTemplate | null>(null)
+const showCreateForm = ref(false);
+const editingTemplate = ref<BudgetTemplate | null>(null);
 
 interface FormCategory {
-  id?: number // ID présent lors de l'édition
-  name: string
-  plannedAmountCents: number
-  sortOrder?: number
+  id?: number; // ID présent lors de l'édition
+  name: string;
+  plannedAmountCents: number;
+  sortOrder?: number;
   subcategories: Array<{
-    id?: number // ID présent lors de l'édition
-    name: string
-    plannedAmountCents: number
-    sortOrder?: number
-  }>
+    id?: number; // ID présent lors de l'édition
+    name: string;
+    plannedAmountCents: number;
+    sortOrder?: number;
+  }>;
 }
 
 const formData = reactive<{
-  name: string
-  isDefault: boolean
-  categories: FormCategory[]
+  name: string;
+  isDefault: boolean;
+  categories: FormCategory[];
 }>({
-  name: '',
+  name: "",
   isDefault: false,
-  categories: []
-})
+  categories: [],
+});
 
 function resetForm() {
-  formData.name = ''
-  formData.isDefault = false
-  formData.categories = []
+  formData.name = "";
+  formData.isDefault = false;
+  formData.categories = [];
 }
 
 function openCreateForm() {
-  showCreateForm.value = true
+  showCreateForm.value = true;
   // Ajouter une catégorie par défaut pour guider l'utilisateur
   if (formData.categories.length === 0) {
-    addCategory()
+    addCategory();
   }
 }
 
 function addCategory() {
   formData.categories.push({
-    name: '',
+    name: "",
     plannedAmountCents: 0,
-    subcategories: []
-  })
+    subcategories: [],
+  });
 }
 
 function removeCategory(index: number) {
-  formData.categories.splice(index, 1)
+  formData.categories.splice(index, 1);
 }
 
 function addSubcategory(categoryIndex: number) {
   formData.categories[categoryIndex].subcategories.push({
-    name: '',
-    plannedAmountCents: 0
-  })
+    name: "",
+    plannedAmountCents: 0,
+  });
 }
 
 function removeSubcategory(categoryIndex: number, subcategoryIndex: number) {
-  formData.categories[categoryIndex].subcategories.splice(subcategoryIndex, 1)
+  formData.categories[categoryIndex].subcategories.splice(subcategoryIndex, 1);
 }
 
 async function handleSubmit() {
@@ -297,34 +341,34 @@ async function handleSubmit() {
       await templateStore.updateTemplate(editingTemplate.value.id, {
         name: formData.name,
         isDefault: formData.isDefault,
-        categories: formData.categories
-      })
+        categories: formData.categories,
+      });
     } else {
       // Mode création
       await templateStore.createTemplate({
         name: formData.name,
         isDefault: formData.isDefault,
-        categories: formData.categories
-      })
+        categories: formData.categories,
+      });
     }
 
-    cancelForm()
-    await templateStore.fetchTemplates()
+    cancelForm();
+    await templateStore.fetchTemplates();
   } catch (error) {
-    console.error('Erreur lors de la soumission:', error)
+    console.error("Erreur lors de la soumission:", error);
   }
 }
 
 function cancelForm() {
-  showCreateForm.value = false
-  editingTemplate.value = null
-  resetForm()
+  showCreateForm.value = false;
+  editingTemplate.value = null;
+  resetForm();
 }
 
 function startEdit(template: BudgetTemplate) {
-  editingTemplate.value = template
-  formData.name = template.name
-  formData.isDefault = template.isDefault
+  editingTemplate.value = template;
+  formData.name = template.name;
+  formData.isDefault = template.isDefault;
 
   // Charger les catégories existantes pour édition
   formData.categories = (template.categories || []).map((cat) => ({
@@ -336,36 +380,40 @@ function startEdit(template: BudgetTemplate) {
       id: sub.id,
       name: sub.name,
       plannedAmountCents: sub.plannedAmountCents,
-      sortOrder: sub.sortOrder
-    }))
-  }))
+      sortOrder: sub.sortOrder,
+    })),
+  }));
 
-  showCreateForm.value = false
+  showCreateForm.value = false;
 }
 
 async function handleSetDefault(id: number) {
-  if (confirm('Définir ce template comme défaut ?')) {
+  if (confirm("Définir ce template comme défaut ?")) {
     try {
-      await templateStore.setDefaultTemplate(id)
+      await templateStore.setDefaultTemplate(id);
     } catch (error) {
-      console.error('Erreur:', error)
+      console.error("Erreur:", error);
     }
   }
 }
 
 async function handleDelete(id: number, name: string) {
-  if (confirm(`Supprimer le template "${name}" ?\n\nCette action est irréversible.`)) {
+  if (
+    confirm(
+      `Supprimer le template "${name}" ?\n\nCette action est irréversible.`,
+    )
+  ) {
     try {
-      await templateStore.deleteTemplate(id)
+      await templateStore.deleteTemplate(id);
     } catch (error) {
-      console.error('Erreur:', error)
+      console.error("Erreur:", error);
     }
   }
 }
 
 onMounted(async () => {
-  await templateStore.fetchTemplates()
-})
+  await templateStore.fetchTemplates();
+});
 </script>
 
 <style scoped>

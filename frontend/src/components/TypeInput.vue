@@ -28,7 +28,7 @@
         @mousedown.prevent="selectSuggestion(suggestion)"
         class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
         :class="{
-          'bg-gray-100 dark:bg-gray-700': index === highlightedIndex
+          'bg-gray-100 dark:bg-gray-700': index === highlightedIndex,
         }"
       >
         {{ formatType(suggestion) }}
@@ -38,82 +38,86 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch } from "vue";
 
 interface Props {
-  modelValue: string
-  suggestions: string[]
-  inputClass?: string
+  modelValue: string;
+  suggestions: string[];
+  inputClass?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  inputClass: ''
-})
+  inputClass: "",
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
-}>()
+  "update:modelValue": [value: string];
+}>();
 
-const inputValue = ref(props.modelValue)
-const showSuggestions = ref(false)
-const highlightedIndex = ref(-1)
+const inputValue = ref(props.modelValue);
+const showSuggestions = ref(false);
+const highlightedIndex = ref(-1);
 
-watch(() => props.modelValue, (newValue) => {
-  inputValue.value = newValue
-})
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    inputValue.value = newValue;
+  },
+);
 
 const filteredSuggestions = computed(() => {
   if (!inputValue.value) {
-    return props.suggestions
+    return props.suggestions;
   }
-  const search = inputValue.value.toLowerCase()
-  return props.suggestions.filter(s =>
-    s.toLowerCase().includes(search)
-  )
-})
+  const search = inputValue.value.toLowerCase();
+  return props.suggestions.filter((s) => s.toLowerCase().includes(search));
+});
 
 function handleInput(event: Event) {
-  const value = (event.target as HTMLInputElement).value
-  inputValue.value = value
-  emit('update:modelValue', value)
-  showSuggestions.value = true
-  highlightedIndex.value = -1
+  const value = (event.target as HTMLInputElement).value;
+  inputValue.value = value;
+  emit("update:modelValue", value);
+  showSuggestions.value = true;
+  highlightedIndex.value = -1;
 }
 
 function selectSuggestion(suggestion: string) {
-  inputValue.value = suggestion
-  emit('update:modelValue', suggestion)
-  showSuggestions.value = false
-  highlightedIndex.value = -1
+  inputValue.value = suggestion;
+  emit("update:modelValue", suggestion);
+  showSuggestions.value = false;
+  highlightedIndex.value = -1;
 }
 
 function handleBlur() {
   // Delay to allow click on suggestion to register
   setTimeout(() => {
-    showSuggestions.value = false
-    highlightedIndex.value = -1
-  }, 200)
+    showSuggestions.value = false;
+    highlightedIndex.value = -1;
+  }, 200);
 }
 
 function navigateDown() {
   if (highlightedIndex.value < filteredSuggestions.value.length - 1) {
-    highlightedIndex.value++
+    highlightedIndex.value++;
   }
 }
 
 function navigateUp() {
   if (highlightedIndex.value > 0) {
-    highlightedIndex.value--
+    highlightedIndex.value--;
   }
 }
 
 function selectHighlighted() {
-  if (highlightedIndex.value >= 0 && highlightedIndex.value < filteredSuggestions.value.length) {
-    selectSuggestion(filteredSuggestions.value[highlightedIndex.value])
+  if (
+    highlightedIndex.value >= 0 &&
+    highlightedIndex.value < filteredSuggestions.value.length
+  ) {
+    selectSuggestion(filteredSuggestions.value[highlightedIndex.value]);
   }
 }
 
 function formatType(type: string): string {
-  return type.charAt(0).toUpperCase() + type.slice(1)
+  return type.charAt(0).toUpperCase() + type.slice(1);
 }
 </script>

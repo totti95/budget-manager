@@ -1,71 +1,71 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { authApi } from '@/api/auth'
-import type { User, LoginCredentials, RegisterData } from '@/types'
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import { authApi } from "@/api/auth";
+import type { User, LoginCredentials, RegisterData } from "@/types";
 
-export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
-  const token = ref<string | null>(localStorage.getItem('token'))
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+export const useAuthStore = defineStore("auth", () => {
+  const user = ref<User | null>(null);
+  const token = ref<string | null>(localStorage.getItem("token"));
+  const loading = ref(false);
+  const error = ref<string | null>(null);
 
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => !!token.value && !!user.value);
 
   async function register(data: RegisterData) {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      const response = await authApi.register(data)
-      token.value = response.token
-      user.value = response.user
-      localStorage.setItem('token', response.token)
-      return response
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de l\'inscription'
-      throw err
+      const response = await authApi.register(data);
+      token.value = response.token;
+      user.value = response.user;
+      localStorage.setItem("token", response.token);
+      return response;
+    } catch (err) {
+      error.value = "Erreur lors de l'inscription";
+      throw err;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function login(credentials: LoginCredentials) {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      const response = await authApi.login(credentials)
-      token.value = response.token
-      user.value = response.user
-      localStorage.setItem('token', response.token)
-      return response
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la connexion'
-      throw err
+      const response = await authApi.login(credentials);
+      token.value = response.token;
+      user.value = response.user;
+      localStorage.setItem("token", response.token);
+      return response;
+    } catch (err) {
+      error.value = "Erreur lors de la connexion";
+      throw err;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function fetchUser() {
-    if (!token.value) return
-    loading.value = true
+    if (!token.value) return;
+    loading.value = true;
     try {
-      user.value = await authApi.me()
+      user.value = await authApi.me();
     } catch (err) {
-      logout()
+      logout();
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function logout() {
     try {
       if (token.value) {
-        await authApi.logout()
+        await authApi.logout();
       }
     } finally {
-      token.value = null
-      user.value = null
-      localStorage.removeItem('token')
+      token.value = null;
+      user.value = null;
+      localStorage.removeItem("token");
     }
   }
 
@@ -78,6 +78,6 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     login,
     fetchUser,
-    logout
-  }
-})
+    logout,
+  };
+});

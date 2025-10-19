@@ -17,9 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
 
         $middleware->throttleApi('60,1');
+
+        // Convertir les requêtes entrantes de camelCase en snake_case
+        $middleware->append(\App\Http\Middleware\ConvertRequestToSnakeCase::class);
+
+        // Convertir toutes les réponses JSON en camelCase
+        $middleware->append(\App\Http\Middleware\ConvertResponseToCamelCase::class);
 
         // Logging structuré des requêtes HTTP
         $middleware->append(LogRequests::class);

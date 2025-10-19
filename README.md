@@ -12,29 +12,33 @@ Un outil web complet de gestion de budget personnel avec Laravel, Vue 3 et Docke
 - **Import/Export CSV** : Importez et exportez vos dépenses
 - **Statistiques & Graphiques** : Analysez vos finances avec des graphiques par catégorie
 - **Multi-utilisateurs** : Chaque utilisateur a ses propres budgets et données
+- **Système de rôles** : Administration avec gestion des utilisateurs et permissions
+- **Interface moderne** : Dark mode, composants réactifs, notifications toast, modales de confirmation
 
 ## 🛠️ Stack Technique
 
 ### Backend
 - **Laravel 11** (PHP 8.3)
-- **PostgreSQL 16**
-- **Redis** (cache & queues)
+- **MySQL 8.0**
 - **Laravel Sanctum** (authentication SPA)
+- **Middlewares** de conversion automatique camelCase ↔ snake_case
 - **Pest** (tests)
 
 ### Frontend
-- **Vue 3** avec TypeScript
+- **Vue 3** avec TypeScript (Composition API)
 - **Vite** (build tool)
 - **Pinia** (state management)
 - **Vue Router** (routing)
 - **TailwindCSS** (styling)
+- **VeeValidate + Zod** (validation de formulaires)
 - **Chart.js** (graphiques)
+- **ESLint + Prettier** (qualité de code)
 
 ### Infrastructure
 - **Docker & Docker Compose**
 - **Nginx**
 - **PHP-FPM**
-- **Mailhog** (emails en dev)
+- **phpMyAdmin** (gestion de base de données en dev)
 
 ## 📋 Prérequis
 
@@ -77,20 +81,28 @@ Une fois les services démarrés :
 
 - **Frontend (Vue)** : http://localhost:5173
 - **Backend API (Laravel)** : http://localhost:8080/api
-- **Mailhog** (emails) : http://localhost:8025
+- **phpMyAdmin** : http://localhost:8081
 
-## 👤 Compte de démonstration
+## 👤 Comptes de démonstration
 
-Utilisez ces identifiants pour vous connecter :
-
+### Compte utilisateur standard
 - **Email** : `demo@budgetmanager.local`
 - **Mot de passe** : `password`
 
-Le compte de démo contient :
+Le compte contient :
 - Un template de budget par défaut avec 7 catégories
 - 3 budgets mensuels (mois actuel + 2 précédents)
 - Des dépenses d'exemple dans chaque budget
 - 4 actifs patrimoniaux (comptes, épargne, immobilier)
+
+### Compte administrateur
+- **Email** : `admin@budgetmanager.local`
+- **Mot de passe** : `password`
+
+Accès aux fonctionnalités d'administration :
+- Gestion des utilisateurs (création, modification, désactivation)
+- Attribution des rôles (user/admin)
+- Changement de mot de passe utilisateur
 
 ## 📘 Commandes disponibles
 
@@ -122,9 +134,18 @@ make artisan CMD="route:list"
 make artisan CMD="cache:clear"
 ```
 
-### Commandes NPM
+### Commandes NPM (depuis le host ou dans le conteneur)
 
 ```bash
+# Dans le conteneur Node
+make shell-node
+npm run lint              # Vérifier le code avec ESLint
+npm run lint:fix          # Corriger automatiquement les erreurs ESLint
+npm run format            # Formater le code avec Prettier
+npm run type-check        # Vérifier les types TypeScript
+npm run build             # Build pour production
+
+# Via Make
 make npm CMD="install axios"
 make npm CMD="run build"
 ```
@@ -148,12 +169,14 @@ budget-manager/
 ├── frontend/                  # Vue 3 SPA
 │   ├── src/
 │   │   ├── api/              # Clients API
-│   │   ├── components/       # Composants Vue
+│   │   ├── components/       # Composants Vue (modales, formulaires, etc.)
+│   │   ├── composables/      # Composables Vue (useToast, useConfirm, etc.)
 │   │   ├── pages/            # Pages/Vues
 │   │   ├── router/           # Configuration router
 │   │   ├── stores/           # Stores Pinia
 │   │   ├── styles/           # Styles globaux
 │   │   └── types/            # Types TypeScript
+│   ├── .eslintrc.cjs         # Configuration ESLint
 │   ├── index.html
 │   └── package.json
 ├── docker/                    # Configuration Docker
@@ -163,6 +186,7 @@ budget-manager/
 │   └── php.ini
 ├── docker-compose.yml
 ├── Makefile
+├── CLAUDE.md                  # Documentation pour développement avec Claude Code
 └── README.md
 ```
 
@@ -171,6 +195,7 @@ budget-manager/
 ### Tables principales
 
 - **users** : Utilisateurs de l'application
+- **roles** : Rôles système (user, admin)
 - **budget_templates** : Templates de budget réutilisables
 - **template_categories** : Catégories dans un template
 - **template_subcategories** : Sous-catégories dans un template
@@ -183,11 +208,24 @@ budget-manager/
 
 ### Relations
 
+- Un utilisateur appartient à un rôle (role_id)
 - Un utilisateur a plusieurs templates et budgets
 - Un template a plusieurs catégories
 - Une catégorie a plusieurs sous-catégories
 - Un budget est généré depuis un template
 - Les dépenses sont liées à une sous-catégorie d'un budget
+
+### Architecture de conversion camelCase/snake_case
+
+Le projet utilise une architecture middleware pour gérer automatiquement la conversion entre les conventions de nommage :
+
+- **Frontend** : Utilise exclusivement **camelCase** (JavaScript/TypeScript convention)
+- **Backend** : Utilise exclusivement **snake_case** (PHP/Laravel convention)
+- **Conversion automatique** :
+  - `ConvertRequestToSnakeCase` : camelCase → snake_case pour les requêtes entrantes
+  - `ConvertResponseToCamelCase` : snake_case → camelCase pour les réponses sortantes
+
+Cela permet au frontend et au backend de suivre leurs conventions respectives sans conversion manuelle.
 
 ## 🔑 Fonctionnalités clés
 
@@ -253,6 +291,14 @@ Documentation complète disponible dans `backend/openapi.yaml`
 - `POST /api/auth/login` - Connexion
 - `GET /api/auth/me` - Utilisateur connecté
 - `POST /api/auth/logout` - Déconnexion
+
+#### Administration (admin uniquement)
+- `GET /api/admin/users` - Liste des utilisateurs avec filtres et pagination
+- `POST /api/admin/users` - Créer un utilisateur
+- `PUT /api/admin/users/{id}` - Modifier un utilisateur
+- `DELETE /api/admin/users/{id}` - Désactiver un utilisateur (soft delete)
+- `PUT /api/admin/users/{id}/password` - Changer le mot de passe
+- `GET /api/admin/roles` - Liste des rôles disponibles
 
 #### Templates
 - `GET /api/templates` - Liste des templates
@@ -359,6 +405,7 @@ Ce problème est normalement résolu. Si vous le rencontrez encore :
 ```bash
 cd frontend
 npm run type-check  # Vérifier les erreurs TypeScript
+npm run lint        # Vérifier les erreurs ESLint
 npm run build       # Build complet
 ```
 
@@ -380,20 +427,16 @@ Vérifier dans `backend/config/cors.php` :
 
 ### Erreur "Too many requests" (429)
 
-Le rate limiting est actif. Attendre 1 minute ou augmenter les limites dans `backend/app/Providers/RouteServiceProvider.php`
+Le rate limiting est actif. Attendre 1 minute ou augmenter les limites dans `backend/bootstrap/app.php`
 
-### Mailhog ne reçoit pas les emails
+### Accès à la base de données
 
-```bash
-# Vérifier que Mailhog tourne
-docker compose ps mailhog
-
-# Vérifier les logs
-docker compose logs mailhog
-
-# Redémarrer le service
-docker compose restart mailhog
-```
+Utilisez phpMyAdmin pour explorer la base de données :
+- URL : http://localhost:8081
+- Serveur : `mysql`
+- Utilisateur : `budget_user`
+- Mot de passe : `budget_password`
+- Base de données : `budget_manager`
 
 ## 📝 Développement
 
@@ -415,10 +458,17 @@ docker compose restart mailhog
 
 ### Conventions de code
 
-- **PHP** : PSR-12
-- **JavaScript/TypeScript** : ESLint + Prettier
+- **PHP** : PSR-12, snake_case pour les noms de variables/colonnes
+- **JavaScript/TypeScript** : ESLint + Prettier, camelCase pour les variables
+- **Vue 3** : Composition API avec `<script setup>`, TypeScript strict
+- **Validation** : VeeValidate + Zod pour les formulaires
 - **Commits** : Messages en français, clairs et descriptifs
 - **Branches** : `feature/nom-fonctionnalite`, `fix/nom-bug`
+
+### Ressources pour le développement
+
+- **CLAUDE.md** : Documentation détaillée pour le développement avec Claude Code (patterns, conventions, commandes courantes)
+- **DONNEES_TEST.md** : Guide complet pour la gestion des données de test
 
 ## 🚀 Déploiement en production
 
@@ -460,13 +510,22 @@ Pour toute question ou problème :
 
 ## 🎉 Scénario de test rapide
 
-1. Se connecter avec le compte démo
+### En tant qu'utilisateur
+1. Se connecter avec `demo@budgetmanager.local` / `password`
 2. Voir le tableau de bord avec les statistiques du mois
 3. Générer un budget pour le mois suivant
 4. Ajouter une dépense dans une catégorie
 5. Voir la variance se mettre à jour
 6. Aller dans "Patrimoine" pour voir vos actifs
 7. Consulter les templates pour comprendre la structure
+
+### En tant qu'administrateur
+1. Se connecter avec `admin@budgetmanager.local` / `password`
+2. Accéder à la page "Gestion des utilisateurs" dans le menu
+3. Créer un nouvel utilisateur (un mot de passe sera généré automatiquement)
+4. Modifier le rôle d'un utilisateur (user ↔ admin)
+5. Changer le mot de passe d'un utilisateur
+6. Désactiver un utilisateur (soft delete)
 
 ---
 

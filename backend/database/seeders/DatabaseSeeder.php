@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Role;
 use App\Models\BudgetTemplate;
 use App\Models\Budget;
 use App\Models\Asset;
@@ -15,11 +16,33 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Récupérer les rôles (créés par la migration)
+        $userRole = Role::where('label', Role::USER)->first();
+        $adminRole = Role::where('label', Role::ADMIN)->first();
+
+        // Create admin user
+        $admin = User::create([
+            'name' => 'Administrateur',
+            'email' => 'admin@budgetmanager.local',
+            'password' => Hash::make('admin123'),
+            'role_id' => $adminRole->id,
+        ]);
+
+        $this->command->info('');
+        $this->command->info('===========================================');
+        $this->command->info('  Compte administrateur créé avec succès  ');
+        $this->command->info('===========================================');
+        $this->command->info('  Email    : admin@budgetmanager.local');
+        $this->command->info('  Password : admin123');
+        $this->command->info('===========================================');
+        $this->command->info('');
+
         // Create demo user
         $user = User::create([
             'name' => 'Demo User',
             'email' => 'demo@budgetmanager.local',
             'password' => Hash::make('password'),
+            'role_id' => $userRole->id,
         ]);
 
         // Create default budget template

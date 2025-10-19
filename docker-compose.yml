@@ -21,9 +21,9 @@ services:
       - ./backend:/var/www/html
       - ./docker/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=postgres
-      - DB_PORT=5432
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
       - DB_DATABASE=budget_manager
       - DB_USERNAME=budget_user
       - DB_PASSWORD=budget_pass
@@ -32,7 +32,7 @@ services:
       - MAIL_HOST=mailhog
       - MAIL_PORT=1025
     depends_on:
-      - postgres
+      - mysql
       - redis
     networks:
       - budget_network
@@ -50,17 +50,19 @@ services:
     networks:
       - budget_network
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: budget_postgres
+  mysql:
+    image: mysql:8.0
+    container_name: budget_mysql
     environment:
-      - POSTGRES_DB=budget_manager
-      - POSTGRES_USER=budget_user
-      - POSTGRES_PASSWORD=budget_pass
+      - MYSQL_DATABASE=budget_manager
+      - MYSQL_USER=budget_user
+      - MYSQL_PASSWORD=budget_pass
+      - MYSQL_ROOT_PASSWORD=root_pass
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
     networks:
       - budget_network
 
@@ -83,22 +85,27 @@ services:
     networks:
       - budget_network
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: budget_pgadmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: budget_phpmyadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-      - PGADMIN_CONFIG_WTF_CSRF_CHECK_DEFAULT=False
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root_pass
+      - PMA_ARBITRARY=0
+      - UPLOAD_LIMIT=50M
     ports:
-      - "5050:80"
+      - "8081:80"
     depends_on:
-      - postgres
+      - mysql
     networks:
       - budget_network
+    volumes:
+      - ./docker/phpmyadmin-config.php:/etc/phpmyadmin/config.user.inc.php:ro
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:
 
 networks:

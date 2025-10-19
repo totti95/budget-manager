@@ -10,6 +10,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\AdminUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,4 +86,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('savings', [SavingsPlanController::class, 'index']);
     Route::get('savings/{savingsPlan}', [SavingsPlanController::class, 'show']);
     Route::put('savings/{savingsPlan}', [SavingsPlanController::class, 'update']);
+});
+
+// Admin routes
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('users', [AdminUserController::class, 'index']);
+    Route::post('users', [AdminUserController::class, 'store']);
+    Route::put('users/{user}', [AdminUserController::class, 'update']);
+    Route::put('users/{user}/password', [AdminUserController::class, 'updatePassword']);
+    Route::delete('users/{user}', [AdminUserController::class, 'destroy']);
 });

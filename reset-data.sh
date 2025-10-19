@@ -61,15 +61,17 @@ case "${1:-help}" in
     echo "=== Nombre d'enregistrements ==="
     echo ""
     echo -n "👤 Users      : "
-    docker compose exec postgres psql -U budget_user -d budget_manager -t -c "SELECT COUNT(*) FROM users;" 2>/dev/null | xargs || echo "Erreur"
+    docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -sN -e "SELECT COUNT(*) FROM users;" 2>/dev/null || echo "Erreur"
     echo -n "📋 Templates  : "
-    docker compose exec postgres psql -U budget_user -d budget_manager -t -c "SELECT COUNT(*) FROM budget_templates;" 2>/dev/null | xargs || echo "Erreur"
+    docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -sN -e "SELECT COUNT(*) FROM budget_templates;" 2>/dev/null || echo "Erreur"
     echo -n "📅 Budgets    : "
-    docker compose exec postgres psql -U budget_user -d budget_manager -t -c "SELECT COUNT(*) FROM budgets;" 2>/dev/null | xargs || echo "Erreur"
+    docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -sN -e "SELECT COUNT(*) FROM budgets;" 2>/dev/null || echo "Erreur"
     echo -n "💸 Expenses   : "
-    docker compose exec postgres psql -U budget_user -d budget_manager -t -c "SELECT COUNT(*) FROM expenses;" 2>/dev/null | xargs || echo "Erreur"
+    docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -sN -e "SELECT COUNT(*) FROM expenses;" 2>/dev/null || echo "Erreur"
     echo -n "💰 Assets     : "
-    docker compose exec postgres psql -U budget_user -d budget_manager -t -c "SELECT COUNT(*) FROM assets;" 2>/dev/null | xargs || echo "Erreur"
+    docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -sN -e "SELECT COUNT(*) FROM assets;" 2>/dev/null || echo "Erreur"
+    echo ""
+    echo "💡 Vous pouvez aussi consulter les données sur phpMyAdmin : http://localhost:8081"
     echo ""
     ;;
 
@@ -77,7 +79,7 @@ case "${1:-help}" in
     BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
     echo "💾 Création d'un backup : $BACKUP_FILE"
     echo ""
-    docker compose exec postgres pg_dump -U budget_user budget_manager > "$BACKUP_FILE"
+    docker compose exec mysql mysqldump -u budget_user -pbudget_pass budget_manager > "$BACKUP_FILE"
     echo ""
     echo "✅ Backup créé : $BACKUP_FILE"
     echo "💡 Pour restaurer : ./reset-data.sh restore $BACKUP_FILE"
@@ -98,7 +100,7 @@ case "${1:-help}" in
     read -p "⚠️  Cela écrasera les données actuelles. Continuer ? [y/N] " -n 1 -r
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-      docker compose exec -T postgres psql -U budget_user -d budget_manager < "$2"
+      docker compose exec -T mysql mysql -u budget_user -pbudget_pass budget_manager < "$2"
       echo ""
       echo "✅ Backup restauré"
     else
