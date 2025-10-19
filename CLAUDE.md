@@ -166,7 +166,6 @@ curl http://localhost:8080/api/auth/login \
 
   // Response will have camelCase
   const user: User = response.data;
-  console.log(user.roleId, user.createdAt);
   ```
 
 ### Money Handling

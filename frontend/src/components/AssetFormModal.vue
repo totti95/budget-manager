@@ -91,7 +91,6 @@
             v-model="value"
             v-bind="valueAttrs"
             type="number"
-
             min="0"
             class="input"
             :class="{ 'border-red-500': errors.value_cents }"
@@ -194,35 +193,36 @@ onMounted(() => {
   loadTypes();
 });
 
-// Watch for modal opening to refresh types
+// Watch for modal opening to refresh types and reset form
 watch(
   () => props.isOpen,
   (isOpen) => {
     if (isOpen) {
       loadTypes();
+      // Reset form with asset data if editing, or empty if creating
+      if (props.asset) {
+        resetForm({
+          values: {
+            type: props.asset.type,
+            label: props.asset.label,
+            institution: props.asset.institution || "",
+            value_cents: props.asset.valueCents,
+            notes: props.asset.notes || "",
+          },
+        });
+      } else {
+        resetForm({
+          values: {
+            type: "",
+            label: "",
+            institution: "",
+            value_cents: 0,
+            notes: "",
+          },
+        });
+      }
     }
   },
-);
-
-// Watch for asset changes to update form
-watch(
-  () => props.asset,
-  (newAsset) => {
-    if (newAsset) {
-      resetForm({
-        values: {
-          type: newAsset.type,
-          label: newAsset.label,
-          institution: newAsset.institution || "",
-          value_cents: newAsset.valueCents,
-          notes: newAsset.notes || "",
-        },
-      });
-    } else {
-      resetForm();
-    }
-  },
-  { immediate: true },
 );
 
 const [type, _typeAttrs] = defineField("type");

@@ -48,8 +48,14 @@ export const usersApi = {
   },
 
   async delete(id: number): Promise<void> {
-    console.log("Deleting user with id API:", id);
     await api.delete(`/admin/users/${id}`);
+  },
+
+  async restore(id: number): Promise<User> {
+    const response = await api.put<{ user: User; message: string }>(
+      `/admin/users/${id}/restore`,
+    );
+    return response.data.user;
   },
 };
 

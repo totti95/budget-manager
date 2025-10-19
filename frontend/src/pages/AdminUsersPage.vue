@@ -27,6 +27,7 @@
         class="px-4 py-2 border rounded-lg"
         @change="handleFilterChange"
       >
+        <option value="">Tous les statuts</option>
         <option value="active">Actifs</option>
         <option value="deleted">Désactivés</option>
       </select>
@@ -85,7 +86,11 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <tr v-for="user in usersStore.users" :key="user.id">
+          <tr
+            v-for="user in usersStore.users"
+            :key="user.id"
+            :class="{ 'opacity-60': user.deletedAt }"
+          >
             <td class="px-6 py-4">{{ user.name }}</td>
             <td class="px-6 py-4">{{ user.email }}</td>
             <td class="px-6 py-4">
@@ -108,24 +113,36 @@
               {{ new Date(user.createdAt).toLocaleDateString("fr-FR") }}
             </td>
             <td class="px-6 py-4 space-x-2">
-              <button
-                @click="openEditModal(user)"
-                class="text-blue-600 hover:text-blue-800"
-              >
-                Modifier
-              </button>
-              <button
-                @click="openPasswordModal(user)"
-                class="text-green-600 hover:text-green-800"
-              >
-                Mot de passe
-              </button>
-              <button
-                @click="confirmDelete(user)"
-                class="text-red-600 hover:text-red-800"
-              >
-                Désactiver
-              </button>
+              <template v-if="user.deletedAt">
+                <!-- Utilisateur désactivé : afficher bouton Réactiver -->
+                <button
+                  @click="confirmRestore(user)"
+                  class="text-green-600 hover:text-green-800"
+                >
+                  Réactiver
+                </button>
+              </template>
+              <template v-else>
+                <!-- Utilisateur actif : afficher boutons normaux -->
+                <button
+                  @click="openEditModal(user)"
+                  class="text-blue-600 hover:text-blue-800"
+                >
+                  Modifier
+                </button>
+                <button
+                  @click="openPasswordModal(user)"
+                  class="text-green-600 hover:text-green-800"
+                >
+                  Mot de passe
+                </button>
+                <button
+                  @click="confirmDelete(user)"
+                  class="text-red-600 hover:text-red-800"
+                >
+                  Désactiver
+                </button>
+              </template>
             </td>
           </tr>
         </tbody>
@@ -464,6 +481,29 @@ const confirmDelete = async (user: User) => {
   try {
     await usersStore.deleteUser(user.id);
     toast.success("Utilisateur désactivé avec succès");
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Une erreur est survenue";
+    toast.error(errorMessage);
+  }
+};
+
+const confirmRestore = async (user: User) => {
+  const result = await confirm({
+    title: "Réactiver l'utilisateur",
+    message: `Voulez-vous vraiment réactiver l'utilisateur ${user.name} ?`,
+    confirmText: "Réactiver",
+    cancelText: "Annuler",
+    confirmClass: "bg-green-600 hover:bg-green-700",
+  });
+
+  if (!result) {
+    return;
+  }
+
+  try {
+    await usersStore.restoreUser(user.id);
+    toast.success("Utilisateur réactivé avec succès");
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Une erreur est survenue";

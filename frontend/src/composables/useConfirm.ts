@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 
 interface ConfirmOptions {
   title?: string;
@@ -15,26 +15,26 @@ interface ConfirmState extends ConfirmOptions {
 
 const state = ref<ConfirmState>({
   isOpen: false,
-  title: '',
-  message: '',
-  confirmText: 'Confirmer',
-  cancelText: 'Annuler',
-  confirmClass: 'bg-red-600 hover:bg-red-700',
+  title: "",
+  message: "",
+  confirmText: "Confirmer",
+  cancelText: "Annuler",
+  confirmClass: "bg-red-600 hover:bg-red-700",
   resolve: null,
 });
 
 export function useConfirm() {
   const confirm = (options: string | ConfirmOptions): Promise<boolean> => {
     return new Promise((resolve) => {
-      const opts = typeof options === 'string' ? { message: options } : options;
+      const opts = typeof options === "string" ? { message: options } : options;
 
       state.value = {
         isOpen: true,
-        title: opts.title || 'Confirmation',
+        title: opts.title || "Confirmation",
         message: opts.message,
-        confirmText: opts.confirmText || 'Confirmer',
-        cancelText: opts.cancelText || 'Annuler',
-        confirmClass: opts.confirmClass || 'bg-red-600 hover:bg-red-700',
+        confirmText: opts.confirmText || "Confirmer",
+        cancelText: opts.cancelText || "Annuler",
+        confirmClass: opts.confirmClass || "bg-red-600 hover:bg-red-700",
         resolve,
       };
     });

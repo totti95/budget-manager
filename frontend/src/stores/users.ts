@@ -26,7 +26,7 @@ export const useUsersStore = defineStore("users", () => {
   // Filters
   const searchQuery = ref("");
   const roleFilter = ref<string>("");
-  const statusFilter = ref<"active" | "deleted" | "">("active");
+  const statusFilter = ref<"active" | "deleted" | "">("");
 
   // Getters
   const paginationInfo = computed(() => ({
@@ -130,11 +130,25 @@ export const useUsersStore = defineStore("users", () => {
     error.value = null;
 
     try {
-      console.log("Deleting user with id:", id);
       await usersApi.delete(id);
       await fetchUsers(currentPage.value);
     } catch (err) {
       error.value = "Erreur lors de la désactivation de l'utilisateur";
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function restoreUser(id: number): Promise<void> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      await usersApi.restore(id);
+      await fetchUsers(currentPage.value);
+    } catch (err) {
+      error.value = "Erreur lors de la réactivation de l'utilisateur";
       throw err;
     } finally {
       loading.value = false;
@@ -156,7 +170,7 @@ export const useUsersStore = defineStore("users", () => {
   function clearFilters() {
     searchQuery.value = "";
     roleFilter.value = "";
-    statusFilter.value = "active";
+    statusFilter.value = "";
   }
 
   return {
@@ -179,6 +193,7 @@ export const useUsersStore = defineStore("users", () => {
     updateUser,
     updatePassword,
     deleteUser,
+    restoreUser,
     setSearchQuery,
     setRoleFilter,
     setStatusFilter,

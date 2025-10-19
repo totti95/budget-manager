@@ -94,5 +94,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('users', [AdminUserController::class, 'store']);
     Route::put('users/{user}', [AdminUserController::class, 'update']);
     Route::put('users/{user}/password', [AdminUserController::class, 'updatePassword']);
+    Route::put('users/{user}/restore', [AdminUserController::class, 'restore'])->withTrashed();
     Route::delete('users/{user}', [AdminUserController::class, 'destroy']);
 });

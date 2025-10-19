@@ -45,11 +45,19 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::with('role')->where('email', $validated['email'])->first();
+        // Chercher l'utilisateur, incluant les soft deleted pour vérifier le statut
+        $user = User::withTrashed()->with('role')->where('email', $validated['email'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Les informations d\'identification fournies sont incorrectes.'],
+            ]);
+        }
+
+        // Vérifier si l'utilisateur est désactivé
+        if ($user->trashed()) {
+            throw ValidationException::withMessages([
+                'email' => ['Votre compte a été désactivé. Veuillez contacter un administrateur.'],
             ]);
         }
 

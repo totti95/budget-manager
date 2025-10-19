@@ -34,13 +34,16 @@ class AdminUserController extends Controller
             });
         }
 
-        // Filtre par statut (actif/désactivé)
-        if ($request->has('status')) {
+        // Filtre par statut (actif/désactivé/tous)
+        if ($request->has('status') && !empty($request->status)) {
             if ($request->status === 'deleted') {
                 $query->onlyTrashed();
             } elseif ($request->status === 'active') {
                 $query->whereNull('deleted_at');
             }
+        } else {
+            // Si status est vide ou absent, afficher tous les utilisateurs (actifs + désactivés)
+            $query->withTrashed();
         }
 
         // Pagination
@@ -124,8 +127,6 @@ class AdminUserController extends Controller
      */
     public function destroy(User $user)
     {
-        error_log("ICI MAMENE");
-        error_log("Attempting to delete user ID: " . $user->id);
         // Charger la relation role si elle n'est pas déjà chargée
         $user->load('role');
 
@@ -146,6 +147,27 @@ class AdminUserController extends Controller
 
         return response()->json([
             'message' => 'Utilisateur désactivé avec succès',
+        ]);
+    }
+
+    /**
+     * Réactiver un utilisateur désactivé (restore soft delete)
+     */
+    public function restore(User $user)
+    {
+        // Vérifier que l'utilisateur est bien désactivé
+        if (!$user->trashed()) {
+            return response()->json([
+                'message' => 'Cet utilisateur est déjà actif',
+            ], 422);
+        }
+
+        $user->restore();
+        $user->load('role');
+
+        return response()->json([
+            'user' => $user,
+            'message' => 'Utilisateur réactivé avec succès',
         ]);
     }
 

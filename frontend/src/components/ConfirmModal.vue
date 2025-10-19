@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted } from "vue";
 
 defineProps<{
   isOpen: boolean;
@@ -76,27 +76,27 @@ const emit = defineEmits<{
 }>();
 
 const onConfirm = () => {
-  emit('confirm');
+  emit("confirm");
 };
 
 const onCancel = () => {
-  emit('cancel');
+  emit("cancel");
 };
 
 // Gestion du clavier
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') {
+  if (event.key === "Escape") {
     onCancel();
   }
 };
 
 // Ajouter/retirer le listener au montage/démontage
 onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener("keydown", handleKeyDown);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener("keydown", handleKeyDown);
 });
 </script>
 

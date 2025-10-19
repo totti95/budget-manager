@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { useConfirm } from '@/composables/useConfirm';
-import ConfirmModal from './ConfirmModal.vue';
+import { useConfirm } from "@/composables/useConfirm";
+import ConfirmModal from "./ConfirmModal.vue";
 
 const { state, handleConfirm, handleCancel } = useConfirm();
 </script>
