@@ -4,18 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     protected $hidden = [
@@ -54,5 +57,21 @@ class User extends Authenticatable
     public function defaultTemplate()
     {
         return $this->budgetTemplates()->where('is_default', true)->first();
+    }
+
+    /**
+     * Relation avec le rôle
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Vérifier si l'utilisateur est un administrateur
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role && $this->role->label === Role::ADMIN;
     }
 }

@@ -160,31 +160,39 @@ docker compose exec php php artisan migrate:fresh --seed
 ### Lister les tables
 
 ```bash
-docker compose exec postgres psql -U budget_user -d budget_manager -c "\dt"
+docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -e "SHOW TABLES;"
 ```
 
 ### Compter les enregistrements
 
 ```bash
 # Users
-docker compose exec postgres psql -U budget_user -d budget_manager -c "SELECT COUNT(*) FROM users;"
+docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -e "SELECT COUNT(*) FROM users;"
 
 # Budgets
-docker compose exec postgres psql -U budget_user -d budget_manager -c "SELECT COUNT(*) FROM budgets;"
+docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -e "SELECT COUNT(*) FROM budgets;"
 
 # Expenses
-docker compose exec postgres psql -U budget_user -d budget_manager -c "SELECT COUNT(*) FROM expenses;"
+docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -e "SELECT COUNT(*) FROM expenses;"
 
 # Assets
-docker compose exec postgres psql -U budget_user -d budget_manager -c "SELECT COUNT(*) FROM assets;"
+docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -e "SELECT COUNT(*) FROM assets;"
 ```
 
 ### Voir toutes les données d'une table
 
 ```bash
 # Exemple : voir tous les utilisateurs
-docker compose exec postgres psql -U budget_user -d budget_manager -c "SELECT id, name, email FROM users;"
+docker compose exec mysql mysql -u budget_user -pbudget_pass budget_manager -e "SELECT id, name, email FROM users;"
 ```
+
+### Accéder à phpMyAdmin
+
+Vous pouvez aussi visualiser et gérer toutes les données via phpMyAdmin :
+
+- **URL** : http://localhost:8081
+- **Connexion automatique** en tant que root
+- Interface graphique pour consulter, modifier et exporter les données
 
 ---
 
@@ -247,11 +255,11 @@ php artisan migrate  # Ajoute nouvelles migrations seulement
 Si vous avez des données importantes :
 
 ```bash
-# Backup PostgreSQL
-docker compose exec postgres pg_dump -U budget_user budget_manager > backup.sql
+# Backup MySQL
+docker compose exec mysql mysqldump -u budget_user -pbudget_pass budget_manager > backup.sql
 
 # Restaurer plus tard
-docker compose exec -T postgres psql -U budget_user -d budget_manager < backup.sql
+docker compose exec -T mysql mysql -u budget_user -pbudget_pass budget_manager < backup.sql
 ```
 
 ---
@@ -397,7 +405,8 @@ chmod +x reset-data.sh
 
 ## 🔗 Liens utiles
 
+- **phpMyAdmin** : http://localhost:8081 (connexion automatique)
 - **Makefile** : `make fresh` fait la même chose que `./reset-data.sh fresh`
 - **Laravel Docs** : https://laravel.com/docs/11.x/seeding
-- **PostgreSQL Docs** : https://www.postgresql.org/docs/
+- **MySQL Docs** : https://dev.mysql.com/doc/
 

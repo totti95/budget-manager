@@ -1,13 +1,19 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
-      <router-link to="/" class="text-primary-600 hover:text-primary-700 mb-2 inline-block">
+      <router-link
+        to="/"
+        class="text-primary-600 hover:text-primary-700 mb-2 inline-block"
+      >
         ← Retour au dashboard
       </router-link>
       <h1 class="text-3xl font-bold">{{ currentBudget?.name }}</h1>
     </div>
 
-    <div v-if="budgetStore.loading || expenseStore.loading" class="text-center py-12">
+    <div
+      v-if="budgetStore.loading || expenseStore.loading"
+      class="text-center py-12"
+    >
       <p>Chargement...</p>
     </div>
 
@@ -28,7 +34,10 @@
         </div>
         <div class="card text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Restant</p>
-          <p class="text-2xl font-bold" :class="remaining >= 0 ? 'text-green-600' : 'text-red-600'">
+          <p
+            class="text-2xl font-bold"
+            :class="remaining >= 0 ? 'text-green-600' : 'text-red-600'"
+          >
             <MoneyDisplay :cents="remaining" />
           </p>
         </div>
@@ -53,7 +62,7 @@
             :budget-id="currentBudget.id"
             @submit="handleAddExpense"
             @category-updated="handleCategoryUpdated"
-            :on-cancel="() => showExpenseForm = false"
+            :on-cancel="() => (showExpenseForm = false)"
           />
         </div>
       </div>
@@ -66,7 +75,10 @@
           {{ expenseStore.error }}
         </div>
 
-        <div v-if="expenseStore.expenses.length === 0" class="text-center py-8 text-gray-600">
+        <div
+          v-if="expenseStore.expenses.length === 0"
+          class="text-center py-8 text-gray-600"
+        >
           <p>Aucune dépense enregistrée</p>
         </div>
 
@@ -84,17 +96,26 @@
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
               <tr v-for="expense in expenseStore.expenses" :key="expense.id">
-                <td>{{ new Date(expense.date).toLocaleDateString('fr-FR') }}</td>
+                <td>
+                  {{ new Date(expense.date).toLocaleDateString("fr-FR") }}
+                </td>
                 <td>
                   <div class="text-sm">
-                    <div class="font-medium">{{ getCategoryName(expense.budgetSubcategoryId) }}</div>
-                    <div class="text-gray-500">{{ getSubcategoryName(expense.budgetSubcategoryId) }}</div>
+                    <div class="font-medium">
+                      {{ getCategoryName(expense.budgetSubcategoryId) }}
+                    </div>
+                    <div class="text-gray-500">
+                      {{ getSubcategoryName(expense.budgetSubcategoryId) }}
+                    </div>
                   </div>
                 </td>
                 <td class="font-medium">{{ expense.label }}</td>
                 <td><MoneyDisplay :cents="expense.amountCents" /></td>
                 <td>
-                  <span v-if="expense.paymentMethod" class="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <span
+                    v-if="expense.paymentMethod"
+                    class="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700"
+                  >
                     {{ formatPaymentMethod(expense.paymentMethod) }}
                   </span>
                   <span v-else>-</span>
@@ -117,107 +138,119 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useBudgetStore } from '@/stores/budget'
-import { useExpenseStore } from '@/stores/expense'
-import ExpenseForm from '@/components/ExpenseForm.vue'
-import MoneyDisplay from '@/components/MoneyDisplay.vue'
+import { onMounted, computed, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useBudgetStore } from "@/stores/budget";
+import { useExpenseStore } from "@/stores/expense";
+import ExpenseForm from "@/components/ExpenseForm.vue";
+import MoneyDisplay from "@/components/MoneyDisplay.vue";
+import type { CreateExpenseData } from "@/api/expenses";
 
-const route = useRoute()
-const budgetStore = useBudgetStore()
-const expenseStore = useExpenseStore()
-const showExpenseForm = ref(false)
+const route = useRoute();
+const budgetStore = useBudgetStore();
+const expenseStore = useExpenseStore();
+const showExpenseForm = ref(false);
 
-const currentBudget = computed(() => budgetStore.currentBudget)
+const currentBudget = computed(() => budgetStore.currentBudget);
 
 const totalPlanned = computed(() => {
-  if (!currentBudget.value?.categories) return 0
+  if (!currentBudget.value?.categories) return 0;
   return currentBudget.value.categories.reduce((total, category) => {
-    return total + (category.subcategories || []).reduce((catTotal, sub) => catTotal + sub.plannedAmountCents, 0)
-  }, 0)
-})
+    return (
+      total +
+      (category.subcategories || []).reduce(
+        (catTotal, sub) => catTotal + sub.plannedAmountCents,
+        0,
+      )
+    );
+  }, 0);
+});
 
 const totalSpent = computed(() => {
-  if (!currentBudget.value?.categories) return 0
+  if (!currentBudget.value?.categories) return 0;
   // Calculer à partir des expenses réelles
-  return expenseStore.expenses.reduce((total, expense) => total + expense.amountCents, 0)
-})
+  return expenseStore.expenses.reduce(
+    (total, expense) => total + expense.amountCents,
+    0,
+  );
+});
 
-const remaining = computed(() => totalPlanned.value - totalSpent.value)
+const remaining = computed(() => totalPlanned.value - totalSpent.value);
 
 onMounted(async () => {
-  const month = route.params.month as string
+  const month = route.params.month as string;
   try {
-    const response = await budgetStore.fetchBudgets(month)
+    const response = await budgetStore.fetchBudgets(month);
     if (response.data.length > 0) {
-      const budgetId = response.data[0].id
-      await budgetStore.fetchBudget(budgetId)
+      const budgetId = response.data[0].id;
+      await budgetStore.fetchBudget(budgetId);
       // Fetch expenses for this budget
-      await expenseStore.fetchExpenses(budgetId)
+      await expenseStore.fetchExpenses(budgetId);
     }
   } catch (error) {
-    console.error('Erreur lors du chargement du budget:', error)
+    console.error("Erreur lors du chargement du budget:", error);
   }
-})
+});
 
-async function handleAddExpense(values: any) {
-  if (!currentBudget.value) return
+async function handleAddExpense(values: CreateExpenseData) {
+  if (!currentBudget.value) return;
 
   try {
-    await expenseStore.createExpense(currentBudget.value.id, values)
-    showExpenseForm.value = false
+    await expenseStore.createExpense(currentBudget.value.id, values);
+    showExpenseForm.value = false;
     // Pas besoin de refresh le budget, les dépenses sont déjà dans le store
   } catch (error) {
-    console.error('Erreur lors de l\'ajout de la dépense:', error)
+    console.error("Erreur lors de l'ajout de la dépense:", error);
   }
 }
 
 async function handleCategoryUpdated() {
   // Refresh budget to get updated categories with new subcategory
   if (currentBudget.value) {
-    await budgetStore.fetchBudget(currentBudget.value.id)
+    await budgetStore.fetchBudget(currentBudget.value.id);
   }
 }
 
 async function handleDeleteExpense(id: number) {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette dépense ?')) {
+  if (confirm("Êtes-vous sûr de vouloir supprimer cette dépense ?")) {
     try {
-      await expenseStore.deleteExpense(id)
+      await expenseStore.deleteExpense(id);
       // Le store met à jour automatiquement la liste
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
+      console.error("Erreur lors de la suppression:", error);
     }
   }
 }
 
 function getCategoryName(subcategoryId: number): string {
-  if (!currentBudget.value?.categories) return ''
+  if (!currentBudget.value?.categories) return "";
   for (const category of currentBudget.value.categories) {
-    if (category.subcategories?.some(sub => sub.id === subcategoryId)) {
-      return category.name
+    if (category.subcategories?.some((sub) => sub.id === subcategoryId)) {
+      return category.name;
     }
   }
-  return ''
+  return "";
 }
 
 function getSubcategoryName(subcategoryId: number): string {
-  if (!currentBudget.value?.categories) return ''
+  if (!currentBudget.value?.categories) return "";
   for (const category of currentBudget.value.categories) {
-    const subcategory = category.subcategories?.find(sub => sub.id === subcategoryId)
-    if (subcategory) return subcategory.name
+    const subcategory = category.subcategories?.find(
+      (sub) => sub.id === subcategoryId,
+    );
+    if (subcategory) return subcategory.name;
   }
-  return ''
+  return "";
 }
 
 function formatPaymentMethod(method: string): string {
   const methods: Record<string, string> = {
-    'cb': 'CB',
-    'especes': 'Espèces',
-    'virement': 'Virement',
-    'prelevement': 'Prélèvement',
-    'cheque': 'Chèque'
-  }
-  return methods[method] || method
+    cb: "CB",
+    especes: "Espèces",
+    virement: "Virement",
+    prelevement: "Prélèvement",
+    cheque: "Chèque",
+  };
+  return methods[method] || method;
 }
 </script>

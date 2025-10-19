@@ -4,7 +4,11 @@
       <h1 class="text-3xl font-bold mb-4">Tableau de bord</h1>
 
       <div class="flex items-center gap-4 mb-6">
-        <select v-model="selectedMonth" @change="loadBudget" class="input max-w-xs">
+        <select
+          v-model="selectedMonth"
+          @change="loadBudget"
+          class="input max-w-xs"
+        >
           <option v-for="month in availableMonths" :key="month" :value="month">
             {{ formatMonth(month) }}
           </option>
@@ -55,7 +59,9 @@
 
         <div class="card">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Dépenses</p>
-          <p class="text-2xl font-bold">{{ statsStore.summary?.expenseCount || 0 }}</p>
+          <p class="text-2xl font-bold">
+            {{ statsStore.summary?.expenseCount || 0 }}
+          </p>
         </div>
       </div>
 
@@ -86,7 +92,12 @@
                   />
                 </td>
                 <td>
-                  <span v-if="cat.variancePercentage !== null" :class="-cat.varianceCents > 0 ? 'text-green-600' : 'text-red-600'">
+                  <span
+                    v-if="cat.variancePercentage !== null"
+                    :class="
+                      -cat.varianceCents > 0 ? 'text-green-600' : 'text-red-600'
+                    "
+                  >
                     {{ (-cat.variancePercentage).toFixed(1) }}%
                   </span>
                 </td>
@@ -97,10 +108,7 @@
       </div>
 
       <div class="flex justify-center">
-        <router-link
-          :to="`/budgets/${selectedMonth}`"
-          class="btn btn-primary"
-        >
+        <router-link :to="`/budgets/${selectedMonth}`" class="btn btn-primary">
           Voir le détail du budget
         </router-link>
       </div>
@@ -118,59 +126,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useBudgetStore } from '@/stores/budget'
-import { useStatsStore } from '@/stores/stats'
-import MoneyDisplay from '@/components/MoneyDisplay.vue'
+import { ref, onMounted, computed } from "vue";
+import { useBudgetStore } from "@/stores/budget";
+import { useStatsStore } from "@/stores/stats";
+import MoneyDisplay from "@/components/MoneyDisplay.vue";
 
-const budgetStore = useBudgetStore()
-const statsStore = useStatsStore()
+const budgetStore = useBudgetStore();
+const statsStore = useStatsStore();
 
-const selectedMonth = ref(new Date().toISOString().slice(0, 7))
-const currentBudget = computed(() => budgetStore.currentBudget)
+const selectedMonth = ref(new Date().toISOString().slice(0, 7));
+const currentBudget = computed(() => budgetStore.currentBudget);
 
 const availableMonths = computed(() => {
-  const months = []
-  const now = new Date()
+  const months = [];
+  const now = new Date();
   for (let i = -2; i <= 2; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
-    months.push(d.toISOString().slice(0, 7))
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    months.push(d.toISOString().slice(0, 7));
   }
-  return months
-})
+  return months;
+});
 
 function formatMonth(month: string): string {
-  const [year, monthNum] = month.split('-')
-  const date = new Date(parseInt(year), parseInt(monthNum) - 1, 1)
-  return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })
+  const [year, monthNum] = month.split("-");
+  const date = new Date(parseInt(year), parseInt(monthNum) - 1, 1);
+  return date.toLocaleDateString("fr-FR", { year: "numeric", month: "long" });
 }
 
 async function loadBudget() {
   try {
-    const response = await budgetStore.fetchBudgets(selectedMonth.value)
+    const response = await budgetStore.fetchBudgets(selectedMonth.value);
     if (response.data.length > 0) {
-      await budgetStore.fetchBudget(response.data[0].id)
-      await statsStore.fetchSummary(response.data[0].id)
-      await statsStore.fetchCategoryStats(response.data[0].id)
+      await budgetStore.fetchBudget(response.data[0].id);
+      await statsStore.fetchSummary(response.data[0].id);
+      await statsStore.fetchCategoryStats(response.data[0].id);
     } else {
-      budgetStore.currentBudget = null
+      budgetStore.currentBudget = null;
     }
   } catch (error) {
-    console.error('Error loading budget:', error)
+    console.error("Error loading budget:", error);
   }
 }
 
 async function handleGenerateBudget() {
   try {
-    const budget = await budgetStore.generateBudget(selectedMonth.value)
-    await statsStore.fetchSummary(budget.id)
-    await statsStore.fetchCategoryStats(budget.id)
+    const budget = await budgetStore.generateBudget(selectedMonth.value);
+    await statsStore.fetchSummary(budget.id);
+    await statsStore.fetchCategoryStats(budget.id);
   } catch (error) {
-    console.error('Error generating budget:', error)
+    console.error("Error generating budget:", error);
   }
 }
 
 onMounted(() => {
-  loadBudget()
-})
+  loadBudget();
+});
 </script>
