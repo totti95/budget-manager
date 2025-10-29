@@ -4,40 +4,39 @@
 
     <!-- Filters and Search -->
     <div class="mb-6 flex flex-wrap gap-4">
-      <input
+      <FormInput
         v-model="usersStore.searchQuery"
         type="text"
         placeholder="Rechercher par nom ou email..."
-        class="flex-1 min-w-[250px] px-4 py-2 border rounded-lg"
+        class="flex-1 min-w-[250px]"
         @input="debouncedSearch"
       />
 
-      <select
+      <FormSelect
         v-model="usersStore.roleFilter"
-        class="px-4 py-2 border rounded-lg"
+        placeholder="Tous les rôles"
         @change="handleFilterChange"
       >
-        <option value="">Tous les rôles</option>
         <option value="user">Utilisateur</option>
         <option value="admin">Administrateur</option>
-      </select>
+      </FormSelect>
 
-      <select
+      <FormSelect
         v-model="usersStore.statusFilter"
-        class="px-4 py-2 border rounded-lg"
+        placeholder="Tous les statuts"
         @change="handleFilterChange"
       >
-        <option value="">Tous les statuts</option>
         <option value="active">Actifs</option>
         <option value="deleted">Désactivés</option>
-      </select>
+      </FormSelect>
 
-      <button
+      <FormButton
+        variant="primary"
+        size="md"
         @click="openCreateModal"
-        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         Créer un utilisateur
-      </button>
+      </FormButton>
     </div>
 
     <!-- Loading state -->
@@ -115,33 +114,37 @@
             <td class="px-6 py-4 space-x-2">
               <template v-if="user.deletedAt">
                 <!-- Utilisateur désactivé : afficher bouton Réactiver -->
-                <button
+                <FormButton
+                  variant="success"
+                  size="sm"
                   @click="confirmRestore(user)"
-                  class="text-green-600 hover:text-green-800"
                 >
                   Réactiver
-                </button>
+                </FormButton>
               </template>
               <template v-else>
                 <!-- Utilisateur actif : afficher boutons normaux -->
-                <button
+                <FormButton
+                  variant="ghost"
+                  size="sm"
                   @click="openEditModal(user)"
-                  class="text-blue-600 hover:text-blue-800"
                 >
                   Modifier
-                </button>
-                <button
+                </FormButton>
+                <FormButton
+                  variant="ghost"
+                  size="sm"
                   @click="openPasswordModal(user)"
-                  class="text-green-600 hover:text-green-800"
                 >
                   Mot de passe
-                </button>
-                <button
+                </FormButton>
+                <FormButton
+                  variant="danger"
+                  size="sm"
                   @click="confirmDelete(user)"
-                  class="text-red-600 hover:text-red-800"
                 >
                   Désactiver
-                </button>
+                </FormButton>
               </template>
             </td>
           </tr>
@@ -153,27 +156,29 @@
         v-if="usersStore.paginationInfo.lastPage > 1"
         class="px-6 py-4 flex justify-between items-center border-t"
       >
-        <button
+        <FormButton
+          variant="secondary"
+          size="sm"
           :disabled="usersStore.paginationInfo.currentPage === 1"
           @click="handlePageChange(usersStore.paginationInfo.currentPage - 1)"
-          class="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Précédent
-        </button>
-        <span class="text-sm text-gray-600">
+        </FormButton>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
           Page {{ usersStore.paginationInfo.currentPage }} sur
           {{ usersStore.paginationInfo.lastPage }}
         </span>
-        <button
+        <FormButton
+          variant="secondary"
+          size="sm"
           :disabled="
             usersStore.paginationInfo.currentPage ===
             usersStore.paginationInfo.lastPage
           "
           @click="handlePageChange(usersStore.paginationInfo.currentPage + 1)"
-          class="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Suivant
-        </button>
+        </FormButton>
       </div>
     </div>
 
@@ -188,62 +193,65 @@
         </h2>
 
         <form @submit.prevent="handleUserSubmit">
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Nom</label>
-            <input
-              v-model="userForm.name"
-              type="text"
-              class="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+          <FormInput
+            v-model="userForm.name"
+            type="text"
+            label="Nom"
+            :error="formErrors.name"
+            required
+            class="mb-4"
+          />
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Email</label>
-            <input
-              v-model="userForm.email"
-              type="email"
-              class="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+          <FormInput
+            v-model="userForm.email"
+            type="email"
+            label="Email"
+            :error="formErrors.email"
+            required
+            class="mb-4"
+          />
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Rôle</label>
-            <select
-              v-model="userForm.roleId"
-              class="w-full px-3 py-2 border rounded-lg"
-              required
+          <FormSelect
+            v-model="userForm.roleId"
+            label="Rôle"
+            placeholder="Sélectionner un rôle"
+            :error="formErrors.roleId"
+            required
+            class="mb-4"
+          >
+            <option
+              v-for="role in usersStore.roles"
+              :key="role.id"
+              :value="role.id"
             >
-              <option value="">Sélectionner un rôle</option>
-              <option
-                v-for="role in usersStore.roles"
-                :key="role.id"
-                :value="role.id"
-              >
-                {{ role.label === "admin" ? "Administrateur" : "Utilisateur" }}
-              </option>
-            </select>
-          </div>
+              {{ role.label === "admin" ? "Administrateur" : "Utilisateur" }}
+            </option>
+          </FormSelect>
 
-          <p v-if="!editingUser" class="text-sm text-gray-600 mb-4 italic">
+          <p v-if="!editingUser" class="text-sm text-gray-600 dark:text-gray-400 mb-4 italic">
             Un mot de passe sera généré automatiquement
           </p>
 
           <div class="flex gap-3">
-            <button
+            <FormButton
               type="submit"
-              class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              variant="primary"
+              size="md"
+              :loading="isSubmitting"
+              loading-text="Enregistrement..."
+              class="flex-1"
             >
               {{ editingUser ? "Modifier" : "Créer" }}
-            </button>
-            <button
+            </FormButton>
+            <FormButton
               type="button"
+              variant="secondary"
+              size="md"
               @click="closeUserModal"
-              class="flex-1 px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              class="flex-1"
             >
               Annuler
-            </button>
+            </FormButton>
           </div>
         </form>
       </div>
@@ -275,12 +283,14 @@
           </div>
         </div>
 
-        <button
+        <FormButton
+          variant="success"
+          size="md"
+          full-width
           @click="closeGeneratedPasswordModal"
-          class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
           J'ai noté le mot de passe
-        </button>
+        </FormButton>
       </div>
     </div>
 
@@ -301,44 +311,44 @@
         </div>
 
         <form @submit.prevent="handlePasswordSubmit">
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2"
-              >Nouveau mot de passe</label
-            >
-            <input
-              v-model="passwordForm.password"
-              type="password"
-              class="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+          <FormInput
+            v-model="passwordForm.password"
+            type="password"
+            label="Nouveau mot de passe"
+            :error="passwordErrors.password"
+            required
+            class="mb-4"
+          />
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2"
-              >Confirmer le mot de passe</label
-            >
-            <input
-              v-model="passwordForm.password_confirmation"
-              type="password"
-              class="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+          <FormInput
+            v-model="passwordForm.password_confirmation"
+            type="password"
+            label="Confirmer le mot de passe"
+            :error="passwordErrors.password_confirmation"
+            required
+            class="mb-4"
+          />
 
           <div class="flex gap-3">
-            <button
+            <FormButton
               type="submit"
-              class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              variant="primary"
+              size="md"
+              :loading="isPasswordSubmitting"
+              loading-text="Modification..."
+              class="flex-1"
             >
               Modifier
-            </button>
-            <button
+            </FormButton>
+            <FormButton
               type="button"
+              variant="secondary"
+              size="md"
               @click="closePasswordModal"
-              class="flex-1 px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              class="flex-1"
             >
               Annuler
-            </button>
+            </FormButton>
           </div>
         </form>
       </div>
@@ -351,7 +361,11 @@ import { ref, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import { useToast } from "@/composables/useToast";
 import { useConfirm } from "@/composables/useConfirm";
+import { errorHandler } from "@/utils/errorHandler";
 import type { User } from "@/types";
+import FormInput from "@/components/FormInput.vue";
+import FormSelect from "@/components/FormSelect.vue";
+import FormButton from "@/components/FormButton.vue";
 
 const usersStore = useUsersStore();
 const toast = useToast();
@@ -363,6 +377,8 @@ const showGeneratedPasswordModal = ref(false);
 const editingUser = ref<User | null>(null);
 const passwordUser = ref<User | null>(null);
 const generatedPassword = ref("");
+const isSubmitting = ref(false);
+const isPasswordSubmitting = ref(false);
 
 const userForm = ref({
   name: "",
@@ -374,6 +390,9 @@ const passwordForm = ref({
   password: "",
   password_confirmation: "",
 });
+
+const formErrors = ref<Record<string, string>>({});
+const passwordErrors = ref<Record<string, string>>({});
 
 let searchTimeout: number | null = null;
 
@@ -414,13 +433,17 @@ const closeUserModal = () => {
 };
 
 const handleUserSubmit = async () => {
+  formErrors.value = {};
+  isSubmitting.value = true;
+
   try {
     if (editingUser.value) {
       await usersStore.updateUser(editingUser.value.id, userForm.value);
       toast.success("Utilisateur modifié avec succès");
+      closeUserModal();
     } else {
       if (!userForm.value.roleId) {
-        toast.error("Le rôle est requis");
+        formErrors.value.roleId = "Le rôle est requis";
         return;
       }
       const result = await usersStore.createUser({
@@ -431,12 +454,17 @@ const handleUserSubmit = async () => {
       generatedPassword.value = result.password;
       showGeneratedPasswordModal.value = true;
       toast.success("Utilisateur créé avec succès");
+      closeUserModal();
     }
-    closeUserModal();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Une erreur est survenue";
-    toast.error(errorMessage);
+    const validationErrors = errorHandler.handleValidation(error);
+    if (validationErrors) {
+      formErrors.value = validationErrors;
+    } else {
+      errorHandler.handle(error, "Erreur lors de l'enregistrement de l'utilisateur");
+    }
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
@@ -454,14 +482,22 @@ const closePasswordModal = () => {
 const handlePasswordSubmit = async () => {
   if (!passwordUser.value) return;
 
+  passwordErrors.value = {};
+  isPasswordSubmitting.value = true;
+
   try {
     await usersStore.updatePassword(passwordUser.value.id, passwordForm.value);
     toast.success("Mot de passe modifié avec succès");
     closePasswordModal();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Une erreur est survenue";
-    toast.error(errorMessage);
+    const validationErrors = errorHandler.handleValidation(error);
+    if (validationErrors) {
+      passwordErrors.value = validationErrors;
+    } else {
+      errorHandler.handle(error, "Erreur lors du changement de mot de passe");
+    }
+  } finally {
+    isPasswordSubmitting.value = false;
   }
 };
 
@@ -482,9 +518,7 @@ const confirmDelete = async (user: User) => {
     await usersStore.deleteUser(user.id);
     toast.success("Utilisateur désactivé avec succès");
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Une erreur est survenue";
-    toast.error(errorMessage);
+    errorHandler.handle(error, "Erreur lors de la désactivation de l'utilisateur");
   }
 };
 
@@ -505,9 +539,7 @@ const confirmRestore = async (user: User) => {
     await usersStore.restoreUser(user.id);
     toast.success("Utilisateur réactivé avec succès");
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Une erreur est survenue";
-    toast.error(errorMessage);
+    errorHandler.handle(error, "Erreur lors de la réactivation de l'utilisateur");
   }
 };
 

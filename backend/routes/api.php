@@ -11,6 +11,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,8 @@ Route::prefix('auth')->group(function () {
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+        Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
     });
 
     Route::middleware('auth:sanctum')->group(function () {

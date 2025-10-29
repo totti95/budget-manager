@@ -1,4 +1,5 @@
 import axios from "axios";
+import { errorHandler } from "@/utils/errorHandler";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
@@ -20,53 +21,39 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Standardiser le format d'erreur
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Une erreur est survenue";
-
-    // Gérer les erreurs d'authentification
+    // Gérer les erreurs d'authentification (401)
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
-      return Promise.reject(
-        new Error("Session expirée. Veuillez vous reconnecter."),
-      );
+      errorHandler.handle(error, "Session expirée. Veuillez vous reconnecter.");
+
+      // Rediriger vers login seulement si pas déjà sur la page de login
+      if (!window.location.pathname.includes("/login")) {
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1000);
+      }
+
+      return Promise.reject(error);
     }
 
     // Gérer les erreurs de validation (422)
+    // Ne pas afficher de toast ici, laisser le composant gérer
     if (error.response?.status === 422) {
       const validationErrors = error.response?.data?.errors;
       if (validationErrors) {
         error.validationErrors = validationErrors;
       }
+      errorHandler.warning("Erreur de validation", validationErrors);
       return Promise.reject(error);
     }
 
-    // Gérer les erreurs de rate limiting
-    if (error.response?.status === 429) {
-      return Promise.reject(
-        new Error("Trop de requêtes. Veuillez patienter avant de réessayer."),
-      );
-    }
+    // Autres erreurs - logger mais ne pas afficher de toast
+    // (les composants décideront s'ils veulent afficher un toast)
+    errorHandler.info("Erreur API", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+    });
 
-    // Gérer les erreurs serveur
-    if (error.response?.status >= 500) {
-      return Promise.reject(
-        new Error("Erreur serveur. Veuillez réessayer plus tard."),
-      );
-    }
-
-    // Gérer les erreurs réseau
-    if (!error.response) {
-      return Promise.reject(
-        new Error("Erreur de connexion. Vérifiez votre connexion internet."),
-      );
-    }
-
-    // Retourner l'erreur avec message standardisé
-    error.message = errorMessage;
     return Promise.reject(error);
   },
 );

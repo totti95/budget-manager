@@ -17,6 +17,18 @@ const router = createRouter({
       meta: { requiresGuest: true },
     },
     {
+      path: "/forgot-password",
+      name: "forgot-password",
+      component: () => import("@/pages/ForgotPasswordPage.vue"),
+      meta: { requiresGuest: true },
+    },
+    {
+      path: "/reset-password",
+      name: "reset-password",
+      component: () => import("@/pages/ResetPasswordPage.vue"),
+      meta: { requiresGuest: true },
+    },
+    {
       path: "/",
       name: "dashboard",
       component: () => import("@/pages/DashboardPage.vue"),

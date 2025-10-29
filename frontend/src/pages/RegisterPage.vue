@@ -7,96 +7,71 @@
         <h2 class="text-3xl font-bold text-center mb-6">Inscription</h2>
 
         <form @submit="onSubmit" class="space-y-4">
-          <div>
-            <label for="name" class="label">Nom</label>
-            <input
-              id="name"
-              v-model="name"
-              v-bind="nameAttrs"
-              type="text"
-              class="input"
-              :class="{ 'border-red-500': errors.name }"
-              placeholder="Votre nom"
-            />
-            <p v-if="errors.name" class="mt-1 text-sm text-red-600">
-              {{ errors.name }}
-            </p>
-          </div>
+          <FormInput
+            id="name"
+            v-model="name"
+            v-bind="nameAttrs"
+            type="text"
+            label="Nom"
+            placeholder="Votre nom"
+            :error="errors.name"
+            required
+            autocomplete="name"
+          />
 
-          <div>
-            <label for="email" class="label">Email</label>
-            <input
-              id="email"
-              v-model="email"
-              v-bind="emailAttrs"
-              type="email"
-              class="input"
-              :class="{ 'border-red-500': errors.email }"
-              placeholder="votre@email.com"
-            />
-            <p v-if="errors.email" class="mt-1 text-sm text-red-600">
-              {{ errors.email }}
-            </p>
-          </div>
+          <FormInput
+            id="email"
+            v-model="email"
+            v-bind="emailAttrs"
+            type="email"
+            label="Email"
+            placeholder="votre@email.com"
+            :error="errors.email"
+            required
+            autocomplete="email"
+          />
 
-          <div>
-            <label for="password" class="label">Mot de passe</label>
-            <input
-              id="password"
-              v-model="password"
-              v-bind="passwordAttrs"
-              type="password"
-              class="input"
-              :class="{ 'border-red-500': errors.password }"
-              placeholder="••••••••"
-            />
-            <p v-if="errors.password" class="mt-1 text-sm text-red-600">
-              {{ errors.password }}
-            </p>
-          </div>
+          <FormInput
+            id="password"
+            v-model="password"
+            v-bind="passwordAttrs"
+            type="password"
+            label="Mot de passe"
+            placeholder="••••••••"
+            :error="errors.password"
+            hint="Au moins 8 caractères"
+            required
+            autocomplete="new-password"
+          />
 
-          <div>
-            <label for="password_confirmation" class="label"
-              >Confirmer le mot de passe</label
-            >
-            <input
-              id="password_confirmation"
-              v-model="password_confirmation"
-              v-bind="password_confirmationAttrs"
-              type="password"
-              class="input"
-              :class="{ 'border-red-500': errors.password_confirmation }"
-              placeholder="••••••••"
-            />
-            <p
-              v-if="errors.password_confirmation"
-              class="mt-1 text-sm text-red-600"
-            >
-              {{ errors.password_confirmation }}
-            </p>
-          </div>
+          <FormInput
+            id="password_confirmation"
+            v-model="password_confirmation"
+            v-bind="password_confirmationAttrs"
+            type="password"
+            label="Confirmer le mot de passe"
+            placeholder="••••••••"
+            :error="errors.password_confirmation"
+            required
+            autocomplete="new-password"
+          />
 
-          <div v-if="authStore.error" class="text-red-600 text-sm">
-            {{ authStore.error }}
-          </div>
-
-          <button
+          <FormButton
             type="submit"
-            :disabled="authStore.loading || isSubmitting"
-            class="w-full btn btn-primary"
+            variant="primary"
+            size="md"
+            :loading="authStore.loading || isSubmitting"
+            loading-text="Inscription en cours..."
+            full-width
           >
-            {{
-              authStore.loading || isSubmitting
-                ? "Inscription..."
-                : "S'inscrire"
-            }}
-          </button>
+            S'inscrire
+          </FormButton>
         </form>
 
         <div class="mt-4 text-center text-sm">
           <router-link
             to="/login"
-            class="text-primary-600 hover:text-primary-700"
+            class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
           >
             Déjà un compte ? Se connecter
           </router-link>
@@ -112,6 +87,9 @@ import { useAuthStore } from "@/stores/auth";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { registerSchema } from "@/schemas/auth";
+import { errorHandler } from "@/utils/errorHandler";
+import FormInput from "@/components/FormInput.vue";
+import FormButton from "@/components/FormButton.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -132,7 +110,7 @@ const onSubmit = handleSubmit(async (values) => {
     await authStore.register(values);
     router.push("/");
   } catch (error) {
-    // Error is already handled in the store
+    errorHandler.handle(error, "Erreur lors de l'inscription. Veuillez réessayer.");
   }
 });
 </script>
