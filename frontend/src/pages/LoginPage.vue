@@ -7,68 +7,64 @@
         <h2 class="text-3xl font-bold text-center mb-6">Connexion</h2>
 
         <form @submit="onSubmit" class="space-y-4">
-          <div>
-            <label for="email" class="label">Email</label>
-            <input
-              id="email"
-              v-model="email"
-              v-bind="emailAttrs"
-              type="email"
-              class="input"
-              :class="{ 'border-red-500': errors.email }"
-              placeholder="votre@email.com"
-            />
-            <p v-if="errors.email" class="mt-1 text-sm text-red-600">
-              {{ errors.email }}
-            </p>
+          <FormInput
+            id="email"
+            v-model="email"
+            v-bind="emailAttrs"
+            type="email"
+            label="Email"
+            placeholder="votre@email.com"
+            :error="errors.email"
+            required
+            autocomplete="email"
+          />
+
+          <FormInput
+            id="password"
+            v-model="password"
+            v-bind="passwordAttrs"
+            type="password"
+            label="Mot de passe"
+            placeholder="••••••••"
+            :error="errors.password"
+            required
+            autocomplete="current-password"
+          />
+
+          <div class="flex items-center justify-end mb-4">
+            <router-link
+              to="/forgot-password"
+              class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Mot de passe oublié ?
+            </router-link>
           </div>
 
-          <div>
-            <label for="password" class="label">Mot de passe</label>
-            <input
-              id="password"
-              v-model="password"
-              v-bind="passwordAttrs"
-              type="password"
-              class="input"
-              :class="{ 'border-red-500': errors.password }"
-              placeholder="••••••••"
-            />
-            <p v-if="errors.password" class="mt-1 text-sm text-red-600">
-              {{ errors.password }}
-            </p>
-          </div>
-
-          <div v-if="authStore.error" class="text-red-600 text-sm">
-            {{ authStore.error }}
-          </div>
-
-          <button
+          <FormButton
             type="submit"
-            :disabled="authStore.loading || isSubmitting"
-            class="w-full btn btn-primary"
+            variant="primary"
+            size="md"
+            :loading="authStore.loading || isSubmitting"
+            loading-text="Connexion en cours..."
+            full-width
           >
-            {{
-              authStore.loading || isSubmitting
-                ? "Connexion..."
-                : "Se connecter"
-            }}
-          </button>
+            Se connecter
+          </FormButton>
         </form>
 
         <div class="mt-4 text-center text-sm">
           <router-link
             to="/register"
-            class="text-primary-600 hover:text-primary-700"
+            class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
           >
             Pas encore de compte ? S'inscrire
           </router-link>
         </div>
 
-        <div class="mt-6 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm">
-          <p class="font-medium mb-1">Compte de démo:</p>
-          <p>Email: demo@budgetmanager.local</p>
-          <p>Mot de passe: password</p>
+        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm border border-blue-200 dark:border-blue-800">
+          <p class="font-semibold mb-2 text-blue-900 dark:text-blue-100">Compte de démo :</p>
+          <p class="text-blue-800 dark:text-blue-200">Email: demo@budgetmanager.local</p>
+          <p class="text-blue-800 dark:text-blue-200">Mot de passe: password</p>
         </div>
       </div>
     </div>
@@ -81,6 +77,9 @@ import { useAuthStore } from "@/stores/auth";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { loginSchema } from "@/schemas/auth";
+import { errorHandler } from "@/utils/errorHandler";
+import FormInput from "@/components/FormInput.vue";
+import FormButton from "@/components/FormButton.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -97,7 +96,7 @@ const onSubmit = handleSubmit(async (values) => {
     await authStore.login(values);
     router.push("/");
   } catch (error) {
-    // Error is already handled in the store
+    errorHandler.handle(error, "Identifiants invalides. Veuillez réessayer.");
   }
 });
 </script>
