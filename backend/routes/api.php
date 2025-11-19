@@ -1,18 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BudgetTemplateController;
-use App\Http\Controllers\BudgetController;
-use App\Http\Controllers\BudgetCategoryController;
-use App\Http\Controllers\BudgetSubcategoryController;
-use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BudgetCategoryController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\BudgetSubcategoryController;
+use App\Http\Controllers\BudgetTemplateController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
-use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\WealthHistoryController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
         'service' => 'Budget Manager API',
-        'timestamp' => now()->toIso8601String()
+        'timestamp' => now()->toIso8601String(),
     ]);
 });
 

@@ -13,6 +13,7 @@ class Asset extends Model
     protected $fillable = [
         'user_id',
         'type',
+        'is_liability',
         'label',
         'institution',
         'value_cents',
@@ -21,6 +22,7 @@ class Asset extends Model
 
     protected $casts = [
         'value_cents' => 'integer',
+        'is_liability' => 'boolean',
     ];
 
     public function user(): BelongsTo

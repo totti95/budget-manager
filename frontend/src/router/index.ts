@@ -47,6 +47,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/epargne",
+      name: "savings",
+      component: () => import("@/pages/SavingsPlansPage.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/templates",
       name: "templates",
       component: () => import("@/pages/TemplatesPage.vue"),

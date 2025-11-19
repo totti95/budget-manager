@@ -121,7 +121,7 @@ class StatsController extends Controller
         $history = $query->get();
 
         return response()->json([
-            'labels' => $history->pluck('recorded_at')->map(fn($date) => $date->format('Y-m-d')),
+            'labels' => $history->pluck('recorded_at')->map(fn ($date) => $date->format('Y-m-d')),
             'datasets' => [
                 [
                     'label' => 'Actifs',

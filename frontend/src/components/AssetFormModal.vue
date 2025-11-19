@@ -12,7 +12,15 @@
     >
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-bold">
-          {{ asset ? "Modifier le patrimoine" : "Ajouter un patrimoine" }}
+          {{
+            asset
+              ? asset.isLiability
+                ? "Modifier le passif"
+                : "Modifier l'actif"
+              : props.isLiability
+                ? "Ajouter un passif"
+                : "Ajouter un actif"
+          }}
         </h3>
         <button
           type="button"
@@ -36,6 +44,18 @@
       </div>
 
       <form @submit="onSubmit" class="space-y-4">
+        <div>
+          <label class="flex items-center gap-2 mb-4">
+            <input
+              type="checkbox"
+              v-model="isLiabilityField"
+              v-bind="isLiabilityAttrs"
+              class="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+            />
+            <span class="label mb-0">Il s'agit d'un passif (dette)</span>
+          </label>
+        </div>
+
         <div>
           <label for="type" class="label">Type</label>
           <TypeInput
@@ -153,9 +173,12 @@ import type { Asset } from "@/types";
 interface Props {
   isOpen: boolean;
   asset?: Asset | null;
+  isLiability?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  isLiability: false,
+});
 const emit = defineEmits<{
   close: [];
   submit: [values: CreateAssetData];
@@ -171,6 +194,7 @@ const { errors, defineField, handleSubmit, isSubmitting, resetForm } = useForm({
   validationSchema: toTypedSchema(assetSchema),
   initialValues: {
     type: "",
+    is_liability: false,
     label: "",
     institution: "",
     value_cents: 0,
@@ -204,6 +228,7 @@ watch(
         resetForm({
           values: {
             type: props.asset.type,
+            is_liability: props.asset.isLiability,
             label: props.asset.label,
             institution: props.asset.institution || "",
             value_cents: props.asset.valueCents,
@@ -214,6 +239,7 @@ watch(
         resetForm({
           values: {
             type: "",
+            is_liability: props.isLiability,
             label: "",
             institution: "",
             value_cents: 0,
@@ -226,6 +252,7 @@ watch(
 );
 
 const [type, _typeAttrs] = defineField("type");
+const [isLiabilityField, isLiabilityAttrs] = defineField("is_liability");
 const [label, labelAttrs] = defineField("label");
 const [institution, institutionAttrs] = defineField("institution");
 const [notes, notesAttrs] = defineField("notes");

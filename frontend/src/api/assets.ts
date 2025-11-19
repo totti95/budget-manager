@@ -3,6 +3,7 @@ import type { Asset, AssetType } from "@/types";
 
 export interface CreateAssetData {
   type: AssetType;
+  is_liability?: boolean;
   label: string;
   institution?: string;
   value_cents: number;
@@ -17,7 +18,13 @@ export const assetsApi = {
 
   async list(
     type?: AssetType,
-  ): Promise<{ assets: Asset[]; totalValueCents: number }> {
+  ): Promise<{
+    assets: Asset[];
+    liabilities: Asset[];
+    totalAssetsCents: number;
+    totalLiabilitiesCents: number;
+    netWorthCents: number;
+  }> {
     const params = type ? { type } : {};
     const response = await api.get("/assets", { params });
     return response.data;

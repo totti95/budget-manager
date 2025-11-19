@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('template_subcategories', function (Blueprint $table) {
-            $table->integer('default_spent_cents')->default(0)->after('allocated_cents');
+            $table->integer('default_spent_cents')->default(0)->after('planned_amount_cents');
         });
     }
 

@@ -54,6 +54,7 @@ class BudgetCategory extends Model
         if ($this->planned_amount_cents === 0) {
             return null;
         }
+
         return ($this->actual_amount_cents / $this->planned_amount_cents - 1) * 100;
     }
 }

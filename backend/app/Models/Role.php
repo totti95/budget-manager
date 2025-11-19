@@ -24,5 +24,6 @@ class Role extends Model
      * Constantes pour les rôles
      */
     public const USER = 'user';
+
     public const ADMIN = 'admin';
 }
