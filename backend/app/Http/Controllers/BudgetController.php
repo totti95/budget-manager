@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Budget;
+use App\Models\SavingsPlan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -14,9 +15,9 @@ class BudgetController extends Controller
 
         if ($request->has('month')) {
             // Convert Y-m format to full date for comparison
-            $monthDate = Carbon::parse($request->month . '-01');
+            $monthDate = Carbon::parse($request->month.'-01');
             $query->whereYear('month', $monthDate->year)
-                  ->whereMonth('month', $monthDate->month);
+                ->whereMonth('month', $monthDate->month);
         }
 
         $budgets = $query->orderBy('month', 'desc')->paginate(12);
@@ -30,7 +31,7 @@ class BudgetController extends Controller
             'month' => 'required|date_format:Y-m',
         ]);
 
-        $month = Carbon::parse($validated['month'] . '-01');
+        $month = Carbon::parse($validated['month'].'-01');
 
         // Check if budget already exists
         $existing = $request->user()->budgets()->where('month', $month)->first();
@@ -43,7 +44,7 @@ class BudgetController extends Controller
 
         // Get default template
         $template = $request->user()->defaultTemplate();
-        if (!$template) {
+        if (! $template) {
             return response()->json([
                 'message' => 'Aucun template par défaut trouvé. Veuillez en créer un.',
             ], 404);
@@ -52,7 +53,7 @@ class BudgetController extends Controller
         // Create budget from template
         $budget = $request->user()->budgets()->create([
             'month' => $month,
-            'name' => 'Budget ' . $month->isoFormat('MMMM YYYY'),
+            'name' => 'Budget '.$month->isoFormat('MMMM YYYY'),
             'generated_from_template_id' => $template->id,
         ]);
 
@@ -77,14 +78,32 @@ class BudgetController extends Controller
                 if (($templateSubcat->default_spent_cents ?? 0) > 0) {
                     $budgetSubcat->expenses()->create([
                         'budget_id' => $budget->id,
-                        'user_id' => $request->user()->id,
-                        'description' => $templateSubcat->name,
+                        'label' => $templateSubcat->name,
                         'amount_cents' => $templateSubcat->default_spent_cents,
                         'date' => $month,
                     ]);
                 }
             }
         }
+
+        // Create or update SavingsPlan for this month
+        // Calculate planned savings from "Épargne" category if exists
+        $savingsCategory = $budget->categories()->where('name', 'Épargne')->first();
+        $plannedCents = 0;
+
+        if ($savingsCategory) {
+            $plannedCents = $savingsCategory->subcategories->sum('planned_amount_cents');
+        }
+
+        SavingsPlan::updateOrCreate(
+            [
+                'user_id' => $request->user()->id,
+                'month' => $month,
+            ],
+            [
+                'planned_cents' => $plannedCents,
+            ]
+        );
 
         return response()->json($budget->load('categories.subcategories'), 201);
     }

@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -19,7 +17,7 @@ return new class extends Migration
             // MySQL doesn't create automatic check constraints for enums, so nothing to drop
             // But if it exists, we need to check first
             $constraintExists = \DB::select("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'assets' AND CONSTRAINT_NAME = 'assets_type_check'");
-            if (!empty($constraintExists)) {
+            if (! empty($constraintExists)) {
                 \DB::statement('ALTER TABLE assets DROP CHECK assets_type_check');
             }
         }

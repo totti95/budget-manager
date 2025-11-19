@@ -41,10 +41,13 @@ class WealthHistoryController extends Controller
         $recordDate = Carbon::parse($validated['recorded_at']);
 
         // Calculate current assets and liabilities
-        $totalAssets = $request->user()->assets()->sum('value_cents');
+        $totalAssets = $request->user()->assets()
+            ->where('is_liability', false)
+            ->sum('value_cents');
 
-        // For now, liabilities are 0 (could be extended later)
-        $totalLiabilities = 0;
+        $totalLiabilities = $request->user()->assets()
+            ->where('is_liability', true)
+            ->sum('value_cents');
 
         $netWorth = $totalAssets - $totalLiabilities;
 

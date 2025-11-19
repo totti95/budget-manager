@@ -6,7 +6,10 @@ import type { CreateAssetData } from "@/api/assets";
 
 export const useAssetsStore = defineStore("assets", () => {
   const assets = ref<Asset[]>([]);
-  const totalValue = ref(0);
+  const liabilities = ref<Asset[]>([]);
+  const totalAssetsCents = ref(0);
+  const totalLiabilitiesCents = ref(0);
+  const netWorthCents = ref(0);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -16,7 +19,10 @@ export const useAssetsStore = defineStore("assets", () => {
     try {
       const response = await assetsApi.list(type);
       assets.value = response.assets;
-      totalValue.value = response.totalValueCents;
+      liabilities.value = response.liabilities;
+      totalAssetsCents.value = response.totalAssetsCents;
+      totalLiabilitiesCents.value = response.totalLiabilitiesCents;
+      netWorthCents.value = response.netWorthCents;
       return response;
     } catch (err) {
       error.value = "Erreur lors du chargement des actifs";
@@ -31,8 +37,14 @@ export const useAssetsStore = defineStore("assets", () => {
     error.value = null;
     try {
       const asset = await assetsApi.create(data);
-      assets.value.unshift(asset);
-      totalValue.value += asset.valueCents;
+      if (asset.isLiability) {
+        liabilities.value.unshift(asset);
+        totalLiabilitiesCents.value += asset.valueCents;
+      } else {
+        assets.value.unshift(asset);
+        totalAssetsCents.value += asset.valueCents;
+      }
+      netWorthCents.value = totalAssetsCents.value - totalLiabilitiesCents.value;
       return asset;
     } catch (err) {
       error.value = "Erreur lors de la création de l'actif";
@@ -47,12 +59,30 @@ export const useAssetsStore = defineStore("assets", () => {
     error.value = null;
     try {
       const asset = await assetsApi.update(id, data);
-      const index = assets.value.findIndex((a) => a.id === id);
-      if (index !== -1) {
-        const oldValue = assets.value[index].valueCents;
-        assets.value[index] = asset;
-        totalValue.value = totalValue.value - oldValue + asset.valueCents;
+
+      // Remove from old list
+      const assetIndex = assets.value.findIndex((a) => a.id === id);
+      const liabilityIndex = liabilities.value.findIndex((a) => a.id === id);
+
+      if (assetIndex !== -1) {
+        totalAssetsCents.value -= assets.value[assetIndex].valueCents;
+        assets.value.splice(assetIndex, 1);
       }
+      if (liabilityIndex !== -1) {
+        totalLiabilitiesCents.value -= liabilities.value[liabilityIndex].valueCents;
+        liabilities.value.splice(liabilityIndex, 1);
+      }
+
+      // Add to new list
+      if (asset.isLiability) {
+        liabilities.value.unshift(asset);
+        totalLiabilitiesCents.value += asset.valueCents;
+      } else {
+        assets.value.unshift(asset);
+        totalAssetsCents.value += asset.valueCents;
+      }
+
+      netWorthCents.value = totalAssetsCents.value - totalLiabilitiesCents.value;
       return asset;
     } catch (err) {
       error.value = "Erreur lors de la mise à jour de l'actif";
@@ -67,11 +97,20 @@ export const useAssetsStore = defineStore("assets", () => {
     error.value = null;
     try {
       await assetsApi.delete(id);
+
       const asset = assets.value.find((a) => a.id === id);
+      const liability = liabilities.value.find((a) => a.id === id);
+
       if (asset) {
-        totalValue.value -= asset.valueCents;
+        totalAssetsCents.value -= asset.valueCents;
+        assets.value = assets.value.filter((a) => a.id !== id);
       }
-      assets.value = assets.value.filter((a) => a.id !== id);
+      if (liability) {
+        totalLiabilitiesCents.value -= liability.valueCents;
+        liabilities.value = liabilities.value.filter((a) => a.id !== id);
+      }
+
+      netWorthCents.value = totalAssetsCents.value - totalLiabilitiesCents.value;
     } catch (err) {
       error.value = "Erreur lors de la suppression de l'actif";
       throw err;
@@ -82,7 +121,10 @@ export const useAssetsStore = defineStore("assets", () => {
 
   return {
     assets,
-    totalValue,
+    liabilities,
+    totalAssetsCents,
+    totalLiabilitiesCents,
+    netWorthCents,
     loading,
     error,
     fetchAssets,

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
@@ -19,23 +18,23 @@ class AdminUserController extends Controller
         $query = User::with('role');
 
         // Filtre par recherche (nom ou email)
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
+                    ->orWhere('email', 'LIKE', "%{$search}%");
             });
         }
 
         // Filtre par rôle
-        if ($request->has('role') && !empty($request->role)) {
+        if ($request->has('role') && ! empty($request->role)) {
             $query->whereHas('role', function ($q) use ($request) {
                 $q->where('label', $request->role);
             });
         }
 
         // Filtre par statut (actif/désactivé/tous)
-        if ($request->has('status') && !empty($request->status)) {
+        if ($request->has('status') && ! empty($request->status)) {
             if ($request->status === 'deleted') {
                 $query->onlyTrashed();
             } elseif ($request->status === 'active') {
@@ -156,7 +155,7 @@ class AdminUserController extends Controller
     public function restore(User $user)
     {
         // Vérifier que l'utilisateur est bien désactivé
-        if (!$user->trashed()) {
+        if (! $user->trashed()) {
             return response()->json([
                 'message' => 'Cet utilisateur est déjà actif',
             ], 422);
@@ -181,7 +180,7 @@ class AdminUserController extends Controller
         $numbers = '0123456789';
         $symbols = '!@#$%^&*-_+=';
 
-        $allChars = $uppercase . $lowercase . $numbers . $symbols;
+        $allChars = $uppercase.$lowercase.$numbers.$symbols;
 
         // Garantir au moins un caractère de chaque type
         $password = '';

@@ -101,6 +101,7 @@ export interface Asset {
   id: number;
   userId: number;
   type: AssetType;
+  isLiability: boolean;
   label: string;
   institution: string | null;
   valueCents: number;

@@ -14,6 +14,7 @@
             <router-link to="/patrimoine" class="nav-link"
               >Patrimoine</router-link
             >
+            <router-link to="/epargne" class="nav-link">Épargne</router-link>
             <router-link to="/templates" class="nav-link"
               >Templates</router-link
             >

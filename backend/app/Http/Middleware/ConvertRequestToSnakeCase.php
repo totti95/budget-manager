@@ -31,7 +31,7 @@ class ConvertRequestToSnakeCase
      */
     private function convertKeysToSnakeCase($data)
     {
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return $data;
         }
 

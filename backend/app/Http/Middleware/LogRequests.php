@@ -15,7 +15,7 @@ class LogRequests
         $response = $next($request);
         $duration = round((microtime(true) - $startTime) * 1000, 2);
 
-        if (!str_contains($request->path(), 'health')) {
+        if (! str_contains($request->path(), 'health')) {
             Log::info('HTTP Request', [
                 'method' => $request->method(),
                 'path' => $request->path(),

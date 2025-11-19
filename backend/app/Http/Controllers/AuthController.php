@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -48,7 +48,7 @@ class AuthController extends Controller
         // Chercher l'utilisateur, incluant les soft deleted pour vérifier le statut
         $user = User::withTrashed()->with('role')->where('email', $validated['email'])->first();
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Les informations d\'identification fournies sont incorrectes.'],
             ]);
@@ -72,6 +72,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $user = $request->user()->load('role');
+
         return response()->json($user);
     }
 
@@ -92,7 +93,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         // Verify current password
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['Le mot de passe actuel est incorrect.'],
             ]);

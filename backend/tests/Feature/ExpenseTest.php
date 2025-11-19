@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\User;
 use App\Models\Budget;
 use App\Models\BudgetCategory;
 use App\Models\BudgetSubcategory;
 use App\Models\Expense;
+use App\Models\User;
 use Carbon\Carbon;
 
 test('user can create expense', function () {

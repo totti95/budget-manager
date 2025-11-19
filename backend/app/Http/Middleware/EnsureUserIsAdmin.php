@@ -17,9 +17,9 @@ class EnsureUserIsAdmin
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return response()->json([
-                'message' => 'Accès interdit. Vous devez être administrateur.'
+                'message' => 'Accès interdit. Vous devez être administrateur.',
             ], 403);
         }
 

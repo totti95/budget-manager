@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('budget_subcategories', function (Blueprint $table) {
-            $table->integer('default_spent_cents')->default(0)->after('planned_amount_cents');
+        Schema::table('assets', function (Blueprint $table) {
+            $table->boolean('is_liability')->default(false)->after('type');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('budget_subcategories', function (Blueprint $table) {
-            $table->dropColumn('default_spent_cents');
+        Schema::table('assets', function (Blueprint $table) {
+            $table->dropColumn('is_liability');
         });
     }
 };

@@ -33,13 +33,13 @@ class SavingsPlan extends Model
             ->where('month', $this->month)
             ->first();
 
-        if (!$budget) {
+        if (! $budget) {
             return 0;
         }
 
         $savingsCategory = $budget->categories()->where('name', 'Épargne')->first();
 
-        if (!$savingsCategory) {
+        if (! $savingsCategory) {
             return 0;
         }
 
