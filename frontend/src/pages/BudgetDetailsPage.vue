@@ -121,12 +121,20 @@
                   <span v-else>-</span>
                 </td>
                 <td>
-                  <button
-                    @click="handleDeleteExpense(expense.id)"
-                    class="text-red-600 hover:text-red-700 dark:text-red-400 text-sm"
-                  >
-                    Supprimer
-                  </button>
+                  <div class="flex gap-2">
+                    <button
+                      @click="handleEditExpense(expense)"
+                      class="text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm"
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      @click="handleDeleteExpense(expense.id)"
+                      class="text-red-600 hover:text-red-700 dark:text-red-400 text-sm"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -134,6 +142,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit Expense Modal -->
+    <EditExpenseModal
+      :isOpen="showEditModal"
+      :expense="expenseToEdit"
+      :categories="currentBudget?.categories || []"
+      @close="closeEditModal"
+      @updated="handleExpenseUpdated"
+    />
   </div>
 </template>
 
@@ -144,12 +161,16 @@ import { useBudgetStore } from "@/stores/budget";
 import { useExpenseStore } from "@/stores/expense";
 import ExpenseForm from "@/components/ExpenseForm.vue";
 import MoneyDisplay from "@/components/MoneyDisplay.vue";
+import EditExpenseModal from "@/components/EditExpenseModal.vue";
 import type { CreateExpenseData } from "@/api/expenses";
+import type { Expense } from "@/types";
 
 const route = useRoute();
 const budgetStore = useBudgetStore();
 const expenseStore = useExpenseStore();
 const showExpenseForm = ref(false);
+const showEditModal = ref(false);
+const expenseToEdit = ref<Expense | null>(null);
 
 const currentBudget = computed(() => budgetStore.currentBudget);
 
@@ -208,6 +229,23 @@ async function handleCategoryUpdated() {
   // Refresh budget to get updated categories with new subcategory
   if (currentBudget.value) {
     await budgetStore.fetchBudget(currentBudget.value.id);
+  }
+}
+
+function handleEditExpense(expense: Expense) {
+  expenseToEdit.value = expense;
+  showEditModal.value = true;
+}
+
+function closeEditModal() {
+  showEditModal.value = false;
+  expenseToEdit.value = null;
+}
+
+async function handleExpenseUpdated(updatedExpense: Expense) {
+  // Refresh expenses to get the updated list
+  if (currentBudget.value) {
+    await expenseStore.fetchExpenses(currentBudget.value.id);
   }
 }
 

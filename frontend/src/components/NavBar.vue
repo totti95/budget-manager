@@ -28,9 +28,12 @@
         </div>
 
         <div class="flex items-center space-x-4">
-          <span class="text-sm text-gray-600 dark:text-gray-300">
+          <router-link
+            to="/profile"
+            class="text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          >
             {{ authStore.user?.name }}
-          </span>
+          </router-link>
           <button @click="handleLogout" class="btn btn-secondary text-sm">
             Déconnexion
           </button>

@@ -12,6 +12,7 @@ use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\WealthHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::put('/password', [AuthController::class, 'updatePassword']);
     });
 });
 
@@ -80,6 +82,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('budgets/{budget}/stats/summary', [StatsController::class, 'summary']);
     Route::get('budgets/{budget}/stats/by-category', [StatsController::class, 'byCategory']);
     Route::get('budgets/{budget}/stats/by-subcategory', [StatsController::class, 'bySubcategory']);
+    Route::get('budgets/{budget}/stats/expense-distribution', [StatsController::class, 'expenseDistribution']);
+    Route::get('stats/wealth-evolution', [StatsController::class, 'wealthEvolution']);
 
     // Assets (Patrimoine)
     Route::get('assets/types', [AssetController::class, 'types']);
@@ -89,6 +93,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('savings', [SavingsPlanController::class, 'index']);
     Route::get('savings/{savingsPlan}', [SavingsPlanController::class, 'show']);
     Route::put('savings/{savingsPlan}', [SavingsPlanController::class, 'update']);
+
+    // Wealth History
+    Route::get('wealth-history', [WealthHistoryController::class, 'index']);
+    Route::post('wealth-history/record', [WealthHistoryController::class, 'record']);
+    Route::delete('wealth-history/{wealthHistory}', [WealthHistoryController::class, 'destroy']);
 });
 
 // Admin routes

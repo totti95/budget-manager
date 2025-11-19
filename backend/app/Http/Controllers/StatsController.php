@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Budget;
+use App\Models\WealthHistory;
 use Illuminate\Http\Request;
 
 class StatsController extends Controller
@@ -99,5 +100,68 @@ class StatsController extends Controller
         }
 
         return response()->json($stats);
+    }
+
+    /**
+     * Get wealth evolution chart data
+     */
+    public function wealthEvolution(Request $request)
+    {
+        $query = WealthHistory::where('user_id', $request->user()->id)
+            ->orderBy('recorded_at', 'asc');
+
+        if ($request->has('from')) {
+            $query->where('recorded_at', '>=', $request->from);
+        }
+
+        if ($request->has('to')) {
+            $query->where('recorded_at', '<=', $request->to);
+        }
+
+        $history = $query->get();
+
+        return response()->json([
+            'labels' => $history->pluck('recorded_at')->map(fn($date) => $date->format('Y-m-d')),
+            'datasets' => [
+                [
+                    'label' => 'Actifs',
+                    'data' => $history->pluck('total_assets_cents'),
+                ],
+                [
+                    'label' => 'Passifs',
+                    'data' => $history->pluck('total_liabilities_cents'),
+                ],
+                [
+                    'label' => 'Patrimoine Net',
+                    'data' => $history->pluck('net_worth_cents'),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Get expense distribution by category for pie chart
+     */
+    public function expenseDistribution(Request $request, Budget $budget)
+    {
+        $this->authorize('view', $budget);
+
+        // Charger toutes les relations nécessaires en une seule requête
+        $budget->loadMissing('categories.subcategories.expenses');
+
+        $distribution = $budget->categories->map(function ($category) {
+            $actualCents = $category->subcategories->sum(function ($subcat) {
+                return $subcat->expenses->sum('amount_cents');
+            });
+
+            return [
+                'label' => $category->name,
+                'value' => $actualCents,
+            ];
+        })->filter(function ($item) {
+            return $item['value'] > 0; // Only include categories with expenses
+        })->values();
+
+        return response()->json($distribution);
     }
 }

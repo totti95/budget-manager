@@ -46,6 +46,7 @@ export interface TemplateSubcategory {
   templateCategoryId: number;
   name: string;
   plannedAmountCents: number;
+  defaultSpentCents?: number;
   sortOrder: number;
 }
 
@@ -75,6 +76,7 @@ export interface BudgetSubcategory {
   budgetCategoryId: number;
   name: string;
   plannedAmountCents: number;
+  defaultSpentCents?: number;
   sortOrder: number;
   expenses?: Expense[];
 }
@@ -158,4 +160,15 @@ export interface PaginatedResponse<T> {
   last_page: number;
   per_page: number;
   total: number;
+}
+
+export interface WealthHistory {
+  id: number;
+  userId: number;
+  recordedAt: string;
+  totalAssetsCents: number;
+  totalLiabilitiesCents: number;
+  netWorthCents: number;
+  createdAt: string;
+  updatedAt: string;
 }

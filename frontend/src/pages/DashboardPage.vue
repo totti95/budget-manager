@@ -65,6 +65,15 @@
         </div>
       </div>
 
+      <!-- Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ExpenseDistributionChart
+          v-if="currentBudget"
+          :budgetId="currentBudget.id"
+        />
+        <WealthEvolutionChart />
+      </div>
+
       <!-- Categories Table -->
       <div class="card">
         <h2 class="text-xl font-bold mb-4">Catégories</h2>
@@ -130,6 +139,8 @@ import { ref, onMounted, computed } from "vue";
 import { useBudgetStore } from "@/stores/budget";
 import { useStatsStore } from "@/stores/stats";
 import MoneyDisplay from "@/components/MoneyDisplay.vue";
+import ExpenseDistributionChart from "@/components/ExpenseDistributionChart.vue";
+import WealthEvolutionChart from "@/components/WealthEvolutionChart.vue";
 
 const budgetStore = useBudgetStore();
 const statsStore = useStatsStore();

@@ -66,11 +66,23 @@ class BudgetController extends Controller
 
             // Copy subcategories
             foreach ($templateCat->subcategories as $templateSubcat) {
-                $budgetCat->subcategories()->create([
+                $budgetSubcat = $budgetCat->subcategories()->create([
                     'name' => $templateSubcat->name,
                     'planned_amount_cents' => $templateSubcat->planned_amount_cents,
                     'sort_order' => $templateSubcat->sort_order,
+                    'default_spent_cents' => $templateSubcat->default_spent_cents ?? 0,
                 ]);
+
+                // Create default expense if default_spent_cents is set
+                if (($templateSubcat->default_spent_cents ?? 0) > 0) {
+                    $budgetSubcat->expenses()->create([
+                        'budget_id' => $budget->id,
+                        'user_id' => $request->user()->id,
+                        'description' => $templateSubcat->name,
+                        'amount_cents' => $templateSubcat->default_spent_cents,
+                        'date' => $month,
+                    ]);
+                }
             }
         }
 

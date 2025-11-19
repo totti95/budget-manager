@@ -14,11 +14,13 @@ class TemplateSubcategory extends Model
         'template_category_id',
         'name',
         'planned_amount_cents',
+        'default_spent_cents',
         'sort_order',
     ];
 
     protected $casts = [
         'planned_amount_cents' => 'integer',
+        'default_spent_cents' => 'integer',
         'sort_order' => 'integer',
     ];
 

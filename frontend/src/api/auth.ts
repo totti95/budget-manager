@@ -25,4 +25,13 @@ export const authApi = {
   async logout(): Promise<void> {
     await api.post("/auth/logout");
   },
+
+  async updatePassword(data: {
+    currentPassword: string;
+    newPassword: string;
+    newPasswordConfirmation: string;
+  }): Promise<{ message: string }> {
+    const response = await api.put<{ message: string }>("/auth/password", data);
+    return response.data;
+  },
 };
