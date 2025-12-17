@@ -8,6 +8,8 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetSubcategoryController;
 use App\Http\Controllers\BudgetTemplateController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
@@ -98,6 +100,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('wealth-history', [WealthHistoryController::class, 'index']);
     Route::post('wealth-history/record', [WealthHistoryController::class, 'record']);
     Route::delete('wealth-history/{wealthHistory}', [WealthHistoryController::class, 'destroy']);
+
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::put('/{notification}/mark-read', [NotificationController::class, 'markRead']);
+        Route::put('/mark-all-read', [NotificationController::class, 'markAllRead']);
+        Route::delete('/{notification}', [NotificationController::class, 'destroy']);
+        Route::delete('/', [NotificationController::class, 'clearAll']);
+    });
+
+    // Notification Settings
+    Route::get('notification-settings', [NotificationSettingController::class, 'show']);
+    Route::put('notification-settings', [NotificationSettingController::class, 'update']);
 });
 
 // Admin routes

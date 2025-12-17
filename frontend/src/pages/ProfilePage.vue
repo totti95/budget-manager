@@ -32,6 +32,12 @@
 
       <!-- Change Password Form -->
       <ChangePasswordForm />
+
+      <!-- Notification Settings -->
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-4">Paramètres de notification</h2>
+        <NotificationSettingsForm />
+      </div>
     </div>
   </div>
 </template>
@@ -39,6 +45,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import ChangePasswordForm from "@/components/ChangePasswordForm.vue";
+import NotificationSettingsForm from "@/components/NotificationSettingsForm.vue";
 
 const authStore = useAuthStore();
 </script>
