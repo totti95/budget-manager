@@ -4,10 +4,16 @@ Ce document liste les fonctionnalités prioritaires à développer pour Budget M
 
 ---
 
-## 🎯 Feature 4 : Alertes de Dépassement Budgétaire
+## ✅ Feature 4 : Alertes de Dépassement Budgétaire (COMPLÉTÉE)
 
 ### Description
 Système de notifications pour alerter l'utilisateur lorsqu'une sous-catégorie ou catégorie dépasse le budget prévu.
+
+**Statut :** ✅ Implémentée et testée (Décembre 2025)
+**Détails :**
+- Backend : Notifications, settings, service de détection, cleanup automatique
+- Frontend : NotificationBell, NotificationsPage, NotificationSettingsForm, polling 30s
+- Tests : Tous les endpoints testés, build réussi, fonctionnel en production
 
 ### Spécifications Backend
 

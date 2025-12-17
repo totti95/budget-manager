@@ -29,6 +29,7 @@
         </div>
 
         <div class="flex items-center space-x-4">
+          <NotificationBell />
           <router-link
             to="/profile"
             class="text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -47,6 +48,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import NotificationBell from "./NotificationBell.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();

@@ -173,3 +173,42 @@ export interface WealthHistory {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Notification {
+  id: number;
+  userId: number;
+  type: "budget_exceeded" | "savings_goal_reached";
+  title: string;
+  message: string;
+  data: {
+    budgetId?: number;
+    budgetMonth?: string;
+    subcategoryId?: number;
+    subcategoryName?: string;
+    categoryName?: string;
+    plannedCents?: number;
+    actualCents?: number;
+    percentageUsed?: number;
+    thresholdPercent?: number;
+  } | null;
+  read: boolean;
+  readAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NotificationSettings {
+  id: number;
+  userId: number;
+  budgetExceededEnabled: boolean;
+  budgetExceededThresholdPercent: number;
+  savingsGoalEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateNotificationSettingsData {
+  budgetExceededEnabled?: boolean;
+  budgetExceededThresholdPercent?: number;
+  savingsGoalEnabled?: boolean;
+}

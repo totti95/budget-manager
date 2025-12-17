@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Budget;
 use App\Models\Expense;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
@@ -58,6 +59,9 @@ class ExpenseController extends Controller
 
         $expense = $budget->expenses()->create($validated);
 
+        // Check for budget exceeded notification
+        app(NotificationService::class)->checkBudgetExceeded($expense);
+
         return response()->json($expense->load('subcategory.budgetCategory'), 201);
     }
 
@@ -82,6 +86,9 @@ class ExpenseController extends Controller
         }
 
         $expense->update($validated);
+
+        // Check for budget exceeded notification
+        app(NotificationService::class)->checkBudgetExceeded($expense);
 
         return response()->json($expense->load('subcategory.budgetCategory'));
     }
