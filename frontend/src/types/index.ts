@@ -246,3 +246,36 @@ export interface UpdateNotificationSettingsData {
   budgetExceededThresholdPercent?: number;
   savingsGoalEnabled?: boolean;
 }
+
+export interface CategoryComparisonStats {
+  name: string;
+  plannedCents: number;
+  actualCents: number;
+  varianceCents: number;
+  variancePercent: number;
+}
+
+export interface BudgetComparisonStats {
+  totalPlannedCents: number;
+  totalActualCents: number;
+  varianceCents: number;
+  variancePercent: number;
+  byCategory: CategoryComparisonStats[];
+}
+
+export interface BudgetWithStats extends Budget {
+  stats?: BudgetComparisonStats;
+}
+
+export interface CategoryEvolution {
+  categoryName: string;
+  values: number[];
+  evolutionPercent: number;
+}
+
+export interface BudgetComparison {
+  budgets: BudgetWithStats[];
+  comparison: {
+    evolution: CategoryEvolution[];
+  };
+}

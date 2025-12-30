@@ -1,5 +1,5 @@
 import api from "./axios";
-import type { Budget, PaginatedResponse } from "@/types";
+import type { Budget, PaginatedResponse, BudgetComparison } from "@/types";
 
 export const budgetsApi = {
   async list(month?: string): Promise<PaginatedResponse<Budget>> {
@@ -27,5 +27,12 @@ export const budgetsApi = {
 
   async delete(id: number): Promise<void> {
     await api.delete(`/budgets/${id}`);
+  },
+
+  async compare(months: string[]): Promise<BudgetComparison> {
+    const response = await api.get<BudgetComparison>("/budgets/compare", {
+      params: { months },
+    });
+    return response.data;
   },
 };

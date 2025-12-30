@@ -152,4 +152,97 @@ class BudgetController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function compare(Request $request)
+    {
+        $validated = $request->validate([
+            'months' => 'required|array|min:2|max:3',
+            'months.*' => 'required|date_format:Y-m',
+        ]);
+
+        $user = $request->user();
+        $budgets = [];
+        $categoryData = [];
+
+        foreach ($validated['months'] as $month) {
+            $monthDate = Carbon::parse($month.'-01');
+            $budget = $user->budgets()
+                ->where('month', $monthDate)
+                ->with(['categories.subcategories.expenses'])
+                ->first();
+
+            if ($budget) {
+                // Calculate stats for this budget
+                $totalPlanned = 0;
+                $totalActual = 0;
+                $byCategory = [];
+
+                foreach ($budget->categories as $category) {
+                    $categoryPlanned = $category->planned_amount_cents;
+                    $categoryActual = 0;
+
+                    foreach ($category->subcategories as $subcategory) {
+                        $subcategoryActual = $subcategory->expenses->sum('amount_cents');
+                        $categoryActual += $subcategoryActual;
+                    }
+
+                    $totalPlanned += $categoryPlanned;
+                    $totalActual += $categoryActual;
+
+                    $byCategory[] = [
+                        'name' => $category->name,
+                        'planned_cents' => $categoryPlanned,
+                        'actual_cents' => $categoryActual,
+                        'variance_cents' => $categoryActual - $categoryPlanned,
+                        'variance_percent' => $categoryPlanned > 0
+                            ? round((($categoryActual - $categoryPlanned) / $categoryPlanned) * 100, 2)
+                            : 0,
+                    ];
+
+                    // Store for evolution calculation
+                    if (! isset($categoryData[$category->name])) {
+                        $categoryData[$category->name] = [];
+                    }
+                    $categoryData[$category->name][] = $categoryActual;
+                }
+
+                $budget->stats = [
+                    'total_planned_cents' => $totalPlanned,
+                    'total_actual_cents' => $totalActual,
+                    'variance_cents' => $totalActual - $totalPlanned,
+                    'variance_percent' => $totalPlanned > 0
+                        ? round((($totalActual - $totalPlanned) / $totalPlanned) * 100, 2)
+                        : 0,
+                    'by_category' => $byCategory,
+                ];
+
+                $budgets[] = $budget;
+            }
+        }
+
+        // Calculate evolution across months
+        $evolution = [];
+        foreach ($categoryData as $categoryName => $values) {
+            if (count($values) >= 2) {
+                $firstValue = $values[0];
+                $lastValue = $values[count($values) - 1];
+                $evolutionPercent = $firstValue > 0
+                    ? round((($lastValue - $firstValue) / $firstValue) * 100, 2)
+                    : 0;
+
+                $evolution[] = [
+                    'category_name' => $categoryName,
+                    'values' => $values,
+                    'evolution_percent' => $evolutionPercent,
+                ];
+            }
+        }
+
+        return response()->json([
+            'budgets' => $budgets,
+            'comparison' => [
+                'evolution' => $evolution,
+            ],
+        ]);
+    }
 }
