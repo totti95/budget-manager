@@ -95,6 +95,40 @@ export interface Expense {
   updatedAt: string;
 }
 
+export type RecurringFrequency = "monthly" | "weekly" | "yearly";
+
+export type DayOfWeek =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
+
+export interface RecurringExpense {
+  id: number;
+  userId: number;
+  templateSubcategoryId: number | null;
+  templateSubcategory?: TemplateSubcategory & {
+    templateCategory?: TemplateCategory;
+  };
+  label: string;
+  amountCents: number;
+  frequency: RecurringFrequency;
+  dayOfMonth: number | null;
+  dayOfWeek: DayOfWeek | null;
+  monthOfYear: number | null;
+  autoCreate: boolean;
+  isActive: boolean;
+  startDate: string;
+  endDate: string | null;
+  paymentMethod: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type AssetType = "immobilier" | "épargne" | "investissement" | "autre";
 
 export interface Asset {

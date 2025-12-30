@@ -18,6 +18,9 @@
             <router-link to="/templates" class="nav-link"
               >Templates</router-link
             >
+            <router-link to="/recurring-expenses" class="nav-link"
+              >Dépenses récurrentes</router-link
+            >
             <router-link
               v-if="authStore.user?.role?.label === 'admin'"
               to="/admin/users"

@@ -71,6 +71,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/recurring-expenses",
+      name: "recurring-expenses",
+      component: () => import("@/pages/RecurringExpensesPage.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/admin/users",
       name: "admin-users",
       component: () => import("@/pages/AdminUsersPage.vue"),

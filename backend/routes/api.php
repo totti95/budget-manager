@@ -9,6 +9,7 @@ use App\Http\Controllers\BudgetSubcategoryController;
 use App\Http\Controllers\BudgetTemplateController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RecurringExpenseController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SavingsPlanController;
@@ -79,6 +80,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
     Route::post('budgets/{budget}/expenses/import-csv', [ExpenseController::class, 'importCsv']);
     Route::get('budgets/{budget}/expenses/export-csv', [ExpenseController::class, 'exportCsv']);
+
+    // Recurring Expenses
+    Route::get('recurring-expenses', [RecurringExpenseController::class, 'index']);
+    Route::post('recurring-expenses', [RecurringExpenseController::class, 'store']);
+    Route::get('recurring-expenses/{recurringExpense}', [RecurringExpenseController::class, 'show']);
+    Route::put('recurring-expenses/{recurringExpense}', [RecurringExpenseController::class, 'update']);
+    Route::delete('recurring-expenses/{recurringExpense}', [RecurringExpenseController::class, 'destroy']);
+    Route::patch('recurring-expenses/{recurringExpense}/toggle-active', [RecurringExpenseController::class, 'toggleActive']);
 
     // Stats
     Route::get('budgets/{budget}/stats/summary', [StatsController::class, 'summary']);

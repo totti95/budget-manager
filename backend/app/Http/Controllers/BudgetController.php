@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Budget;
 use App\Models\SavingsPlan;
+use App\Services\RecurringExpenseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BudgetController extends Controller
 {
@@ -104,6 +106,15 @@ class BudgetController extends Controller
                 'planned_cents' => $plannedCents,
             ]
         );
+
+        // Create recurring expenses for this budget
+        $recurringExpensesCreated = app(RecurringExpenseService::class)
+            ->createRecurringExpensesForBudget($budget);
+
+        Log::info('Budget generated with recurring expenses', [
+            'budget_id' => $budget->id,
+            'recurring_expenses_created' => $recurringExpensesCreated,
+        ]);
 
         return response()->json($budget->load('categories.subcategories'), 201);
     }
