@@ -65,6 +65,11 @@ class User extends Authenticatable
         return $this->hasOne(NotificationSetting::class);
     }
 
+    public function recurringExpenses(): HasMany
+    {
+        return $this->hasMany(RecurringExpense::class);
+    }
+
     public function defaultTemplate()
     {
         return $this->budgetTemplates()->where('is_default', true)->first();

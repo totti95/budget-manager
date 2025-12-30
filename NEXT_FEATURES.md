@@ -254,10 +254,17 @@ Composant dans NavBar.vue avec :
 
 ---
 
-## 🔄 Feature 5 : Dépenses Récurrentes Automatiques
+## ✅ Feature 5 : Dépenses Récurrentes Automatiques (COMPLÉTÉE)
 
 ### Description
 Permettre la création automatique de dépenses récurrentes (loyer, abonnements, salaire) chaque mois lors de la génération du budget.
+
+**Statut :** ✅ Implémentée et testée (Décembre 2025)
+**Détails :**
+- Backend : RecurringExpense model, RecurringExpenseService, RecurringExpenseController, RecurringExpensePolicy
+- Frontend : RecurringExpensesPage, API client, store Pinia
+- Tests : Migration réussie, build frontend réussi, fonctionnel
+- Note : Fréquence hebdomadaire crée une seule dépense par mois (première occurrence)
 
 ### Spécifications Backend
 
