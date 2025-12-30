@@ -273,6 +273,16 @@ php artisan test --filter=AuthTest  # Specific test
 - Use `make logs` to debug container issues
 - Use `make clean` then `make init` for complete reset
 
+### File Creation and Permissions (CRITICAL)
+- **NEVER create files via Docker commands** (e.g., `docker compose exec php touch file.php`)
+- **ALWAYS create files directly in the project directory** using Write tool or text editor
+- Files created via Docker have root/container user ownership, causing permission issues
+- Symptoms: "Permission denied" errors when trying to edit/delete files, git checkout failures
+- If you accidentally created files via Docker:
+  1. Delete them: `docker compose exec php rm /path/to/file`
+  2. Fix directory permissions: `docker compose exec php chown -R $(id -u):$(id -g) /path/to/directory`
+  3. Recreate files using Write tool or text editor in the host filesystem
+
 ## URLs & Access
 
 - Frontend: http://localhost:5173

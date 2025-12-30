@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Budgets
     Route::get('budgets', [BudgetController::class, 'index']);
     Route::post('budgets/generate', [BudgetController::class, 'generate']);
+    Route::get('budgets/compare', [BudgetController::class, 'compare']);
     Route::get('budgets/{budget}', [BudgetController::class, 'show']);
     Route::put('budgets/{budget}', [BudgetController::class, 'update']);
     Route::delete('budgets/{budget}', [BudgetController::class, 'destroy']);

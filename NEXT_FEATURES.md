@@ -499,10 +499,17 @@ Ajouter lien "Dépenses récurrentes" dans menu
 
 ---
 
-## 📊 Feature 6 : Comparaison Multi-Budgets
+## ✅ Feature 6 : Comparaison Multi-Budgets (COMPLÉTÉE)
 
 ### Description
 Comparer 2 ou 3 budgets mensuels côte-à-côte pour analyser l'évolution des dépenses.
+
+**Statut :** ✅ Implémentée et testée (Décembre 2025)
+**Détails :**
+- Backend : Endpoint `/budgets/compare` avec calcul des stats et évolution par catégorie
+- Frontend : BudgetComparisonPage, BudgetComparisonTable, BudgetComparisonChart avec Chart.js
+- Tests : Type-check réussi, build réussi, tri chronologique automatique
+- Fonctionnalités : Sélection de 2-3 mois, tableau comparatif, graphique barres groupées, calcul évolution %
 
 ### Spécifications Backend
 

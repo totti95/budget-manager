@@ -11,6 +11,9 @@
 
           <div class="hidden md:flex space-x-4">
             <router-link to="/" class="nav-link">Dashboard</router-link>
+            <router-link to="/budgets-compare" class="nav-link"
+              >Comparer budgets</router-link
+            >
             <router-link to="/patrimoine" class="nav-link"
               >Patrimoine</router-link
             >
