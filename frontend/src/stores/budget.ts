@@ -98,6 +98,21 @@ export const useBudgetStore = defineStore("budget", () => {
     }
   }
 
+  async function exportPdf(id: number) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await budgetsApi.exportPdf(id);
+      return result; // { blob, filename }
+    } catch (err) {
+      error.value = "Erreur lors de l'export PDF";
+      console.error(err as Error);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     budgets,
     currentBudget,
@@ -108,5 +123,6 @@ export const useBudgetStore = defineStore("budget", () => {
     generateBudget,
     updateBudget,
     deleteBudget,
+    exportPdf,
   };
 });
