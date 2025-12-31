@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Budget;
 use App\Models\SavingsPlan;
 use App\Services\RecurringExpenseService;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -244,5 +245,114 @@ class BudgetController extends Controller
                 'evolution' => $evolution,
             ],
         ]);
+    }
+
+    public function exportPdf(Request $request, Budget $budget)
+    {
+        $this->authorize('view', $budget);
+
+        $budget->load([
+            'categories.subcategories.expenses',
+            'expenses',
+        ]);
+
+        // Calculate statistics
+        $stats = $this->calculateBudgetStats($budget);
+
+        // Get authenticated user
+        $user = $request->user();
+
+        // Generate PDF from Blade view
+        $pdf = PDF::loadView('budgets.pdf', [
+            'budget' => $budget,
+            'stats' => $stats,
+            'user' => $user,
+        ]);
+
+        // Configure PDF options
+        $pdf->setPaper('a4');
+
+        // Return PDF download response
+        // Add 2 hours to handle timezone (DB stores last day of previous month at 23:00 UTC = first day of next month)
+        $filename = 'budget-'.$budget->month->copy()->addHours(2)->format('Y-m').'.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    private function calculateBudgetStats(Budget $budget): array
+    {
+        $totalPlanned = 0;
+        $totalActual = 0;
+        $byCategory = [];
+        $allExpenses = [];
+
+        foreach ($budget->categories as $category) {
+            $categoryPlanned = 0;
+            $categoryActual = 0;
+            $bySubcategory = [];
+
+            foreach ($category->subcategories as $subcategory) {
+                $subcategoryActual = $subcategory->expenses->sum('amount_cents');
+                $categoryPlanned += $subcategory->planned_amount_cents;
+                $categoryActual += $subcategoryActual;
+
+                $subcategoryVariance = $subcategoryActual - $subcategory->planned_amount_cents;
+                $subcategoryVariancePercent = $subcategory->planned_amount_cents > 0
+                    ? round((($subcategoryActual - $subcategory->planned_amount_cents) / $subcategory->planned_amount_cents) * 100, 2)
+                    : 0;
+
+                $bySubcategory[] = [
+                    'name' => $subcategory->name,
+                    'planned_cents' => $subcategory->planned_amount_cents,
+                    'actual_cents' => $subcategoryActual,
+                    'variance_cents' => $subcategoryVariance,
+                    'variance_percent' => $subcategoryVariancePercent,
+                ];
+
+                // Collect all expenses for top 10
+                foreach ($subcategory->expenses as $expense) {
+                    $allExpenses[] = [
+                        'date' => $expense->date,
+                        'label' => $expense->label,
+                        'amount_cents' => $expense->amount_cents,
+                        'category' => $category->name,
+                        'subcategory' => $subcategory->name,
+                        'payment_method' => $expense->payment_method,
+                    ];
+                }
+            }
+
+            $totalPlanned += $categoryPlanned;
+            $totalActual += $categoryActual;
+
+            $categoryVariance = $categoryActual - $categoryPlanned;
+            $categoryVariancePercent = $categoryPlanned > 0
+                ? round((($categoryActual - $categoryPlanned) / $categoryPlanned) * 100, 2)
+                : 0;
+
+            $byCategory[] = [
+                'name' => $category->name,
+                'planned_cents' => $categoryPlanned,
+                'actual_cents' => $categoryActual,
+                'variance_cents' => $categoryVariance,
+                'variance_percent' => $categoryVariancePercent,
+                'subcategories' => $bySubcategory,
+            ];
+        }
+
+        // Sort expenses by amount descending and take top 10
+        usort($allExpenses, fn ($a, $b) => $b['amount_cents'] <=> $a['amount_cents']);
+        $topExpenses = array_slice($allExpenses, 0, 10);
+
+        return [
+            'total_planned_cents' => $totalPlanned,
+            'total_actual_cents' => $totalActual,
+            'variance_cents' => $totalActual - $totalPlanned,
+            'variance_percent' => $totalPlanned > 0
+                ? round((($totalActual - $totalPlanned) / $totalPlanned) * 100, 2)
+                : 0,
+            'by_category' => $byCategory,
+            'top_expenses' => $topExpenses,
+        ];
     }
 }

@@ -626,10 +626,17 @@ Chart.js avec :
 
 ---
 
-## 📄 Feature 7 : Export PDF de Budget
+## ✅ Feature 7 : Export PDF de Budget (COMPLÉTÉE)
 
 ### Description
 Générer un PDF récapitulatif professionnel d'un budget mensuel.
+
+**Statut :** ✅ Implémentée (Décembre 2025)
+**Détails :**
+- Backend : Package barryvdh/laravel-dompdf installé, BudgetController::exportPdf(), vue Blade pdf.blade.php
+- Frontend : Bouton "Télécharger PDF" dans BudgetDetailsPage, API client exportPdf(), store action
+- Fonctionnalités : Génération PDF avec résumé stats, tableau catégories/sous-catégories, top 10 dépenses
+- Tests : Type-check réussi, build réussi, formatage professionnel avec CSS inline
 
 ### Spécifications Backend
 

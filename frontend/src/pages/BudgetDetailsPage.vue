@@ -7,7 +7,32 @@
       >
         ← Retour au dashboard
       </router-link>
-      <h1 class="text-3xl font-bold">{{ currentBudget?.name }}</h1>
+      <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold">{{ currentBudget?.name }}</h1>
+        <FormButton
+          v-if="currentBudget"
+          variant="secondary"
+          @click="handleExportPdf"
+          :loading="isExportingPdf"
+          :disabled="isExportingPdf"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2 inline-block"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          Télécharger PDF
+        </FormButton>
+      </div>
     </div>
 
     <div
@@ -159,18 +184,22 @@ import { onMounted, computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useBudgetStore } from "@/stores/budget";
 import { useExpenseStore } from "@/stores/expense";
+import { useToast } from "@/composables/useToast";
 import ExpenseForm from "@/components/ExpenseForm.vue";
 import MoneyDisplay from "@/components/MoneyDisplay.vue";
 import EditExpenseModal from "@/components/EditExpenseModal.vue";
+import FormButton from "@/components/FormButton.vue";
 import type { CreateExpenseData } from "@/api/expenses";
 import type { Expense } from "@/types";
 
 const route = useRoute();
 const budgetStore = useBudgetStore();
 const expenseStore = useExpenseStore();
+const toast = useToast();
 const showExpenseForm = ref(false);
 const showEditModal = ref(false);
 const expenseToEdit = ref<Expense | null>(null);
+const isExportingPdf = ref(false);
 
 const currentBudget = computed(() => budgetStore.currentBudget);
 
@@ -257,6 +286,46 @@ async function handleDeleteExpense(id: number) {
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);
     }
+  }
+}
+
+async function handleExportPdf() {
+  if (!currentBudget.value) return;
+
+  isExportingPdf.value = true;
+
+  try {
+    // Get PDF blob and filename from API
+    const result = await budgetStore.exportPdf(currentBudget.value.id);
+
+    if (!result || !result.blob) {
+      throw new Error("Résultat invalide du store");
+    }
+
+    const { blob, filename } = result;
+
+    // Create download link
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename || "budget.pdf"; // Use filename from backend with fallback
+
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    toast.success("PDF téléchargé avec succès");
+  } catch (err) {
+    console.error("Erreur lors de l'export PDF:", err);
+    const errorMessage =
+      err instanceof Error ? err.message : "Erreur inconnue";
+    toast.error(`Erreur lors de la génération du PDF: ${errorMessage}`);
+  } finally {
+    isExportingPdf.value = false;
   }
 }
 

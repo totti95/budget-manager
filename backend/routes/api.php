@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('budgets/{budget}', [BudgetController::class, 'show']);
     Route::put('budgets/{budget}', [BudgetController::class, 'update']);
     Route::delete('budgets/{budget}', [BudgetController::class, 'destroy']);
+    Route::get('budgets/{budget}/export-pdf', [BudgetController::class, 'exportPdf']);
 
     // Budget Categories (within a budget)
     Route::post('budgets/{budget}/categories', [BudgetCategoryController::class, 'store']);
