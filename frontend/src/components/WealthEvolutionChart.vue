@@ -3,7 +3,7 @@
     <h3 class="text-lg font-semibold mb-4">Évolution du Patrimoine</h3>
     <div v-if="loading" class="text-center py-8">Chargement...</div>
     <div v-else-if="error" class="text-red-600">{{ error }}</div>
-    <div v-else-if="chartData">
+    <div v-else-if="chartData" class="h-96">
       <canvas ref="chartCanvas"></canvas>
     </div>
     <div v-else class="text-gray-500 text-center py-8">
@@ -13,9 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import { Chart, registerables } from "chart.js";
-import { statsApi } from "@/api/stats";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {Chart, registerables, type TooltipItem} from "chart.js";
+import {statsApi} from "@/api/stats";
 
 Chart.register(...registerables);
 
@@ -27,8 +27,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const chartCanvas = ref<HTMLCanvasElement | null>(null);
-const chartInstance = ref<Chart | null>(null);
-const chartData = ref<any>(null);
+let chartInstance: Chart<"line", number[], string> | null = null;
+type WealthDataset = { label: string; data: number[] };
+type WealthChartData = { labels: string[]; datasets: WealthDataset[] };
+const chartData = ref<WealthChartData | null>(null);
 const loading = ref(false);
 const error = ref("");
 
@@ -39,34 +41,38 @@ const loadData = async () => {
   error.value = "";
 
   try {
-    const data = await statsApi.wealthEvolution({
+    chartData.value = await statsApi.wealthEvolution({
       from: props.from,
       to: props.to,
     });
-    chartData.value = data;
-    renderChart();
   } catch (err: any) {
+    chartData.value = null;
     error.value = err.response?.data?.message || "Erreur de chargement";
   } finally {
     loading.value = false;
+    await nextTick(); // wait for canvas before drawing
+    if (chartData.value) {
+      renderChart();
+    } else {
+      chartInstance?.destroy();
+      chartInstance = null;
+    }
   }
 };
 
 const renderChart = () => {
   if (!chartCanvas.value || !chartData.value) return;
 
-  if (chartInstance.value) {
-    chartInstance.value.destroy();
-  }
+  chartInstance?.destroy();
 
   const ctx = chartCanvas.value.getContext("2d");
   if (!ctx) return;
 
-  chartInstance.value = new Chart(ctx, {
+  chartInstance = new Chart(ctx, {
     type: "line",
     data: {
       labels: chartData.value.labels,
-      datasets: chartData.value.datasets.map((dataset: any, index: number) => ({
+      datasets: chartData.value.datasets.map((dataset, index) => ({
         label: dataset.label,
         data: dataset.data.map(centsToEuros),
         borderColor:
@@ -87,7 +93,7 @@ const renderChart = () => {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           display: true,
@@ -95,16 +101,17 @@ const renderChart = () => {
         },
         tooltip: {
           callbacks: {
-            label: function (context) {
-              let label = context.dataset.label || "";
-              if (label) {
-                label += ": ";
-              }
-              label += new Intl.NumberFormat("fr-FR", {
-                style: "currency",
-                currency: "EUR",
-              }).format(context.parsed.y);
-              return label;
+            label: (context: TooltipItem<"line">) => {
+              const label = context.dataset.label
+                ? `${context.dataset.label}: `
+                : "";
+              return (
+                label +
+                new Intl.NumberFormat("fr-FR", {
+                  style: "currency",
+                  currency: "EUR",
+                }).format(context.parsed.y ?? 0)
+              );
             },
           },
         },
@@ -113,13 +120,12 @@ const renderChart = () => {
         y: {
           beginAtZero: true,
           ticks: {
-            callback: function (value) {
-              return new Intl.NumberFormat("fr-FR", {
+            callback: (value) =>
+              new Intl.NumberFormat("fr-FR", {
                 style: "currency",
                 currency: "EUR",
                 maximumFractionDigits: 0,
-              }).format(value as number);
-            },
+              }).format(value as number),
           },
         },
       },

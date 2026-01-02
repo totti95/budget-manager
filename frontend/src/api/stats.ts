@@ -1,5 +1,5 @@
 import api from "./axios";
-import type { BudgetStats, CategoryStats } from "@/types";
+import type { BudgetStats, CategoryStats, TagStats } from "@/types";
 
 export interface WealthEvolutionData {
   labels: string[];
@@ -59,6 +59,13 @@ export const statsApi = {
   ): Promise<ExpenseDistributionItem[]> {
     const response = await api.get<ExpenseDistributionItem[]>(
       `/budgets/${budgetId}/stats/expense-distribution`,
+    );
+    return response.data;
+  },
+
+  async byTag(budgetId: number): Promise<TagStats[]> {
+    const response = await api.get<TagStats[]>(
+      `/budgets/${budgetId}/stats/by-tag`,
     );
     return response.data;
   },

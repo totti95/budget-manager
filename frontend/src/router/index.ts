@@ -83,6 +83,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/tags",
+      name: "tags",
+      component: () => import("@/pages/TagsPage.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/admin/users",
       name: "admin-users",
       component: () => import("@/pages/AdminUsersPage.vue"),

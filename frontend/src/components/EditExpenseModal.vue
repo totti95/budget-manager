@@ -121,6 +121,8 @@
           ></textarea>
         </div>
 
+        <TagInput v-model="form.tagIds" label="Tags (optionnel)" />
+
         <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
 
         <div class="flex gap-3 justify-end">
@@ -145,9 +147,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { expensesApi } from "@/api/expenses";
 import type { Expense, BudgetCategory } from "@/types";
+import TagInput from "./TagInput.vue";
+import { useTagsStore } from "@/stores/tags";
 
 interface Props {
   isOpen: boolean;
@@ -170,10 +174,21 @@ const form = ref({
   budgetSubcategoryId: null as number | null,
   paymentMethod: "",
   notes: "",
+  tagIds: [] as number[],
 });
 
 const loading = ref(false);
 const error = ref("");
+
+// Tags store
+const tagsStore = useTagsStore();
+
+// Load tags on mount
+onMounted(async () => {
+  if (tagsStore.tags.length === 0) {
+    await tagsStore.fetchTags();
+  }
+});
 
 const centsToEuros = (cents: number) => cents / 100;
 const eurosToCents = (euros: number) => Math.round(euros * 100);
@@ -189,6 +204,7 @@ watch(
         budgetSubcategoryId: expense.budgetSubcategoryId,
         paymentMethod: expense.paymentMethod || "",
         notes: expense.notes || "",
+        tagIds: expense.tags?.map((t) => t.id) || [],
       };
     }
   },
@@ -214,6 +230,7 @@ const handleSubmit = async () => {
       budget_subcategory_id: form.value.budgetSubcategoryId!,
       payment_method: form.value.paymentMethod || undefined,
       notes: form.value.notes || undefined,
+      tag_ids: form.value.tagIds,
     });
 
     emit("updated", updatedExpense);

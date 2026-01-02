@@ -14,6 +14,7 @@ use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\WealthHistoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,6 +84,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('budgets/{budget}/expenses/import-csv', [ExpenseController::class, 'importCsv']);
     Route::get('budgets/{budget}/expenses/export-csv', [ExpenseController::class, 'exportCsv']);
 
+    // Tags
+    Route::get('tags', [TagController::class, 'index']);
+    Route::post('tags', [TagController::class, 'store']);
+    Route::put('tags/{tag}', [TagController::class, 'update']);
+    Route::delete('tags/{tag}', [TagController::class, 'destroy']);
+
     // Recurring Expenses
     Route::get('recurring-expenses', [RecurringExpenseController::class, 'index']);
     Route::post('recurring-expenses', [RecurringExpenseController::class, 'store']);
@@ -95,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('budgets/{budget}/stats/summary', [StatsController::class, 'summary']);
     Route::get('budgets/{budget}/stats/by-category', [StatsController::class, 'byCategory']);
     Route::get('budgets/{budget}/stats/by-subcategory', [StatsController::class, 'bySubcategory']);
+    Route::get('budgets/{budget}/stats/by-tag', [StatsController::class, 'byTag']);
     Route::get('budgets/{budget}/stats/expense-distribution', [StatsController::class, 'expenseDistribution']);
     Route::get('stats/wealth-evolution', [StatsController::class, 'wealthEvolution']);
 

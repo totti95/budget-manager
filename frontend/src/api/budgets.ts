@@ -49,7 +49,7 @@ export const budgetsApi = {
     console.log("All headers:", response.headers);
 
     // Try multiple patterns to extract filename
-    let match = contentDisposition.match(/filename[*]?=["']?([^"';]+)["']?/i);
+    const match = contentDisposition.match(/filename[*]?=["']?([^"';]+)["']?/i);
     if (match && match[1]) {
       filename = match[1].trim();
       console.log("Extracted filename:", filename);

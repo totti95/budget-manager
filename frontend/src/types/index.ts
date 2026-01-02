@@ -81,6 +81,15 @@ export interface BudgetSubcategory {
   expenses?: Expense[];
 }
 
+export interface Tag {
+  id: number;
+  userId: number;
+  name: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Expense {
   id: number;
   budgetId: number;
@@ -91,6 +100,7 @@ export interface Expense {
   paymentMethod: string | null;
   notes: string | null;
   subcategory?: BudgetSubcategory;
+  tags?: Tag[];
   createdAt: string;
   updatedAt: string;
 }
@@ -169,6 +179,14 @@ export interface CategoryStats {
   actualAmountCents: number;
   varianceCents: number;
   variancePercentage: number | null;
+  expenseCount: number;
+}
+
+export interface TagStats {
+  tagId: number;
+  tagName: string;
+  tagColor: string;
+  totalAmountCents: number;
   expenseCount: number;
 }
 

@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->hasMany(RecurringExpense::class);
     }
 
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
     public function defaultTemplate()
     {
         return $this->budgetTemplates()->where('is_default', true)->first();

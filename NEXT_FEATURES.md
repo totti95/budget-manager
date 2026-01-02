@@ -734,10 +734,21 @@ async function downloadPdf() {
 
 ---
 
-## 🏷️ Feature 8 : Tags pour Dépenses
+## ✅ Feature 8 : Tags pour Dépenses (COMPLÉTÉE)
 
 ### Description
 Ajouter un système de tags libres aux dépenses pour filtrage et statistiques avancées.
+
+**Statut :** ✅ Implémentée et testée (Janvier 2026)
+**Détails :**
+- Backend : Tag model, TagPolicy, TagController CRUD, relation many-to-many avec Expense via pivot table
+- ExpenseController : Ajout sync tags dans store/update, filtre par tag dans index, eager loading tags
+- StatsController : Endpoint byTag pour statistiques par tag
+- Frontend : TagInput (autocomplete + création inline), TagBadge (affichage coloré)
+- API : tagsApi (CRUD complet), stats.byTag()
+- Store : tagsStore Pinia avec gestion état et erreurs
+- Tests : Type-check réussi, build réussi
+- Fonctionnalités : Création/modification/suppression tags, couleurs personnalisables, filtrage dépenses par tag, stats par tag
 
 ### Spécifications Backend
 
