@@ -164,4 +164,42 @@ class StatsController extends Controller
 
         return response()->json($distribution);
     }
+
+    /**
+     * Get expense statistics grouped by tag
+     */
+    public function byTag(Request $request, Budget $budget)
+    {
+        $this->authorize('view', $budget);
+
+        // Get all expenses with their tags for this budget
+        $expenses = $budget->expenses()->with('tags')->get();
+
+        // Group expenses by tag
+        $tagStats = [];
+
+        foreach ($expenses as $expense) {
+            foreach ($expense->tags as $tag) {
+                $tagId = $tag->id;
+
+                if (!isset($tagStats[$tagId])) {
+                    $tagStats[$tagId] = [
+                        'tagId' => $tag->id,
+                        'tagName' => $tag->name,
+                        'tagColor' => $tag->color,
+                        'totalAmountCents' => 0,
+                        'expenseCount' => 0,
+                    ];
+                }
+
+                $tagStats[$tagId]['totalAmountCents'] += $expense->amount_cents;
+                $tagStats[$tagId]['expenseCount']++;
+            }
+        }
+
+        // Sort by total amount descending
+        $tagStats = collect($tagStats)->sortByDesc('totalAmountCents')->values();
+
+        return response()->json($tagStats);
+    }
 }

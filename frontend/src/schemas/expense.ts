@@ -14,6 +14,7 @@ export const expenseSchema = z.object({
     .positive("Le montant doit être supérieur à 0"),
   payment_method: z.string().optional(),
   notes: z.string().optional(),
+  tag_ids: z.array(z.number()).optional(),
 });
 
 export type ExpenseInput = z.infer<typeof expenseSchema>;

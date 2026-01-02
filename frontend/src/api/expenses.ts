@@ -3,6 +3,7 @@ import type { Expense, PaginatedResponse } from "@/types";
 
 export interface ExpenseFilters {
   subcatId?: number;
+  tagId?: number;
   q?: string;
   from?: string;
   to?: string;
@@ -16,6 +17,7 @@ export interface CreateExpenseData {
   amount_cents: number;
   payment_method?: string;
   notes?: string;
+  tag_ids?: number[];
 }
 
 export const expensesApi = {

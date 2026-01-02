@@ -13,11 +13,18 @@ class ExpenseController extends Controller
     {
         $this->authorize('view', $budget);
 
-        $query = $budget->expenses()->with('subcategory.budgetCategory');
+        $query = $budget->expenses()->with('subcategory.budgetCategory', 'tags');
 
         // Filter by subcategory
         if ($request->has('subcatId')) {
             $query->where('budget_subcategory_id', $request->subcatId);
+        }
+
+        // Filter by tag
+        if ($request->has('tagId')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('tags.id', $request->tagId);
+            });
         }
 
         // Search
@@ -49,6 +56,8 @@ class ExpenseController extends Controller
             'amount_cents' => 'required|integer|min:1',
             'payment_method' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:tags,id',
         ]);
 
         // Verify subcategory belongs to this budget
@@ -59,10 +68,17 @@ class ExpenseController extends Controller
 
         $expense = $budget->expenses()->create($validated);
 
+        // Sync tags if provided
+        if (isset($validated['tag_ids'])) {
+            // Verify tags belong to the user
+            $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id');
+            $expense->tags()->sync($userTags);
+        }
+
         // Check for budget exceeded notification
         app(NotificationService::class)->checkBudgetExceeded($expense);
 
-        return response()->json($expense->load('subcategory.budgetCategory'), 201);
+        return response()->json($expense->load('subcategory.budgetCategory', 'tags'), 201);
     }
 
     public function update(Request $request, Expense $expense)
@@ -76,6 +92,8 @@ class ExpenseController extends Controller
             'amount_cents' => 'sometimes|integer|min:1',
             'payment_method' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'tag_ids' => 'sometimes|nullable|array',
+            'tag_ids.*' => 'exists:tags,id',
         ]);
 
         if (isset($validated['budget_subcategory_id'])) {
@@ -87,10 +105,17 @@ class ExpenseController extends Controller
 
         $expense->update($validated);
 
+        // Sync tags if provided
+        if (isset($validated['tag_ids'])) {
+            // Verify tags belong to the user
+            $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id');
+            $expense->tags()->sync($userTags);
+        }
+
         // Check for budget exceeded notification
         app(NotificationService::class)->checkBudgetExceeded($expense);
 
-        return response()->json($expense->load('subcategory.budgetCategory'));
+        return response()->json($expense->load('subcategory.budgetCategory', 'tags'));
     }
 
     public function destroy(Request $request, Expense $expense)

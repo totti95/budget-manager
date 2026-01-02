@@ -181,6 +181,12 @@
       />
     </div>
 
+    <TagInput
+      v-model="tagIds"
+      label="Tags (optionnel)"
+      :error="errors.tag_ids"
+    />
+
     <div class="flex gap-2">
       <button
         type="submit"
@@ -208,12 +214,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { expenseSchema } from "@/schemas/expense";
 import type { Expense, BudgetCategory } from "@/types";
 import apiClient from "@/api/axios";
+import TagInput from "./TagInput.vue";
+import { useTagsStore } from "@/stores/tags";
 
 interface Props {
   expense?: Expense;
@@ -232,6 +240,7 @@ const emit = defineEmits<{
       amount_cents: number;
       payment_method?: string;
       notes?: string;
+      tag_ids?: number[];
     },
   ];
   categoryUpdated: [];
@@ -245,6 +254,16 @@ const newSubcategoryAmount = ref(0);
 const hasTriedSubmit = ref(false);
 const subcategoryError = ref("");
 const isCreatingSubcategory = ref(false);
+
+// Tags store
+const tagsStore = useTagsStore();
+
+// Load tags on mount
+onMounted(async () => {
+  if (tagsStore.tags.length === 0) {
+    await tagsStore.fetchTags();
+  }
+});
 
 // Convert euros to cents
 const amountToCents = (value: number) => Math.round(value * 100);
@@ -260,6 +279,7 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
         amount_cents: props.expense.amountCents,
         payment_method: props.expense.paymentMethod || "",
         notes: props.expense.notes || "",
+        tag_ids: props.expense.tags?.map((t) => t.id) || [],
       }
     : {
         date: new Date().toISOString().split("T")[0],
@@ -268,6 +288,7 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
         amount_cents: 0,
         payment_method: "",
         notes: "",
+        tag_ids: [],
       },
 });
 
@@ -278,6 +299,15 @@ const [budgetSubcategoryId, budgetSubcategoryIdAttrs] = defineField(
 const [label, labelAttrs] = defineField("label");
 const [paymentMethod, paymentMethodAttrs] = defineField("payment_method");
 const [notes, notesAttrs] = defineField("notes");
+const [tagIdsField] = defineField("tag_ids");
+
+// Computed wrapper for tagIds to ensure it's always an array
+const tagIds = computed({
+  get: () => tagIdsField.value || [],
+  set: (value) => {
+    tagIdsField.value = value;
+  },
+});
 
 // Handle amount separately to convert between euros and cents
 const [amountCents, amountAttrs] = defineField("amount_cents");

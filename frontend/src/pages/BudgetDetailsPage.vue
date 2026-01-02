@@ -68,6 +68,12 @@
         </div>
       </div>
 
+      <!-- Expenses by Tag Chart -->
+      <ExpensesByTagChart
+        v-if="currentBudget"
+        :budget-id="currentBudget.id"
+      />
+
       <!-- Add Expense Form -->
       <div class="card">
         <div class="flex items-center justify-between mb-4">
@@ -100,11 +106,40 @@
           {{ expenseStore.error }}
         </div>
 
+        <!-- Tag Filter -->
+        <div v-if="tagsStore.tags.length > 0" class="mb-4 flex gap-2 items-center">
+          <label class="font-medium text-sm">Filtrer par tag :</label>
+          <select
+            v-model="selectedTagFilter"
+            class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option :value="null">Tous les tags</option>
+            <option
+              v-for="tag in tagsStore.tags"
+              :key="tag.id"
+              :value="tag.id"
+            >
+              {{ tag.name }}
+            </option>
+          </select>
+          <button
+            v-if="selectedTagFilter"
+            @click="selectedTagFilter = null"
+            class="text-sm text-blue-600 hover:underline"
+          >
+            Réinitialiser
+          </button>
+        </div>
+
         <div
           v-if="expenseStore.expenses.length === 0"
           class="text-center py-8 text-gray-600"
         >
           <p>Aucune dépense enregistrée</p>
+        </div>
+
+        <div v-else-if="filteredExpenses.length === 0" class="text-center py-8 text-gray-600">
+          <p>Aucune dépense trouvée pour ce filtre</p>
         </div>
 
         <div v-else class="overflow-x-auto">
@@ -116,11 +151,12 @@
                 <th>Libellé</th>
                 <th>Montant</th>
                 <th>Paiement</th>
+                <th>Tags</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr v-for="expense in expenseStore.expenses" :key="expense.id">
+              <tr v-for="expense in filteredExpenses" :key="expense.id">
                 <td>
                   {{ new Date(expense.date).toLocaleDateString("fr-FR") }}
                 </td>
@@ -144,6 +180,17 @@
                     {{ formatPaymentMethod(expense.paymentMethod) }}
                   </span>
                   <span v-else>-</span>
+                </td>
+                <td>
+                  <div class="flex flex-wrap gap-1">
+                    <TagBadge
+                      v-for="tag in expense.tags"
+                      :key="tag.id"
+                      :tag="tag"
+                      :removable="false"
+                    />
+                    <span v-if="!expense.tags || expense.tags.length === 0" class="text-gray-400">-</span>
+                  </div>
                 </td>
                 <td>
                   <div class="flex gap-2">
@@ -184,22 +231,27 @@ import { onMounted, computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useBudgetStore } from "@/stores/budget";
 import { useExpenseStore } from "@/stores/expense";
+import { useTagsStore } from "@/stores/tags";
 import { useToast } from "@/composables/useToast";
 import ExpenseForm from "@/components/ExpenseForm.vue";
 import MoneyDisplay from "@/components/MoneyDisplay.vue";
 import EditExpenseModal from "@/components/EditExpenseModal.vue";
 import FormButton from "@/components/FormButton.vue";
+import TagBadge from "@/components/TagBadge.vue";
+import ExpensesByTagChart from "@/components/ExpensesByTagChart.vue";
 import type { CreateExpenseData } from "@/api/expenses";
 import type { Expense } from "@/types";
 
 const route = useRoute();
 const budgetStore = useBudgetStore();
 const expenseStore = useExpenseStore();
+const tagsStore = useTagsStore();
 const toast = useToast();
 const showExpenseForm = ref(false);
 const showEditModal = ref(false);
 const expenseToEdit = ref<Expense | null>(null);
 const isExportingPdf = ref(false);
+const selectedTagFilter = ref<number | null>(null);
 
 const currentBudget = computed(() => budgetStore.currentBudget);
 
@@ -227,6 +279,18 @@ const totalSpent = computed(() => {
 
 const remaining = computed(() => totalPlanned.value - totalSpent.value);
 
+const filteredExpenses = computed(() => {
+  let expenses = expenseStore.expenses;
+
+  if (selectedTagFilter.value) {
+    expenses = expenses.filter((e) =>
+      e.tags?.some((tag) => tag.id === selectedTagFilter.value),
+    );
+  }
+
+  return expenses;
+});
+
 onMounted(async () => {
   const month = route.params.month as string;
   try {
@@ -236,6 +300,10 @@ onMounted(async () => {
       await budgetStore.fetchBudget(budgetId);
       // Fetch expenses for this budget
       await expenseStore.fetchExpenses(budgetId);
+    }
+    // Load tags
+    if (tagsStore.tags.length === 0) {
+      await tagsStore.fetchTags();
     }
   } catch (error) {
     console.error("Erreur lors du chargement du budget:", error);
