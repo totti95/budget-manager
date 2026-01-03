@@ -12,6 +12,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RecurringExpenseController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\SavingsGoalController;
+use App\Http\Controllers\SavingsGoalContributionController;
 use App\Http\Controllers\SavingsPlanController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\TagController;
@@ -114,6 +116,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('savings', [SavingsPlanController::class, 'index']);
     Route::get('savings/{savingsPlan}', [SavingsPlanController::class, 'show']);
     Route::put('savings/{savingsPlan}', [SavingsPlanController::class, 'update']);
+
+    // Savings Goals
+    Route::apiResource('savings-goals', SavingsGoalController::class);
+    Route::patch('savings-goals/{savingsGoal}/sync-asset', [SavingsGoalController::class, 'syncAsset']);
+
+    // Savings Goal Contributions
+    Route::get('savings-goals/{savingsGoal}/contributions', [SavingsGoalContributionController::class, 'index']);
+    Route::post('savings-goals/{savingsGoal}/contributions', [SavingsGoalContributionController::class, 'store']);
+    Route::delete('savings-goals/{savingsGoal}/contributions/{contribution}', [SavingsGoalContributionController::class, 'destroy']);
 
     // Wealth History
     Route::get('wealth-history', [WealthHistoryController::class, 'index']);

@@ -1,8 +1,10 @@
 <?php
 
+use App\Console\Commands\CheckSavingsGoalsStatus;
 use App\Models\Notification;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -17,3 +19,6 @@ Artisan::command('notifications:cleanup', function () {
 
     $this->info("Deleted {$deleted} read notifications older than 30 days.");
 })->purpose('Delete read notifications older than 30 days')->daily();
+
+// Schedule savings goals status check
+Schedule::command(CheckSavingsGoalsStatus::class)->daily();

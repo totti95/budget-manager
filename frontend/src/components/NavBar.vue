@@ -137,6 +137,7 @@ const baseLinks = [
   { to: "/budgets-compare", label: "Comparer budgets" },
   { to: "/patrimoine", label: "Patrimoine" },
   { to: "/epargne", label: "Épargne" },
+  { to: "/objectifs", label: "Objectifs" },
   { to: "/templates", label: "Templates" },
   { to: "/tags", label: "Tags" },
   { to: "/recurring-expenses", label: "Dépenses récurrentes" },

@@ -204,6 +204,9 @@ class DatabaseSeeder extends Seeder
                 'notes' => 'Résidence principale',
             ],
         ]);
+
+        // Savings Goals
+        $this->call(SavingsGoalSeeder::class);
     }
 
     private function getRandomExpenseLabel(string $subcategory): string

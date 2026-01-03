@@ -229,7 +229,12 @@ export interface WealthHistory {
 export interface Notification {
   id: number;
   userId: number;
-  type: "budget_exceeded" | "savings_goal_reached";
+  type:
+    | "budget_exceeded"
+    | "savings_goal_reached"
+    | "savings_goal_milestone"
+    | "savings_goal_risk"
+    | "savings_goal_reminder";
   title: string;
   message: string;
   data: {
@@ -242,6 +247,14 @@ export interface Notification {
     actualCents?: number;
     percentageUsed?: number;
     thresholdPercent?: number;
+    goalId?: number;
+    milestone?: number;
+    currentAmountCents?: number;
+    targetAmountCents?: number;
+    progressPercentage?: number;
+    timeProgressPercentage?: number;
+    deficitPercentage?: number;
+    suggestedAmountCents?: number;
   } | null;
   read: boolean;
   readAt: string | null;
@@ -255,6 +268,9 @@ export interface NotificationSettings {
   budgetExceededEnabled: boolean;
   budgetExceededThresholdPercent: number;
   savingsGoalEnabled: boolean;
+  savingsGoalMilestoneEnabled: boolean;
+  savingsGoalRiskEnabled: boolean;
+  savingsGoalReminderEnabled: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -263,6 +279,9 @@ export interface UpdateNotificationSettingsData {
   budgetExceededEnabled?: boolean;
   budgetExceededThresholdPercent?: number;
   savingsGoalEnabled?: boolean;
+  savingsGoalMilestoneEnabled?: boolean;
+  savingsGoalRiskEnabled?: boolean;
+  savingsGoalReminderEnabled?: boolean;
 }
 
 export interface CategoryComparisonStats {
@@ -296,4 +315,72 @@ export interface BudgetComparison {
   comparison: {
     evolution: CategoryEvolution[];
   };
+}
+
+export interface SavingsGoal {
+  id: number;
+  userId: number;
+  assetId: number | null;
+  name: string;
+  description: string | null;
+  targetAmountCents: number;
+  currentAmountCents: number;
+  startDate: string;
+  targetDate: string | null;
+  status: "active" | "completed" | "abandoned" | "paused";
+  priority: number;
+  notifyMilestones: boolean;
+  notifyRisk: boolean;
+  notifyReminder: boolean;
+  reminderDayOfMonth: number | null;
+  suggestedMonthlyAmountCents: number | null;
+  createdAt: string;
+  updatedAt: string;
+
+  // Relations (optionnelles)
+  asset?: Asset;
+  contributions?: SavingsGoalContribution[];
+
+  // Computed attributes (retournés par l'API)
+  progressPercentage?: number;
+  daysRemaining?: number;
+  timeProgressPercentage?: number;
+  isOnTrack?: boolean;
+}
+
+export interface SavingsGoalContribution {
+  id: number;
+  savingsGoalId: number;
+  userId: number;
+  amountCents: number;
+  contributionDate: string;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSavingsGoalData {
+  assetId?: number | null;
+  name: string;
+  description?: string | null;
+  targetAmountCents: number;
+  startDate: string;
+  targetDate?: string | null;
+  priority?: number;
+  notifyMilestones?: boolean;
+  notifyRisk?: boolean;
+  notifyReminder?: boolean;
+  reminderDayOfMonth?: number | null;
+  suggestedMonthlyAmountCents?: number | null;
+}
+
+export interface UpdateSavingsGoalData
+  extends Partial<CreateSavingsGoalData> {
+  status?: "active" | "completed" | "abandoned" | "paused";
+}
+
+export interface CreateContributionData {
+  amountCents: number;
+  contributionDate: string;
+  note?: string | null;
 }
