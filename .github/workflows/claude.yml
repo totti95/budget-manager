@@ -30,6 +30,17 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Debug - Check if API key is set
+        run: |
+          if [ -z "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
+            echo "ERROR: CLAUDE_CODE_OAUTH_TOKEN secret is not set!"
+            exit 1
+          else
+            echo "API key secret is set (length: ${#CLAUDE_CODE_OAUTH_TOKEN})"
+          fi
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
