@@ -118,7 +118,7 @@ function renderChart() {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (context) => `${context.parsed.y.toFixed(1)}%`,
+            label: (context) => `${context.parsed.y?.toFixed(1) || '0'}%`,
           },
         },
       },

@@ -2,13 +2,13 @@ import { z } from "zod";
 
 export const createUserSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  email: z.email(),
+  email: z.string().email("L'email est invalide"),
   roleId: z.number().min(1, "Le rôle est requis"),
 });
 
 export const updateUserSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").optional(),
-  email: z.email().optional(),
+  email: z.string().email("L'email est invalide").optional(),
   roleId: z.number().min(1, "Le rôle est requis").optional(),
 });
 

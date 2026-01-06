@@ -247,7 +247,7 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
       }
     : {
         date: new Date().toISOString().split("T")[0],
-        budget_subcategory_id: "",
+        budget_subcategory_id: undefined as any,
         label: "",
         amount_cents: 0,
         payment_method: "",
@@ -306,7 +306,7 @@ watch(
 // Reset subcategory quand on change de catégorie
 watch(selectedCategoryId, () => {
   if (!props.expense) {
-    budgetSubcategoryId.value = "";
+    budgetSubcategoryId.value = undefined as any;
   }
   showNewSubcategoryInput.value = false;
   newSubcategoryName.value = "";
