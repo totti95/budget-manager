@@ -86,12 +86,8 @@
               @keydown.esc="cancelEditRevenue"
             />
             <div class="flex gap-2">
-              <button @click="saveRevenue" class="text-xs text-green-600">
-                ✓
-              </button>
-              <button @click="cancelEditRevenue" class="text-xs text-red-600">
-                ✗
-              </button>
+              <button @click="saveRevenue" class="text-xs text-green-600">✓</button>
+              <button @click="cancelEditRevenue" class="text-xs text-red-600">✗</button>
             </div>
           </div>
         </div>
@@ -124,15 +120,16 @@
         <div class="card text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Épargne</p>
           <p
-            v-if="currentBudget.savingsRatePercent !== null && currentBudget.savingsRatePercent !== undefined"
+            v-if="
+              currentBudget.savingsRatePercent !== null &&
+              currentBudget.savingsRatePercent !== undefined
+            "
             class="text-2xl font-bold"
             :class="getSavingsRateColor(currentBudget.savingsRatePercent)"
           >
             {{ currentBudget.savingsRatePercent.toFixed(1) }}%
           </p>
-          <p v-else class="text-2xl font-bold text-gray-400">
-            N/A
-          </p>
+          <p v-else class="text-2xl font-bold text-gray-400">N/A</p>
         </div>
       </div>
 

@@ -1,9 +1,5 @@
 <template>
-  <WidgetWrapper
-    title="Résumé du mois"
-    :loading="false"
-    :error="null"
-  >
+  <WidgetWrapper title="Résumé du mois" :loading="false" :error="null">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Prévu</p>

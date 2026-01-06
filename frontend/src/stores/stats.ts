@@ -1,12 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { statsApi } from "@/api/stats";
-import type {
-  BudgetStats,
-  CategoryStats,
-  TopCategoryStats,
-  SavingsRateDataPoint,
-} from "@/types";
+import type { BudgetStats, CategoryStats, TopCategoryStats, SavingsRateDataPoint } from "@/types";
 
 export const useStatsStore = defineStore("stats", () => {
   const summary = ref<BudgetStats | null>(null);

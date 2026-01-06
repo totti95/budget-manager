@@ -56,13 +56,10 @@ export const statsApi = {
     return response.data;
   },
 
-  async topCategories(
-    budgetId: number,
-    limit: number = 5,
-  ): Promise<TopCategoryStats[]> {
+  async topCategories(budgetId: number, limit: number = 5): Promise<TopCategoryStats[]> {
     const response = await api.get<TopCategoryStats[]>(
       `/budgets/${budgetId}/stats/top-categories`,
-      { params: { limit } },
+      { params: { limit } }
     );
     return response.data;
   },
@@ -72,10 +69,9 @@ export const statsApi = {
     to?: string;
     months?: number;
   }): Promise<SavingsRateDataPoint[]> {
-    const response = await api.get<SavingsRateDataPoint[]>(
-      "/stats/savings-rate-evolution",
-      { params },
-    );
+    const response = await api.get<SavingsRateDataPoint[]>("/stats/savings-rate-evolution", {
+      params,
+    });
     return response.data;
   },
 };

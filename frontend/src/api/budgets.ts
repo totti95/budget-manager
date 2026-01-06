@@ -20,10 +20,7 @@ export const budgetsApi = {
     return response.data;
   },
 
-  async update(
-    id: number,
-    data: { name?: string; revenueCents?: number },
-  ): Promise<Budget> {
+  async update(id: number, data: { name?: string; revenueCents?: number }): Promise<Budget> {
     const response = await api.put<Budget>(`/budgets/${id}`, data);
     return response.data;
   },

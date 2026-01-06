@@ -1,10 +1,5 @@
 <template>
-  <WidgetWrapper
-    title="Top 5 Catégories"
-    :loading="loading"
-    :error="error"
-    :on-refresh="loadData"
-  >
+  <WidgetWrapper title="Top 5 Catégories" :loading="loading" :error="error" :on-refresh="loadData">
     <div v-if="categories.length > 0" class="space-y-3">
       <div
         v-for="(cat, index) in categories"
@@ -22,19 +17,14 @@
         </div>
         <div class="text-right">
           <MoneyDisplay :cents="cat.actualCents" class="text-lg font-bold" />
-          <p
-            class="text-sm"
-            :class="cat.varianceCents > 0 ? 'text-red-600' : 'text-green-600'"
-          >
+          <p class="text-sm" :class="cat.varianceCents > 0 ? 'text-red-600' : 'text-green-600'">
             {{ cat.varianceCents > 0 ? "+" : "" }}
             <MoneyDisplay :cents="Math.abs(cat.varianceCents)" :show-sign="false" />
           </p>
         </div>
       </div>
     </div>
-    <div v-else class="text-center py-8 text-gray-500">
-      Aucune dépense enregistrée
-    </div>
+    <div v-else class="text-center py-8 text-gray-500">Aucune dépense enregistrée</div>
   </WidgetWrapper>
 </template>
 
@@ -65,10 +55,7 @@ async function loadData() {
   loading.value = true;
   error.value = null;
   try {
-    categories.value = await statsStore.fetchTopCategories(
-      props.budgetId,
-      props.limit,
-    );
+    categories.value = await statsStore.fetchTopCategories(props.budgetId, props.limit);
   } catch (err: any) {
     error.value = "Erreur de chargement";
   } finally {
@@ -77,5 +64,8 @@ async function loadData() {
 }
 
 onMounted(() => loadData());
-watch(() => props.budgetId, () => loadData());
+watch(
+  () => props.budgetId,
+  () => loadData()
+);
 </script>

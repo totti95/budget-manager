@@ -1,9 +1,5 @@
 <template>
-  <WidgetWrapper
-    title="Évolution du Patrimoine"
-    :loading="false"
-    :error="null"
-  >
+  <WidgetWrapper title="Évolution du Patrimoine" :loading="false" :error="null">
     <div class="h-full">
       <WealthEvolutionChart :from="from" :to="to" />
     </div>

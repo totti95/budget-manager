@@ -27,18 +27,13 @@
       </div>
     </div>
 
-    <div
-      v-if="loading && !allowLoadingWithContent"
-      class="flex-1 flex items-center justify-center"
-    >
+    <div v-if="loading && !allowLoadingWithContent" class="flex-1 flex items-center justify-center">
       <p class="text-gray-500">Chargement...</p>
     </div>
 
     <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center">
       <p class="text-red-600 mb-4">{{ error }}</p>
-      <button v-if="onRefresh" @click="handleRefresh" class="btn btn-primary">
-        Réessayer
-      </button>
+      <button v-if="onRefresh" @click="handleRefresh" class="btn btn-primary">Réessayer</button>
     </div>
 
     <div v-else class="widget-content flex-1 overflow-auto">

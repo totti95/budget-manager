@@ -1,9 +1,7 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
-    <div
-      class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-    >
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
         <h1 class="text-3xl font-bold mb-2">Tableau de bord</h1>
         <select v-model="selectedMonth" @change="loadBudget" class="input max-w-xs">
@@ -32,9 +30,7 @@
         <button @click="toggleEditMode" class="btn btn-secondary">
           {{ editMode ? "Terminer" : "Personnaliser" }}
         </button>
-        <button v-if="editMode" @click="openWidgetSelector" class="btn btn-primary">
-          Ajouter
-        </button>
+        <button v-if="editMode" @click="openWidgetSelector" class="btn btn-primary">Ajouter</button>
         <button v-if="editMode" @click="resetDashboard" class="btn btn-danger">
           Réinitialiser
         </button>
@@ -85,10 +81,7 @@
     </grid-layout>
 
     <!-- No budget state -->
-    <div
-      v-else-if="!budgetStore.loading && !currentBudget"
-      class="card text-center py-12"
-    >
+    <div v-else-if="!budgetStore.loading && !currentBudget" class="card text-center py-12">
       <p class="text-gray-600 dark:text-gray-400 mb-4">Aucun budget pour ce mois</p>
       <button @click="handleGenerateBudget" class="btn btn-primary">Générer le budget</button>
     </div>
@@ -136,9 +129,7 @@ const availableMonths = computed(() => {
   return months;
 });
 
-const existingWidgetIds = computed(() =>
-  dashboardStore.layout.map((item) => item.i),
-);
+const existingWidgetIds = computed(() => dashboardStore.layout.map((item) => item.i));
 
 function formatMonth(month: string): string {
   const [year, monthNum] = month.split("-");

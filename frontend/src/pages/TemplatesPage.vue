@@ -68,8 +68,7 @@
               <span class="text-sm text-gray-600 dark:text-gray-400">€</span>
             </div>
             <p class="text-xs text-gray-500 mt-1">
-              Si défini, ce revenu sera utilisé lors de la génération de nouveaux
-              budgets
+              Si défini, ce revenu sera utilisé lors de la génération de nouveaux budgets
             </p>
           </div>
 
@@ -151,7 +150,11 @@
                   <div class="flex items-center gap-1">
                     <input
                       :value="subcategory.plannedAmountCents / 100"
-                      @input="subcategory.plannedAmountCents = Math.round(Number(($event.target as HTMLInputElement).value) * 100)"
+                      @input="
+                        subcategory.plannedAmountCents = Math.round(
+                          Number(($event.target as HTMLInputElement).value) * 100
+                        )
+                      "
                       type="number"
                       required
                       min="0"
@@ -334,7 +337,7 @@ function getCategoryTotal(category: FormCategory): number {
 async function handleSubmit() {
   try {
     // Calculer le total de chaque catégorie à partir des sous-catégories
-    const categoriesWithTotal = formData.categories.map(cat => ({
+    const categoriesWithTotal = formData.categories.map((cat) => ({
       ...cat,
       plannedAmountCents: getCategoryTotal(cat),
     }));
