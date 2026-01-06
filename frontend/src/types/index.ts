@@ -27,6 +27,7 @@ export interface BudgetTemplate {
   userId: number;
   name: string;
   isDefault: boolean;
+  revenueCents?: number;
   categories?: TemplateCategory[];
   createdAt: string;
   updatedAt: string;
@@ -56,6 +57,8 @@ export interface Budget {
   month: string;
   name: string;
   generatedFromTemplateId: number | null;
+  revenueCents?: number;
+  savingsRatePercent?: number;
   categories?: BudgetCategory[];
   expenses?: Expense[];
   createdAt: string;
@@ -383,4 +386,63 @@ export interface CreateContributionData {
   amountCents: number;
   contributionDate: string;
   note?: string | null;
+}
+
+// Widget System Types
+export type WidgetType =
+  | "current-month-summary"
+  | "top-5-categories"
+  | "asset-evolution"
+  | "savings-rate"
+  | "expense-distribution";
+
+export interface WidgetLayoutItem {
+  i: WidgetType;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  minW?: number;
+  minH?: number;
+  maxW?: number;
+  maxH?: number;
+}
+
+export interface WidgetSettings {
+  [widgetId: string]: Record<string, any>;
+}
+
+export interface DashboardLayout {
+  id?: number;
+  userId?: number;
+  layoutConfig: WidgetLayoutItem[];
+  widgetSettings: WidgetSettings;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Top Categories
+export interface TopCategoryStats {
+  id: number;
+  name: string;
+  actualCents: number;
+  plannedCents: number;
+  varianceCents: number;
+  expenseCount: number;
+}
+
+// Savings Rate
+export interface SavingsRateDataPoint {
+  month: string;
+  monthLabel: string;
+  revenueCents: number;
+  expensesCents: number;
+  savingsCents: number;
+  savingsRatePercent: number | null;
+}
+
+// Widget Props Base
+export interface BaseWidgetProps {
+  loading?: boolean;
+  onRefresh?: () => void;
 }

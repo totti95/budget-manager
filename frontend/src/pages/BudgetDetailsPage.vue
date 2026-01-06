@@ -9,29 +9,51 @@
       </router-link>
       <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold">{{ currentBudget?.name }}</h1>
-        <FormButton
-          v-if="currentBudget"
-          variant="secondary"
-          @click="handleExportPdf"
-          :loading="isExportingPdf"
-          :disabled="isExportingPdf"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 mr-2 inline-block"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        <div v-if="currentBudget" class="flex gap-2">
+          <FormButton
+            variant="secondary"
+            @click="handleExportPdf"
+            :loading="isExportingPdf"
+            :disabled="isExportingPdf"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          Télécharger PDF
-        </FormButton>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2 inline-block"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Télécharger PDF
+          </FormButton>
+          <button
+            @click="handleDeleteBudget"
+            class="btn bg-red-600 hover:bg-red-700 text-white"
+            :disabled="budgetStore.loading"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2 inline-block"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            Supprimer
+          </button>
+        </div>
       </div>
     </div>
 
@@ -44,19 +66,59 @@
 
     <div v-else-if="currentBudget" class="space-y-6">
       <!-- Budget Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <!-- Revenu -->
+        <div class="card text-center">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Revenu</p>
+          <div v-if="!editingRevenue" class="flex flex-col items-center">
+            <p class="text-2xl font-bold text-green-600">
+              <MoneyDisplay :cents="currentBudget.revenueCents || 0" />
+            </p>
+            <button
+              @click="startEditRevenue"
+              class="text-xs text-blue-600 hover:text-blue-700 mt-1"
+            >
+              Modifier
+            </button>
+          </div>
+          <div v-else class="flex flex-col items-center gap-2">
+            <input
+              v-model.number="revenueEuros"
+              type="number"
+              step="0.01"
+              min="0"
+              class="input text-center py-1 w-full"
+              @keyup.enter="saveRevenue"
+              @keydown.esc="cancelEditRevenue"
+            />
+            <div class="flex gap-2">
+              <button @click="saveRevenue" class="text-xs text-green-600">
+                ✓
+              </button>
+              <button @click="cancelEditRevenue" class="text-xs text-red-600">
+                ✗
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prévu -->
         <div class="card text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Prévu</p>
           <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             <MoneyDisplay :cents="totalPlanned" />
           </p>
         </div>
+
+        <!-- Dépensé -->
         <div class="card text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Dépensé</p>
           <p class="text-2xl font-bold text-blue-600">
             <MoneyDisplay :cents="totalSpent" />
           </p>
         </div>
+
+        <!-- Restant -->
         <div class="card text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Restant</p>
           <p
@@ -64,6 +126,21 @@
             :class="remaining >= 0 ? 'text-green-600' : 'text-red-600'"
           >
             <MoneyDisplay :cents="remaining" />
+          </p>
+        </div>
+
+        <!-- Taux d'épargne -->
+        <div class="card text-center">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Épargne</p>
+          <p
+            v-if="currentBudget.savingsRatePercent !== null && currentBudget.savingsRatePercent !== undefined"
+            class="text-2xl font-bold"
+            :class="getSavingsRateColor(currentBudget.savingsRatePercent)"
+          >
+            {{ currentBudget.savingsRatePercent.toFixed(1) }}%
+          </p>
+          <p v-else class="text-2xl font-bold text-gray-400">
+            N/A
           </p>
         </div>
       </div>
@@ -228,7 +305,7 @@
 
 <script setup lang="ts">
 import { onMounted, computed, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useBudgetStore } from "@/stores/budget";
 import { useExpenseStore } from "@/stores/expense";
 import { useTagsStore } from "@/stores/tags";
@@ -243,6 +320,7 @@ import type { CreateExpenseData } from "@/api/expenses";
 import type { Expense } from "@/types";
 
 const route = useRoute();
+const router = useRouter();
 const budgetStore = useBudgetStore();
 const expenseStore = useExpenseStore();
 const tagsStore = useTagsStore();
@@ -252,6 +330,8 @@ const showEditModal = ref(false);
 const expenseToEdit = ref<Expense | null>(null);
 const isExportingPdf = ref(false);
 const selectedTagFilter = ref<number | null>(null);
+const editingRevenue = ref(false);
+const revenueEuros = ref<number>(0);
 
 const currentBudget = computed(() => budgetStore.currentBudget);
 
@@ -427,5 +507,59 @@ function formatPaymentMethod(method: string): string {
     cheque: "Chèque",
   };
   return methods[method] || method;
+}
+
+function startEditRevenue() {
+  if (currentBudget.value) {
+    revenueEuros.value = (currentBudget.value.revenueCents || 0) / 100;
+    editingRevenue.value = true;
+  }
+}
+
+function cancelEditRevenue() {
+  editingRevenue.value = false;
+}
+
+async function saveRevenue() {
+  if (!currentBudget.value) return;
+
+  try {
+    const revenueCents = Math.round(revenueEuros.value * 100);
+    await budgetStore.updateBudget(currentBudget.value.id, { revenueCents });
+    editingRevenue.value = false;
+    // Recharger le budget pour avoir le savingsRatePercent recalculé
+    await budgetStore.fetchBudget(currentBudget.value.id);
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du revenu:", error);
+  }
+}
+
+function getSavingsRateColor(rate: number): string {
+  if (rate >= 20) return "text-green-600";
+  if (rate >= 10) return "text-blue-600";
+  if (rate >= 0) return "text-yellow-600";
+  return "text-red-600";
+}
+
+async function handleDeleteBudget() {
+  if (!currentBudget.value) return;
+
+  const budgetName = currentBudget.value.name;
+
+  if (
+    confirm(
+      `Êtes-vous sûr de vouloir supprimer le budget "${budgetName}" ?\n\nToutes les dépenses associées seront également supprimées.\n\nCette action est irréversible.`
+    )
+  ) {
+    try {
+      await budgetStore.deleteBudget(currentBudget.value.id);
+      toast.success("Budget supprimé avec succès");
+      // Rediriger vers le dashboard
+      await router.push("/");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du budget:", error);
+      toast.error("Erreur lors de la suppression du budget");
+    }
+  }
 }
 </script>

@@ -202,4 +202,91 @@ class StatsController extends Controller
 
         return response()->json($tagStats);
     }
+
+    /**
+     * Get top N categories by expense amount for a budget
+     */
+    public function topCategories(Request $request, Budget $budget)
+    {
+        $this->authorize('view', $budget);
+
+        $limit = $request->query('limit', 5);
+
+        $budget->loadMissing('categories.subcategories.expenses');
+
+        $categoryTotals = $budget->categories->map(function ($category) {
+            $actualCents = $category->subcategories->sum(function ($subcat) {
+                return $subcat->expenses->sum('amount_cents');
+            });
+
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'actualCents' => $actualCents,
+                'plannedCents' => $category->planned_amount_cents,
+                'varianceCents' => $actualCents - $category->planned_amount_cents,
+                'expenseCount' => $category->subcategories->sum(fn ($s) => $s->expenses->count()),
+            ];
+        })
+            ->filter(fn ($cat) => $cat['actualCents'] > 0)
+            ->sortByDesc('actualCents')
+            ->take($limit)
+            ->values();
+
+        return response()->json($categoryTotals);
+    }
+
+    /**
+     * Get savings rate evolution over time for the authenticated user
+     */
+    public function savingsRateEvolution(Request $request)
+    {
+        $validated = $request->validate([
+            'from' => 'sometimes|date_format:Y-m',
+            'to' => 'sometimes|date_format:Y-m',
+            'months' => 'sometimes|integer|min:1|max:24',
+        ]);
+
+        $user = $request->user();
+        $months = $validated['months'] ?? 12;
+
+        $query = $user->budgets()
+            ->orderBy('month', 'desc')
+            ->whereNotNull('revenue_cents')
+            ->with('expenses');
+
+        if (isset($validated['from'])) {
+            $fromDate = \Carbon\Carbon::parse($validated['from'].'-01');
+            $query->where('month', '>=', $fromDate);
+        }
+        if (isset($validated['to'])) {
+            $toDate = \Carbon\Carbon::parse($validated['to'].'-01');
+            $query->where('month', '<=', $toDate);
+        }
+
+        if (! isset($validated['from']) && ! isset($validated['to'])) {
+            $query->take($months);
+        }
+
+        $budgets = $query->get()->sortBy('month');
+
+        $data = $budgets->map(function ($budget) {
+            $totalExpenses = $budget->expenses->sum('amount_cents');
+            $savings = $budget->revenue_cents - $totalExpenses;
+            $savingsRate = $budget->revenue_cents > 0
+                ? round(($savings / $budget->revenue_cents) * 100, 2)
+                : null;
+
+            return [
+                'month' => $budget->month->format('Y-m'),
+                'monthLabel' => $budget->month->translatedFormat('F Y'),
+                'revenueCents' => $budget->revenue_cents,
+                'expensesCents' => $totalExpenses,
+                'savingsCents' => $savings,
+                'savingsRatePercent' => $savingsRate,
+            ];
+        });
+
+        return response()->json($data);
+    }
 }

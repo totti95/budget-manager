@@ -53,11 +53,24 @@ class BudgetController extends Controller
             ], 404);
         }
 
+        // Déterminer le revenu à utiliser
+        $revenueCents = $template->revenue_cents;
+
+        // Si le template n'a pas de revenu, prendre celui du dernier budget
+        if (! $revenueCents) {
+            $lastBudget = $request->user()->budgets()
+                ->whereNotNull('revenue_cents')
+                ->orderBy('month', 'desc')
+                ->first();
+            $revenueCents = $lastBudget?->revenue_cents;
+        }
+
         // Create budget from template
         $budget = $request->user()->budgets()->create([
             'month' => $month,
             'name' => 'Budget '.$month->isoFormat('MMMM YYYY'),
             'generated_from_template_id' => $template->id,
+            'revenue_cents' => $revenueCents,
         ]);
 
         // Copy categories from template
@@ -138,6 +151,7 @@ class BudgetController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
+            'revenue_cents' => 'sometimes|required|integer|min:0',
         ]);
 
         $budget->update($validated);

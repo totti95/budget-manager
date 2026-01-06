@@ -18,6 +18,7 @@ export const templatesApi = {
   async create(data: {
     name: string;
     isDefault?: boolean;
+    revenueCents?: number | null;
     categories?: Array<{
       name: string;
       plannedAmountCents: number;
@@ -32,6 +33,7 @@ export const templatesApi = {
     const response = await apiClient.post("/templates", {
       name: data.name,
       is_default: data.isDefault,
+      revenue_cents: data.revenueCents,
       categories: data.categories?.map((cat, catIndex) => ({
         name: cat.name,
         planned_amount_cents: cat.plannedAmountCents,
@@ -52,6 +54,7 @@ export const templatesApi = {
     data: {
       name?: string;
       isDefault?: boolean;
+      revenueCents?: number | null;
       categories?: Array<{
         id?: number;
         name: string;
@@ -71,6 +74,7 @@ export const templatesApi = {
 
     if (data.name !== undefined) payload.name = data.name;
     if (data.isDefault !== undefined) payload.is_default = data.isDefault;
+    if (data.revenueCents !== undefined) payload.revenue_cents = data.revenueCents;
 
     if (data.categories) {
       payload.categories = data.categories.map((cat, catIndex) => ({

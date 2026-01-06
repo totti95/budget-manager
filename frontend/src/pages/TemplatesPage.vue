@@ -64,6 +64,28 @@
             </label>
           </div>
 
+          <!-- Revenu mensuel par défaut -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">
+              Revenu mensuel par défaut (optionnel)
+            </label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model.number="revenueEuros"
+                type="number"
+                step="0.01"
+                min="0"
+                class="input w-full"
+                placeholder="Ex: 3000"
+              />
+              <span class="text-sm text-gray-600 dark:text-gray-400">€</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              Si défini, ce revenu sera utilisé lors de la génération de nouveaux
+              budgets
+            </p>
+          </div>
+
           <!-- Catégories -->
           <div class="mb-6">
             <div class="flex justify-between items-center mb-3">
@@ -97,15 +119,16 @@
                   class="input flex-1"
                   placeholder="Nom de la catégorie"
                 />
-                <input
-                  v-model.number="category.plannedAmountCents"
-                  type="number"
-                  required
-                  min="0"
-                  step="100"
-                  class="input w-32"
-                  placeholder="Montant (centimes)"
-                />
+                <div class="flex items-center gap-1">
+                  <input
+                    :value="getCategoryTotal(category) / 100"
+                    type="number"
+                    disabled
+                    class="input w-28 bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                    placeholder="Total"
+                  />
+                  <span class="text-sm text-gray-600">€</span>
+                </div>
                 <button
                   type="button"
                   @click="removeCategory(catIndex)"
@@ -138,15 +161,19 @@
                     class="input flex-1 text-sm"
                     placeholder="Nom de la sous-catégorie"
                   />
-                  <input
-                    v-model.number="subcategory.plannedAmountCents"
-                    type="number"
-                    required
-                    min="0"
-                    step="100"
-                    class="input w-28 text-sm"
-                    placeholder="Montant"
-                  />
+                  <div class="flex items-center gap-1">
+                    <input
+                      :value="subcategory.plannedAmountCents / 100"
+                      @input="subcategory.plannedAmountCents = Math.round(Number(($event.target as HTMLInputElement).value) * 100)"
+                      type="number"
+                      required
+                      min="0"
+                      step="0.01"
+                      class="input w-24 text-sm"
+                      placeholder="Montant"
+                    />
+                    <span class="text-xs text-gray-600">€</span>
+                  </div>
                   <button
                     type="button"
                     @click="removeSubcategory(catIndex, subIndex)"
@@ -193,9 +220,13 @@
                 Par défaut
               </span>
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {{ template.categories?.length || 0 }} catégorie(s)
-            </p>
+            <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p>{{ template.categories?.length || 0 }} catégorie(s)</p>
+              <p v-if="template.revenueCents" class="mt-1">
+                <span class="font-medium">Revenu par défaut :</span>
+                {{ (template.revenueCents / 100).toFixed(2) }} €
+              </p>
+            </div>
           </div>
 
           <div class="flex gap-2">
@@ -273,6 +304,7 @@ const templateStore = useTemplateStore();
 
 const showCreateForm = ref(false);
 const editingTemplate = ref<BudgetTemplate | null>(null);
+const revenueEuros = ref<number | null>(null);
 
 interface FormCategory {
   id?: number; // ID présent lors de l'édition
@@ -301,6 +333,7 @@ function resetForm() {
   formData.name = "";
   formData.isDefault = false;
   formData.categories = [];
+  revenueEuros.value = null;
 }
 
 function openCreateForm() {
@@ -334,22 +367,31 @@ function removeSubcategory(categoryIndex: number, subcategoryIndex: number) {
   formData.categories[categoryIndex].subcategories.splice(subcategoryIndex, 1);
 }
 
+function getCategoryTotal(category: FormCategory): number {
+  return category.subcategories.reduce((sum, sub) => sum + sub.plannedAmountCents, 0);
+}
+
 async function handleSubmit() {
   try {
+    // Calculer le total de chaque catégorie à partir des sous-catégories
+    const categoriesWithTotal = formData.categories.map(cat => ({
+      ...cat,
+      plannedAmountCents: getCategoryTotal(cat),
+    }));
+
+    const payload = {
+      name: formData.name,
+      isDefault: formData.isDefault,
+      revenueCents: revenueEuros.value ? Math.round(revenueEuros.value * 100) : null,
+      categories: categoriesWithTotal,
+    };
+
     if (editingTemplate.value) {
-      // Mode édition (nom, isDefault ET catégories)
-      await templateStore.updateTemplate(editingTemplate.value.id, {
-        name: formData.name,
-        isDefault: formData.isDefault,
-        categories: formData.categories,
-      });
+      // Mode édition (nom, isDefault, revenueCents ET catégories)
+      await templateStore.updateTemplate(editingTemplate.value.id, payload);
     } else {
       // Mode création
-      await templateStore.createTemplate({
-        name: formData.name,
-        isDefault: formData.isDefault,
-        categories: formData.categories,
-      });
+      await templateStore.createTemplate(payload);
     }
 
     cancelForm();
@@ -369,6 +411,7 @@ function startEdit(template: BudgetTemplate) {
   editingTemplate.value = template;
   formData.name = template.name;
   formData.isDefault = template.isDefault;
+  revenueEuros.value = template.revenueCents ? template.revenueCents / 100 : null;
 
   // Charger les catégories existantes pour édition
   formData.categories = (template.categories || []).map((cat) => ({

@@ -16,10 +16,12 @@ class Budget extends Model
         'month',
         'name',
         'generated_from_template_id',
+        'revenue_cents',
     ];
 
     protected $casts = [
         'month' => 'date',
+        'revenue_cents' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -55,5 +57,15 @@ class Budget extends Model
     public function getVarianceCentsAttribute(): int
     {
         return $this->total_actual_cents - $this->total_planned_cents;
+    }
+
+    public function getSavingsRatePercentAttribute(): ?float
+    {
+        if (! $this->revenue_cents || $this->revenue_cents <= 0) {
+            return null;
+        }
+        $savings = $this->revenue_cents - $this->total_actual_cents;
+
+        return round(($savings / $this->revenue_cents) * 100, 2);
     }
 }
