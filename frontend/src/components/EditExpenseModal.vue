@@ -7,17 +7,8 @@
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">Modifier la dépense</h3>
-        <button
-          @click="handleClose"
-          class="text-gray-400 hover:text-gray-600"
-          type="button"
-        >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+        <button @click="handleClose" class="text-gray-400 hover:text-gray-600" type="button">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -30,9 +21,7 @@
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-          <label for="date" class="block text-sm font-medium mb-1">
-            Date
-          </label>
+          <label for="date" class="block text-sm font-medium mb-1"> Date </label>
           <input
             id="date"
             v-model="form.date"
@@ -43,9 +32,7 @@
         </div>
 
         <div>
-          <label for="label" class="block text-sm font-medium mb-1">
-            Description
-          </label>
+          <label for="label" class="block text-sm font-medium mb-1"> Description </label>
           <input
             id="label"
             v-model="form.label"
@@ -56,9 +43,7 @@
         </div>
 
         <div>
-          <label for="amount" class="block text-sm font-medium mb-1">
-            Montant (€)
-          </label>
+          <label for="amount" class="block text-sm font-medium mb-1"> Montant (€) </label>
           <input
             id="amount"
             v-model.number="form.amountEuros"
@@ -71,9 +56,7 @@
         </div>
 
         <div>
-          <label for="subcategory" class="block text-sm font-medium mb-1">
-            Sous-catégorie
-          </label>
+          <label for="subcategory" class="block text-sm font-medium mb-1"> Sous-catégorie </label>
           <select
             id="subcategory"
             v-model="form.budgetSubcategoryId"
@@ -81,11 +64,7 @@
             class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="" disabled>Sélectionner une sous-catégorie</option>
-            <optgroup
-              v-for="category in categories"
-              :key="category.id"
-              :label="category.name"
-            >
+            <optgroup v-for="category in categories" :key="category.id" :label="category.name">
               <option
                 v-for="subcategory in category.subcategories"
                 :key="subcategory.id"
@@ -110,9 +89,7 @@
         </div>
 
         <div>
-          <label for="notes" class="block text-sm font-medium mb-1">
-            Notes
-          </label>
+          <label for="notes" class="block text-sm font-medium mb-1"> Notes </label>
           <textarea
             id="notes"
             v-model="form.notes"
@@ -208,7 +185,7 @@ watch(
       };
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 const handleClose = () => {

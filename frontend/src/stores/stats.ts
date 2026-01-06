@@ -1,12 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { statsApi } from "@/api/stats";
-import type {
-  BudgetStats,
-  CategoryStats,
-  TopCategoryStats,
-  SavingsRateDataPoint,
-} from "@/types";
+import type { BudgetStats, CategoryStats, TopCategoryStats, SavingsRateDataPoint } from "@/types";
 
 export const useStatsStore = defineStore("stats", () => {
   const summary = ref<BudgetStats | null>(null);
@@ -51,10 +46,7 @@ export const useStatsStore = defineStore("stats", () => {
     loading.value = true;
     error.value = null;
     try {
-      subcategoryStats.value = await statsApi.bySubcategory(
-        budgetId,
-        categoryId,
-      );
+      subcategoryStats.value = await statsApi.bySubcategory(budgetId, categoryId);
       return subcategoryStats.value;
     } catch (err) {
       error.value = "Erreur lors du chargement des stats";

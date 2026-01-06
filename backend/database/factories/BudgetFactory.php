@@ -13,7 +13,7 @@ class BudgetFactory extends Factory
         return [
             'user_id' => User::factory(),
             'month' => Carbon::now()->startOfMonth(),
-            'name' => 'Budget '.fake()->monthName().' '.fake()->year(),
+            'name' => 'Budget ' . fake()->monthName() . ' ' . fake()->year(),
             'generated_from_template_id' => null,
         ];
     }

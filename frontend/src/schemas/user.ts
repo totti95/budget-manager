@@ -2,24 +2,19 @@ import { z } from "zod";
 
 export const createUserSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  email: z.email(),
+  email: z.string().email("L'email est invalide"),
   roleId: z.number().min(1, "Le rôle est requis"),
 });
 
 export const updateUserSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
-    .optional(),
-  email: z.email().optional(),
+  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").optional(),
+  email: z.string().email("L'email est invalide").optional(),
   roleId: z.number().min(1, "Le rôle est requis").optional(),
 });
 
 export const updatePasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {

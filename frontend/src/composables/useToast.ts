@@ -11,11 +11,7 @@ const toasts = ref<Toast[]>([]);
 let nextId = 0;
 
 export function useToast() {
-  const addToast = (
-    message: string,
-    type: Toast["type"] = "info",
-    duration = 3000,
-  ) => {
+  const addToast = (message: string, type: Toast["type"] = "info", duration = 3000) => {
     const id = nextId++;
     toasts.value.push({ id, message, type, duration });
   };

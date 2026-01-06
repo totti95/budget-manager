@@ -41,9 +41,7 @@ const availableTags = computed(() => {
 const filteredTags = computed(() => {
   if (!searchQuery.value) return availableTags.value;
   const query = searchQuery.value.toLowerCase();
-  return availableTags.value.filter((tag) =>
-    tag.name.toLowerCase().includes(query),
-  );
+  return availableTags.value.filter((tag) => tag.name.toLowerCase().includes(query));
 });
 
 // Check if search query matches an existing tag name exactly
@@ -60,7 +58,10 @@ function selectTag(tag: Tag) {
 }
 
 function removeTag(tagId: number) {
-  emit("update:modelValue", props.modelValue.filter((id) => id !== tagId));
+  emit(
+    "update:modelValue",
+    props.modelValue.filter((id) => id !== tagId)
+  );
 }
 
 async function createAndSelectTag() {
@@ -91,11 +92,7 @@ function handleKeydown(event: KeyboardEvent) {
     } else if (!exactMatch.value && searchQuery.value.trim()) {
       createAndSelectTag();
     }
-  } else if (
-    event.key === "Backspace" &&
-    !searchQuery.value &&
-    selectedTags.value.length > 0
-  ) {
+  } else if (event.key === "Backspace" && !searchQuery.value && selectedTags.value.length > 0) {
     // Remove last tag on backspace if input is empty
     const lastTag = selectedTags.value[selectedTags.value.length - 1];
     removeTag(lastTag.id);
@@ -155,10 +152,7 @@ function handleBlur() {
           type="button"
           class="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
         >
-          <span
-            class="w-3 h-3 rounded-full"
-            :style="{ backgroundColor: tag.color }"
-          ></span>
+          <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: tag.color }"></span>
           <span class="text-sm">{{ tag.name }}</span>
         </button>
 

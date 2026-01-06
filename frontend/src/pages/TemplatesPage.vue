@@ -2,16 +2,11 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Templates de budget</h1>
-      <button @click="openCreateForm" class="btn btn-primary">
-        + Nouveau template
-      </button>
+      <button @click="openCreateForm" class="btn btn-primary">+ Nouveau template</button>
     </div>
 
     <!-- Liste des templates -->
-    <div
-      v-if="templateStore.loading && !showCreateForm"
-      class="text-center py-12"
-    >
+    <div v-if="templateStore.loading && !showCreateForm" class="text-center py-12">
       <p>Chargement...</p>
     </div>
 
@@ -22,9 +17,7 @@
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Vous n'avez pas encore de template de budget.
       </p>
-      <button @click="openCreateForm" class="btn btn-primary">
-        Créer mon premier template
-      </button>
+      <button @click="openCreateForm" class="btn btn-primary">Créer mon premier template</button>
     </div>
 
     <div v-else class="space-y-4">
@@ -40,9 +33,7 @@
         <form @submit.prevent="handleSubmit">
           <!-- Nom du template -->
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-2"
-              >Nom du template</label
-            >
+            <label class="block text-sm font-medium mb-2">Nom du template</label>
             <input
               v-model="formData.name"
               type="text"
@@ -55,11 +46,7 @@
           <!-- Définir par défaut -->
           <div class="mb-6">
             <label class="flex items-center">
-              <input
-                v-model="formData.isDefault"
-                type="checkbox"
-                class="mr-2"
-              />
+              <input v-model="formData.isDefault" type="checkbox" class="mr-2" />
               <span class="text-sm">Définir comme template par défaut</span>
             </label>
           </div>
@@ -81,8 +68,7 @@
               <span class="text-sm text-gray-600 dark:text-gray-400">€</span>
             </div>
             <p class="text-xs text-gray-500 mt-1">
-              Si défini, ce revenu sera utilisé lors de la génération de nouveaux
-              budgets
+              Si défini, ce revenu sera utilisé lors de la génération de nouveaux budgets
             </p>
           </div>
 
@@ -164,7 +150,11 @@
                   <div class="flex items-center gap-1">
                     <input
                       :value="subcategory.plannedAmountCents / 100"
-                      @input="subcategory.plannedAmountCents = Math.round(Number(($event.target as HTMLInputElement).value) * 100)"
+                      @input="
+                        subcategory.plannedAmountCents = Math.round(
+                          Number(($event.target as HTMLInputElement).value) * 100
+                        )
+                      "
                       type="number"
                       required
                       min="0"
@@ -189,26 +179,16 @@
 
           <!-- Actions -->
           <div class="flex gap-3">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="templateStore.loading"
-            >
+            <button type="submit" class="btn btn-primary" :disabled="templateStore.loading">
               {{ editingTemplate ? "Mettre à jour" : "Créer le template" }}
             </button>
-            <button type="button" @click="cancelForm" class="btn btn-secondary">
-              Annuler
-            </button>
+            <button type="button" @click="cancelForm" class="btn btn-secondary">Annuler</button>
           </div>
         </form>
       </div>
 
       <!-- Templates existants -->
-      <div
-        v-for="template in templateStore.templates"
-        :key="template.id"
-        class="card"
-      >
+      <div v-for="template in templateStore.templates" :key="template.id" class="card">
         <div class="flex justify-between items-start mb-4">
           <div>
             <h3 class="text-xl font-bold flex items-center gap-2">
@@ -238,12 +218,7 @@
             >
               Définir par défaut
             </button>
-            <button
-              @click="startEdit(template)"
-              class="btn btn-secondary text-sm"
-            >
-              Modifier
-            </button>
+            <button @click="startEdit(template)" class="btn btn-secondary text-sm">Modifier</button>
             <button
               @click="handleDelete(template.id, template.name)"
               class="btn bg-red-600 hover:bg-red-700 text-white text-sm"
@@ -255,15 +230,8 @@
         </div>
 
         <!-- Détails des catégories -->
-        <div
-          v-if="template.categories && template.categories.length > 0"
-          class="mt-4"
-        >
-          <div
-            v-for="category in template.categories"
-            :key="category.id"
-            class="mb-3"
-          >
+        <div v-if="template.categories && template.categories.length > 0" class="mt-4">
+          <div v-for="category in template.categories" :key="category.id" class="mb-3">
             <div class="flex justify-between items-center py-2 border-b">
               <span class="font-medium">{{ category.name }}</span>
               <span class="text-gray-600">
@@ -280,12 +248,7 @@
                 class="flex justify-between py-1 text-sm text-gray-600 dark:text-gray-400"
               >
                 <span>{{ subcategory.name }}</span>
-                <span
-                  >{{
-                    (subcategory.plannedAmountCents / 100).toFixed(2)
-                  }}
-                  €</span
-                >
+                <span>{{ (subcategory.plannedAmountCents / 100).toFixed(2) }} €</span>
               </div>
             </div>
           </div>
@@ -374,7 +337,7 @@ function getCategoryTotal(category: FormCategory): number {
 async function handleSubmit() {
   try {
     // Calculer le total de chaque catégorie à partir des sous-catégories
-    const categoriesWithTotal = formData.categories.map(cat => ({
+    const categoriesWithTotal = formData.categories.map((cat) => ({
       ...cat,
       plannedAmountCents: getCategoryTotal(cat),
     }));
@@ -441,11 +404,7 @@ async function handleSetDefault(id: number) {
 }
 
 async function handleDelete(id: number, name: string) {
-  if (
-    confirm(
-      `Supprimer le template "${name}" ?\n\nCette action est irréversible.`,
-    )
-  ) {
+  if (confirm(`Supprimer le template "${name}" ?\n\nCette action est irréversible.`)) {
     try {
       await templateStore.deleteTemplate(id);
     } catch (error) {

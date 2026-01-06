@@ -62,7 +62,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     inputValue.value = newValue;
-  },
+  }
 );
 
 const filteredSuggestions = computed(() => {
@@ -109,10 +109,7 @@ function navigateUp() {
 }
 
 function selectHighlighted() {
-  if (
-    highlightedIndex.value >= 0 &&
-    highlightedIndex.value < filteredSuggestions.value.length
-  ) {
+  if (highlightedIndex.value >= 0 && highlightedIndex.value < filteredSuggestions.value.length) {
     selectSuggestion(filteredSuggestions.value[highlightedIndex.value]);
   }
 }

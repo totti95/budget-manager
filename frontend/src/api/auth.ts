@@ -1,10 +1,5 @@
 import api from "./axios";
-import type {
-  LoginCredentials,
-  RegisterData,
-  AuthResponse,
-  User,
-} from "@/types";
+import type { LoginCredentials, RegisterData, AuthResponse, User } from "@/types";
 
 export const authApi = {
   async register(data: RegisterData): Promise<AuthResponse> {

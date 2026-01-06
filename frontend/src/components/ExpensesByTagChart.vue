@@ -6,17 +6,15 @@
     <div v-else-if="tagStats && tagStats.length > 0" class="h-96">
       <canvas ref="chartCanvas"></canvas>
     </div>
-    <div v-else class="text-gray-500 text-center py-8">
-      Aucune dépense avec tags pour ce budget
-    </div>
+    <div v-else class="text-gray-500 text-center py-8">Aucune dépense avec tags pour ce budget</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {nextTick, onMounted, ref, watch} from "vue";
-import {Chart, registerables, type TooltipItem} from "chart.js";
-import {statsApi} from "@/api/stats";
-import type {TagStats} from "@/types";
+import { nextTick, onMounted, ref, watch } from "vue";
+import { Chart, registerables, type TooltipItem } from "chart.js";
+import { statsApi } from "@/api/stats";
+import type { TagStats } from "@/types";
 
 Chart.register(...registerables);
 
@@ -122,7 +120,7 @@ watch(
   () => props.budgetId,
   () => {
     loadData();
-  },
+  }
 );
 </script>
 

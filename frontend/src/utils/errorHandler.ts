@@ -44,7 +44,8 @@ class ErrorHandler {
     }
 
     // Logger dans la console
-    const consoleMethod = level === "error" ? console.error : level === "warning" ? console.warn : console.info;
+    const consoleMethod =
+      level === "error" ? console.error : level === "warning" ? console.warn : console.info;
     consoleMethod(`[${level.toUpperCase()}] ${message}`, details || "");
   }
 
@@ -79,7 +80,8 @@ class ErrorHandler {
     }>;
 
     const statusCode = axiosError.response?.status;
-    const message = axiosError.response?.data?.message || axiosError.message || "Une erreur est survenue";
+    const message =
+      axiosError.response?.data?.message || axiosError.message || "Une erreur est survenue";
     const validationErrors = axiosError.response?.data?.errors;
 
     return {

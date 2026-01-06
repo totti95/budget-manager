@@ -13,21 +13,15 @@
     <!-- Statistiques globales -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Objectifs actifs
-        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Objectifs actifs</p>
         <p class="text-2xl font-bold">{{ activeGoalsCount }}</p>
       </div>
       <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Total épargné
-        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total épargné</p>
         <p class="text-2xl font-bold">{{ formatEuros(totalSavedCents) }}</p>
       </div>
       <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Total objectifs
-        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total objectifs</p>
         <p class="text-2xl font-bold">
           {{ formatEuros(totalTargetCents) }}
         </p>
@@ -76,9 +70,7 @@
 
     <!-- Empty state -->
     <div v-else class="text-center py-12">
-      <p class="text-gray-500 mb-4">
-        Aucun objectif d'épargne. Commencez par en créer un !
-      </p>
+      <p class="text-gray-500 mb-4">Aucun objectif d'épargne. Commencez par en créer un !</p>
       <button
         @click="openCreateModal"
         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
@@ -131,29 +123,19 @@ const goals = computed(() => store.goals);
 const loading = computed(() => store.loading);
 
 const activeGoals = computed(() =>
-  goals.value
-    .filter((g) => g.status === "active")
-    .sort((a, b) => b.priority - a.priority)
+  goals.value.filter((g) => g.status === "active").sort((a, b) => b.priority - a.priority)
 );
 
-const completedGoals = computed(() =>
-  goals.value.filter((g) => g.status === "completed")
-);
+const completedGoals = computed(() => goals.value.filter((g) => g.status === "completed"));
 
 const activeGoalsCount = computed(() => activeGoals.value.length);
 
 const totalSavedCents = computed(() =>
-  activeGoals.value.reduce(
-    (sum, g) => sum + g.currentAmountCents,
-    0
-  )
+  activeGoals.value.reduce((sum, g) => sum + g.currentAmountCents, 0)
 );
 
 const totalTargetCents = computed(() =>
-  activeGoals.value.reduce(
-    (sum, g) => sum + g.targetAmountCents,
-    0
-  )
+  activeGoals.value.reduce((sum, g) => sum + g.targetAmountCents, 0)
 );
 
 function formatEuros(cents: number): string {

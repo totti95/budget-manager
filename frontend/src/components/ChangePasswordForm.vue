@@ -40,16 +40,11 @@
         <p v-if="errors.newPassword" class="text-red-600 text-sm mt-1">
           {{ errors.newPassword }}
         </p>
-        <p class="text-gray-500 text-xs mt-1">
-          Minimum 8 caractères
-        </p>
+        <p class="text-gray-500 text-xs mt-1">Minimum 8 caractères</p>
       </div>
 
       <div>
-        <label
-          for="newPasswordConfirmation"
-          class="block text-sm font-medium mb-1"
-        >
+        <label for="newPasswordConfirmation" class="block text-sm font-medium mb-1">
           Confirmer le nouveau mot de passe
         </label>
         <input
@@ -62,10 +57,7 @@
             'border-red-500': errors.newPasswordConfirmation,
           }"
         />
-        <p
-          v-if="errors.newPasswordConfirmation"
-          class="text-red-600 text-sm mt-1"
-        >
+        <p v-if="errors.newPasswordConfirmation" class="text-red-600 text-sm mt-1">
           {{ errors.newPasswordConfirmation }}
         </p>
       </div>
@@ -153,8 +145,7 @@ const handleSubmit = async () => {
         });
       }
     } else {
-      generalError.value =
-        err.response?.data?.message || "Une erreur est survenue";
+      generalError.value = err.response?.data?.message || "Une erreur est survenue";
     }
   } finally {
     loading.value = false;

@@ -5,31 +5,22 @@
     <!-- Summary Card -->
     <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="card text-center">
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-          Épargne prévue totale
-        </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Épargne prévue totale</p>
         <p class="text-2xl font-bold text-blue-600">
           <MoneyDisplay :cents="totalPlanned" />
         </p>
       </div>
       <div class="card text-center">
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-          Épargne réelle totale
-        </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Épargne réelle totale</p>
         <p class="text-2xl font-bold text-green-600">
           <MoneyDisplay :cents="totalActual" />
         </p>
       </div>
       <div class="card text-center">
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Écart</p>
-        <p
-          class="text-2xl font-bold"
-          :class="variance >= 0 ? 'text-green-600' : 'text-red-600'"
-        >
+        <p class="text-2xl font-bold" :class="variance >= 0 ? 'text-green-600' : 'text-red-600'">
           <MoneyDisplay :cents="variance" />
-          <span class="text-sm ml-1"
-            >({{ variancePercentage.toFixed(1) }}%)</span
-          >
+          <span class="text-sm ml-1">({{ variancePercentage.toFixed(1) }}%)</span>
         </p>
       </div>
     </div>
@@ -50,21 +41,13 @@
         <p>Chargement...</p>
       </div>
 
-      <div
-        v-else-if="savingsStore.error"
-        class="text-center py-8 text-red-600"
-      >
+      <div v-else-if="savingsStore.error" class="text-center py-8 text-red-600">
         <p>{{ savingsStore.error }}</p>
       </div>
 
-      <div
-        v-else-if="savingsStore.plans.length === 0"
-        class="text-center py-8 text-gray-600"
-      >
+      <div v-else-if="savingsStore.plans.length === 0" class="text-center py-8 text-gray-600">
         <p>Aucun plan d'épargne enregistré</p>
-        <p class="text-sm mt-2">
-          Les plans d'épargne sont créés automatiquement avec vos budgets
-        </p>
+        <p class="text-sm mt-2">Les plans d'épargne sont créés automatiquement avec vos budgets</p>
       </div>
 
       <div v-else class="overflow-x-auto">
@@ -141,20 +124,12 @@
     </div>
 
     <!-- Edit Modal -->
-    <div
-      v-if="isEditModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center"
-    >
+    <div v-if="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- Backdrop -->
-      <div
-        class="absolute inset-0 bg-black bg-opacity-50"
-        @click="closeEditModal"
-      />
+      <div class="absolute inset-0 bg-black bg-opacity-50" @click="closeEditModal" />
 
       <!-- Modal -->
-      <div
-        class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
-      >
+      <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-bold">Modifier l'épargne prévue</h3>
           <button
@@ -162,12 +137,7 @@
             @click="closeEditModal"
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -207,18 +177,10 @@
           </div>
 
           <div class="flex gap-2 pt-2">
-            <button
-              type="submit"
-              :disabled="isSubmitting"
-              class="flex-1 btn btn-primary"
-            >
+            <button type="submit" :disabled="isSubmitting" class="flex-1 btn btn-primary">
               {{ isSubmitting ? "Enregistrement..." : "Modifier" }}
             </button>
-            <button
-              type="button"
-              @click="closeEditModal"
-              class="flex-1 btn btn-secondary"
-            >
+            <button type="button" @click="closeEditModal" class="flex-1 btn btn-secondary">
               Annuler
             </button>
           </div>
@@ -250,10 +212,7 @@ const totalPlanned = computed(() => {
 });
 
 const totalActual = computed(() => {
-  return savingsStore.plans.reduce(
-    (sum, plan) => sum + (plan.actualCents || 0),
-    0,
-  );
+  return savingsStore.plans.reduce((sum, plan) => sum + (plan.actualCents || 0), 0);
 });
 
 const variance = computed(() => totalActual.value - totalPlanned.value);

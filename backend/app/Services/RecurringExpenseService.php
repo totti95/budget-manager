@@ -11,7 +11,8 @@ class RecurringExpenseService
     /**
      * Create expenses from all active recurring expenses for a budget.
      *
-     * @param  Budget  $budget
+     * @param Budget $budget
+     *
      * @return int Number of expenses created
      */
     public function createRecurringExpensesForBudget(Budget $budget): int
@@ -67,7 +68,7 @@ class RecurringExpenseService
                 'label' => $recurring->label,
                 'amount_cents' => $recurring->amount_cents,
                 'payment_method' => $recurring->payment_method,
-                'notes' => $recurring->notes ? $recurring->notes.' (récurrent)' : 'Dépense récurrente',
+                'notes' => $recurring->notes ? $recurring->notes . ' (récurrent)' : 'Dépense récurrente',
             ]);
 
             $created++;
@@ -86,9 +87,10 @@ class RecurringExpenseService
      * Find budget subcategory matching template subcategory name.
      * Matches by subcategory name and optionally category name for accuracy.
      *
-     * @param  Budget  $budget
-     * @param  string  $subcategoryName
-     * @param  string|null  $categoryName
+     * @param Budget $budget
+     * @param string $subcategoryName
+     * @param string|null $categoryName
+     *
      * @return int|null budget_subcategory_id
      */
     private function findMatchingBudgetSubcategory(

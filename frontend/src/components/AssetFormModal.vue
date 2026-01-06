@@ -1,15 +1,10 @@
 <template>
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center"
-  >
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-black bg-opacity-50" @click="close" />
 
     <!-- Modal -->
-    <div
-      class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
-    >
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-bold">
           {{
@@ -27,12 +22,7 @@
           @click="close"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -138,22 +128,10 @@
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button
-            type="submit"
-            :disabled="isSubmitting"
-            class="flex-1 btn btn-primary"
-          >
-            {{
-              isSubmitting
-                ? "Enregistrement..."
-                : asset
-                  ? "Modifier"
-                  : "Ajouter"
-            }}
+          <button type="submit" :disabled="isSubmitting" class="flex-1 btn btn-primary">
+            {{ isSubmitting ? "Enregistrement..." : asset ? "Modifier" : "Ajouter" }}
           </button>
-          <button type="button" @click="close" class="flex-1 btn btn-secondary">
-            Annuler
-          </button>
+          <button type="button" @click="close" class="flex-1 btn btn-secondary">Annuler</button>
         </div>
       </form>
     </div>
@@ -248,7 +226,7 @@ watch(
         });
       }
     }
-  },
+  }
 );
 
 const [type, _typeAttrs] = defineField("type");

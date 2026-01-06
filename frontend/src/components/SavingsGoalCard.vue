@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-  >
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
     <div class="flex justify-between items-start mb-4">
       <div>
         <h3 class="text-lg font-semibold">{{ goal.name }}</h3>
@@ -16,12 +14,8 @@
 
     <!-- Montants -->
     <div class="flex justify-between items-baseline mb-2">
-      <span class="text-2xl font-bold">{{
-        formatEuros(goal.currentAmountCents)
-      }}</span>
-      <span class="text-gray-500"
-        >/ {{ formatEuros(goal.targetAmountCents) }}</span
-      >
+      <span class="text-2xl font-bold">{{ formatEuros(goal.currentAmountCents) }}</span>
+      <span class="text-gray-500">/ {{ formatEuros(goal.targetAmountCents) }}</span>
     </div>
 
     <!-- Barre de progression -->
@@ -47,9 +41,7 @@
         <span v-if="isOnTrack" class="text-green-600 dark:text-green-400">
           ✓ Sur la bonne voie
         </span>
-        <span v-else class="text-orange-600 dark:text-orange-400">
-          ⚠ En retard
-        </span>
+        <span v-else class="text-orange-600 dark:text-orange-400"> ⚠ En retard </span>
       </div>
     </div>
 
@@ -65,10 +57,7 @@
     </div>
 
     <!-- Asset lié -->
-    <div
-      v-if="goal.asset"
-      class="mb-4 flex items-center text-sm text-gray-600 dark:text-gray-400"
-    >
+    <div v-if="goal.asset" class="mb-4 flex items-center text-sm text-gray-600 dark:text-gray-400">
       <span>🏦 {{ goal.asset.label }}</span>
       <button
         v-if="goal.status === 'active'"
@@ -80,10 +69,7 @@
     </div>
 
     <!-- Historique des contributions -->
-    <div
-      v-if="goal.contributions && goal.contributions.length > 0"
-      class="mb-4"
-    >
+    <div v-if="goal.contributions && goal.contributions.length > 0" class="mb-4">
       <button
         @click="$emit('view-contributions', goal)"
         class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
@@ -135,9 +121,7 @@ defineEmits<{
   "view-contributions": [goal: SavingsGoal];
 }>();
 
-const progressPercentage = computed(() =>
-  Math.round(props.goal.progressPercentage ?? 0)
-);
+const progressPercentage = computed(() => Math.round(props.goal.progressPercentage ?? 0));
 
 const isOnTrack = computed(() => props.goal.isOnTrack ?? true);
 
@@ -151,8 +135,7 @@ const daysRemainingText = computed(() => {
 });
 
 const suggestedMonthly = computed(() => {
-  if (!props.goal.targetDate || props.goal.status !== "active")
-    return null;
+  if (!props.goal.targetDate || props.goal.status !== "active") return null;
   return props.goal.suggestedMonthlyAmountCents;
 });
 
@@ -168,14 +151,10 @@ const statusLabel = computed(() => {
 
 const statusClass = computed(() => {
   const classes = {
-    active:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    completed:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-    abandoned:
-      "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
-    paused:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+    active: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    abandoned: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+    paused: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
   };
   return classes[props.goal.status] || "";
 });

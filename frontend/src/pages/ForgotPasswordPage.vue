@@ -1,14 +1,11 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4"
-  >
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
     <div class="max-w-md w-full">
       <div class="card">
         <div class="text-center mb-6">
           <h2 class="text-3xl font-bold">Mot de passe oublié ?</h2>
           <p class="mt-2 text-gray-600 dark:text-gray-400">
-            Entrez votre email et nous vous enverrons un lien pour réinitialiser
-            votre mot de passe.
+            Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
           </p>
         </div>
 
@@ -33,8 +30,8 @@
                 Email envoyé avec succès !
               </p>
               <p class="mt-1 text-sm text-green-700 dark:text-green-300">
-                Vérifiez votre boîte de réception et cliquez sur le lien pour
-                réinitialiser votre mot de passe.
+                Vérifiez votre boîte de réception et cliquez sur le lien pour réinitialiser votre
+                mot de passe.
               </p>
             </div>
           </div>
@@ -66,12 +63,7 @@
         </form>
 
         <div v-else class="space-y-3">
-          <FormButton
-            variant="secondary"
-            size="md"
-            full-width
-            @click="resetForm"
-          >
+          <FormButton variant="secondary" size="md" full-width @click="resetForm">
             Envoyer un autre email
           </FormButton>
         </div>
@@ -101,7 +93,13 @@ import FormButton from "@/components/FormButton.vue";
 
 const emailSent = ref(false);
 
-const { errors, defineField, handleSubmit, isSubmitting, resetForm: veeResetForm } = useForm({
+const {
+  errors,
+  defineField,
+  handleSubmit,
+  isSubmitting,
+  resetForm: veeResetForm,
+} = useForm({
   validationSchema: toTypedSchema(forgotPasswordSchema),
 });
 
@@ -112,10 +110,7 @@ const onSubmit = handleSubmit(async (values) => {
     await passwordResetApi.forgotPassword(values);
     emailSent.value = true;
   } catch (error) {
-    errorHandler.handle(
-      error,
-      "Impossible d'envoyer l'email. Veuillez vérifier l'adresse saisie."
-    );
+    errorHandler.handle(error, "Impossible d'envoyer l'email. Veuillez vérifier l'adresse saisie.");
   }
 });
 

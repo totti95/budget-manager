@@ -59,20 +59,14 @@
     </div>
 
     <!-- Loading State -->
-    <div
-      v-if="notificationsStore.loading"
-      class="text-center py-12"
-    >
+    <div v-if="notificationsStore.loading" class="text-center py-12">
       <div
         class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"
       ></div>
     </div>
 
     <!-- Empty State -->
-    <div
-      v-else-if="notificationsStore.notifications.length === 0"
-      class="text-center py-12"
-    >
+    <div v-else-if="notificationsStore.notifications.length === 0" class="text-center py-12">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-16 w-16 mx-auto text-gray-400 mb-4"
@@ -91,10 +85,7 @@
     </div>
 
     <!-- Notifications List -->
-    <div
-      v-else
-      class="space-y-0 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden"
-    >
+    <div v-else class="space-y-0 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <NotificationItem
         v-for="notification in notificationsStore.notifications"
         :key="notification.id"
@@ -106,17 +97,13 @@
     </div>
 
     <!-- Pagination -->
-    <div
-      v-if="notificationsStore.totalPages > 1"
-      class="flex justify-center gap-2 mt-6"
-    >
+    <div v-if="notificationsStore.totalPages > 1" class="flex justify-center gap-2 mt-6">
       <button
         @click="changePage(notificationsStore.currentPage - 1)"
         :disabled="notificationsStore.currentPage === 1"
         class="btn btn-secondary text-sm"
         :class="{
-          'opacity-50 cursor-not-allowed':
-            notificationsStore.currentPage === 1,
+          'opacity-50 cursor-not-allowed': notificationsStore.currentPage === 1,
         }"
       >
         Précédent
@@ -129,9 +116,7 @@
 
       <button
         @click="changePage(notificationsStore.currentPage + 1)"
-        :disabled="
-          notificationsStore.currentPage === notificationsStore.totalPages
-        "
+        :disabled="notificationsStore.currentPage === notificationsStore.totalPages"
         class="btn btn-secondary text-sm"
         :class="{
           'opacity-50 cursor-not-allowed':
@@ -161,11 +146,7 @@ const selectedFilter = ref<"all" | "unread" | "read">("all");
 // Fetch notifications based on filter
 async function fetchWithFilter() {
   const readFilter =
-    selectedFilter.value === "unread"
-      ? false
-      : selectedFilter.value === "read"
-      ? true
-      : undefined;
+    selectedFilter.value === "unread" ? false : selectedFilter.value === "read" ? true : undefined;
 
   await notificationsStore.fetchNotifications(1, readFilter);
 }
@@ -178,11 +159,7 @@ watch(selectedFilter, () => {
 // Change page
 function changePage(page: number) {
   const readFilter =
-    selectedFilter.value === "unread"
-      ? false
-      : selectedFilter.value === "read"
-      ? true
-      : undefined;
+    selectedFilter.value === "unread" ? false : selectedFilter.value === "read" ? true : undefined;
 
   notificationsStore.fetchNotifications(page, readFilter);
 }

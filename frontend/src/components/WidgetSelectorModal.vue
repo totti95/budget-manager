@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-  >
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div
       class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
     >
@@ -11,12 +9,7 @@
           @click="$emit('close')"
           class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -58,10 +51,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  getAllWidgetTypes,
-  getWidgetDefinition,
-} from "./widgets/widgetRegistry";
+import { getAllWidgetTypes, getWidgetDefinition } from "./widgets/widgetRegistry";
 import type { WidgetType } from "@/types";
 
 interface Props {

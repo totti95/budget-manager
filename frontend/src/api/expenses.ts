@@ -21,24 +21,15 @@ export interface CreateExpenseData {
 }
 
 export const expensesApi = {
-  async list(
-    budgetId: number,
-    filters?: ExpenseFilters,
-  ): Promise<PaginatedResponse<Expense>> {
-    const response = await api.get<PaginatedResponse<Expense>>(
-      `/budgets/${budgetId}/expenses`,
-      {
-        params: filters,
-      },
-    );
+  async list(budgetId: number, filters?: ExpenseFilters): Promise<PaginatedResponse<Expense>> {
+    const response = await api.get<PaginatedResponse<Expense>>(`/budgets/${budgetId}/expenses`, {
+      params: filters,
+    });
     return response.data;
   },
 
   async create(budgetId: number, data: CreateExpenseData): Promise<Expense> {
-    const response = await api.post<Expense>(
-      `/budgets/${budgetId}/expenses`,
-      data,
-    );
+    const response = await api.post<Expense>(`/budgets/${budgetId}/expenses`, data);
     return response.data;
   },
 
@@ -51,19 +42,12 @@ export const expensesApi = {
     await api.delete(`/expenses/${id}`);
   },
 
-  async importCsv(
-    budgetId: number,
-    file: File,
-  ): Promise<{ imported: number; errors: string[] }> {
+  async importCsv(budgetId: number, file: File): Promise<{ imported: number; errors: string[] }> {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await api.post(
-      `/budgets/${budgetId}/expenses/import-csv`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      },
-    );
+    const response = await api.post(`/budgets/${budgetId}/expenses/import-csv`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
   },
 

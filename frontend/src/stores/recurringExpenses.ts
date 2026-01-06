@@ -1,9 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import {
-  recurringExpensesApi,
-  type CreateRecurringExpenseData,
-} from "@/api/recurringExpenses";
+import { recurringExpensesApi, type CreateRecurringExpenseData } from "@/api/recurringExpenses";
 import type { RecurringExpense } from "@/types";
 
 export const useRecurringExpenseStore = defineStore("recurringExpenses", () => {
@@ -41,10 +38,7 @@ export const useRecurringExpenseStore = defineStore("recurringExpenses", () => {
     }
   }
 
-  async function updateRecurringExpense(
-    id: number,
-    data: Partial<CreateRecurringExpenseData>
-  ) {
+  async function updateRecurringExpense(id: number, data: Partial<CreateRecurringExpenseData>) {
     loading.value = true;
     error.value = null;
     try {
@@ -68,9 +62,7 @@ export const useRecurringExpenseStore = defineStore("recurringExpenses", () => {
     error.value = null;
     try {
       await recurringExpensesApi.delete(id);
-      recurringExpenses.value = recurringExpenses.value.filter(
-        (re) => re.id !== id
-      );
+      recurringExpenses.value = recurringExpenses.value.filter((re) => re.id !== id);
     } catch (err) {
       error.value = "Erreur lors de la suppression de la dépense récurrente";
       console.error(err);

@@ -256,11 +256,11 @@ class StatsController extends Controller
             ->with('expenses');
 
         if (isset($validated['from'])) {
-            $fromDate = \Carbon\Carbon::parse($validated['from'].'-01');
+            $fromDate = \Carbon\Carbon::parse($validated['from'] . '-01');
             $query->where('month', '>=', $fromDate);
         }
         if (isset($validated['to'])) {
-            $toDate = \Carbon\Carbon::parse($validated['to'].'-01');
+            $toDate = \Carbon\Carbon::parse($validated['to'] . '-01');
             $query->where('month', '<=', $toDate);
         }
 

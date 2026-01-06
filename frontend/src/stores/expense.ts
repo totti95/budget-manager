@@ -1,10 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import {
-  expensesApi,
-  type CreateExpenseData,
-  type ExpenseFilters,
-} from "@/api/expenses";
+import { expensesApi, type CreateExpenseData, type ExpenseFilters } from "@/api/expenses";
 import type { Expense } from "@/types";
 
 export const useExpenseStore = defineStore("expense", () => {

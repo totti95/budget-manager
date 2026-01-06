@@ -1,30 +1,18 @@
 <template>
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center"
-    @keydown.esc="close"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center" @keydown.esc="close">
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-black bg-opacity-50" @click="close" />
 
     <!-- Modal -->
-    <div
-      class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
-    >
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-bold">
-          Ajouter une contribution - {{ goal.name }}
-        </h3>
+        <h3 class="text-xl font-bold">Ajouter une contribution - {{ goal.name }}</h3>
         <button
           type="button"
           @click="close"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -37,9 +25,7 @@
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-          <label for="amount" class="block text-sm font-medium mb-1"
-            >Montant (€)</label
-          >
+          <label for="amount" class="block text-sm font-medium mb-1">Montant (€)</label>
           <input
             id="amount"
             v-model="amountEuros"
@@ -53,9 +39,7 @@
         </div>
 
         <div>
-          <label for="date" class="block text-sm font-medium mb-1"
-            >Date de contribution</label
-          >
+          <label for="date" class="block text-sm font-medium mb-1">Date de contribution</label>
           <input
             id="date"
             v-model="contributionDate"
@@ -66,9 +50,7 @@
         </div>
 
         <div>
-          <label for="note" class="block text-sm font-medium mb-1"
-            >Note (optionnel)</label
-          >
+          <label for="note" class="block text-sm font-medium mb-1">Note (optionnel)</label>
           <input
             id="note"
             v-model="note"
@@ -115,9 +97,7 @@ const emit = defineEmits<{
 
 const store = useSavingsGoalsStore();
 const amountEuros = ref("");
-const contributionDate = ref(
-  new Date().toISOString().split("T")[0]
-);
+const contributionDate = ref(new Date().toISOString().split("T")[0]);
 const note = ref("");
 const loading = ref(false);
 

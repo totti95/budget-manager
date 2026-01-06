@@ -132,7 +132,7 @@ class DatabaseSeeder extends Seeder
         foreach ($months as $month) {
             $budget = $user->budgets()->create([
                 'month' => $month,
-                'name' => 'Budget '.$month->isoFormat('MMMM YYYY'),
+                'name' => 'Budget ' . $month->isoFormat('MMMM YYYY'),
                 'generated_from_template_id' => $template->id,
             ]);
 
@@ -212,7 +212,7 @@ class DatabaseSeeder extends Seeder
     private function getRandomExpenseLabel(string $subcategory): string
     {
         $labels = [
-            'Loyer' => ['Loyer '.Carbon::now()->format('m/Y')],
+            'Loyer' => ['Loyer ' . Carbon::now()->format('m/Y')],
             'Courses' => ['Carrefour', 'Leclerc', 'Auchan', 'Lidl'],
             'Essence' => ['Station Total', 'Station BP', 'Station Esso'],
             'Restaurants' => ['Restaurant Le Bon Coin', 'Pizzeria', 'Sushi Bar'],
@@ -224,7 +224,7 @@ class DatabaseSeeder extends Seeder
             return $labels[$subcategory][array_rand($labels[$subcategory])];
         }
 
-        return 'Dépense '.$subcategory;
+        return 'Dépense ' . $subcategory;
     }
 
     private function getRandomPaymentMethod(): string

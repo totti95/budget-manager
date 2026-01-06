@@ -66,19 +66,13 @@
               {{ notification.title }}
             </p>
             <p
-              :class="[
-                'mt-1',
-                compact ? 'text-xs' : 'text-sm',
-                'text-gray-600 dark:text-gray-400',
-              ]"
+              :class="['mt-1', compact ? 'text-xs' : 'text-sm', 'text-gray-600 dark:text-gray-400']"
             >
               {{ notification.message }}
             </p>
 
             <!-- Metadata -->
-            <div
-              class="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-500"
-            >
+            <div class="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-500">
               <span>{{ formatDate(notification.createdAt) }}</span>
               <span v-if="notification.data?.categoryName">•</span>
               <span v-if="notification.data?.categoryName">

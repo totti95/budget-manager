@@ -68,10 +68,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
     hasUnsavedChanges.value = true;
   }
 
-  function updateWidgetSettings(
-    widgetId: string,
-    settings: Record<string, any>,
-  ) {
+  function updateWidgetSettings(widgetId: string, settings: Record<string, any>) {
     widgetSettings.value[widgetId] = {
       ...widgetSettings.value[widgetId],
       ...settings,

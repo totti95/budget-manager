@@ -24,7 +24,7 @@ test('user can create expense', function () {
 
     $response->assertStatus(201)
         ->assertJsonStructure([
-            'id', 'label', 'amount_cents', 'subcategory',
+            'id', 'label', 'amountCents', 'subcategory',
         ]);
 
     expect(Expense::where('budget_id', $budget->id)->exists())->toBeTrue();

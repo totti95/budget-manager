@@ -16,24 +16,17 @@ export const notificationsApi = {
     if (read !== undefined) params.read = read;
     if (type) params.type = type;
 
-    const response = await api.get<PaginatedResponse<Notification>>(
-      "/notifications",
-      { params }
-    );
+    const response = await api.get<PaginatedResponse<Notification>>("/notifications", { params });
     return response.data;
   },
 
   async unreadCount(): Promise<number> {
-    const response = await api.get<{ count: number }>(
-      "/notifications/unread-count"
-    );
+    const response = await api.get<{ count: number }>("/notifications/unread-count");
     return response.data.count;
   },
 
   async markRead(id: number): Promise<Notification> {
-    const response = await api.put<Notification>(
-      `/notifications/${id}/mark-read`
-    );
+    const response = await api.put<Notification>(`/notifications/${id}/mark-read`);
     return response.data;
   },
 
@@ -52,19 +45,12 @@ export const notificationsApi = {
 
 export const notificationSettingsApi = {
   async get(): Promise<NotificationSettings> {
-    const response = await api.get<NotificationSettings>(
-      "/notification-settings"
-    );
+    const response = await api.get<NotificationSettings>("/notification-settings");
     return response.data;
   },
 
-  async update(
-    data: UpdateNotificationSettingsData
-  ): Promise<NotificationSettings> {
-    const response = await api.put<NotificationSettings>(
-      "/notification-settings",
-      data
-    );
+  async update(data: UpdateNotificationSettingsData): Promise<NotificationSettings> {
+    const response = await api.put<NotificationSettings>("/notification-settings", data);
     return response.data;
   },
 };

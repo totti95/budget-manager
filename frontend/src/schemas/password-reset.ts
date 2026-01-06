@@ -8,9 +8,7 @@ export const resetPasswordSchema = z
   .object({
     email: z.string().email("Email invalide"),
     token: z.string().min(1, "Token requis"),
-    password: z
-      .string()
-      .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
     passwordConfirmation: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirmation, {

@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4"
-  >
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
     <div class="max-w-md w-full">
       <div class="card">
         <h2 class="text-3xl font-bold text-center mb-6">Connexion</h2>
@@ -61,7 +59,9 @@
           </router-link>
         </div>
 
-        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm border border-blue-200 dark:border-blue-800">
+        <div
+          class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm border border-blue-200 dark:border-blue-800"
+        >
           <p class="font-semibold mb-2 text-blue-900 dark:text-blue-100">Compte de démo :</p>
           <p class="text-blue-800 dark:text-blue-200">Email: demo@budgetmanager.local</p>
           <p class="text-blue-800 dark:text-blue-200">Mot de passe: password</p>

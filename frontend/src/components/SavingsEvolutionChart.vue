@@ -29,7 +29,7 @@ Chart.register(
   Title,
   Tooltip,
   Legend,
-  Filler,
+  Filler
 );
 
 interface Props {
@@ -50,14 +50,14 @@ function createChart() {
 
   // Sort plans by month (oldest first)
   const sortedPlans = [...props.plans].sort(
-    (a, b) => new Date(a.month).getTime() - new Date(b.month).getTime(),
+    (a, b) => new Date(a.month).getTime() - new Date(b.month).getTime()
   );
 
   const labels = sortedPlans.map((plan) =>
     new Date(plan.month).toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "short",
-    }),
+    })
   );
 
   const plannedData = sortedPlans.map((plan) => plan.plannedCents / 100);
@@ -148,7 +148,7 @@ watch(
   () => {
     createChart();
   },
-  { deep: true },
+  { deep: true }
 );
 
 onBeforeUnmount(() => {

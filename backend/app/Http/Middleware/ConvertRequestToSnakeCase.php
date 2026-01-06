@@ -14,7 +14,7 @@ class ConvertRequestToSnakeCase
      * Convertit les clés des données de la requête de camelCase en snake_case
      * pour correspondre aux conventions de Laravel et de la base de données.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
     public function handle(Request $request, Closure $next): Response
     {

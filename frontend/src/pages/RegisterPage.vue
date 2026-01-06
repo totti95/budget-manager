@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4"
-  >
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
     <div class="max-w-md w-full">
       <div class="card">
         <h2 class="text-3xl font-bold text-center mb-6">Inscription</h2>
@@ -101,9 +99,7 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
 const [name, nameAttrs] = defineField("name");
 const [email, emailAttrs] = defineField("email");
 const [password, passwordAttrs] = defineField("password");
-const [password_confirmation, password_confirmationAttrs] = defineField(
-  "password_confirmation",
-);
+const [password_confirmation, password_confirmationAttrs] = defineField("password_confirmation");
 
 const onSubmit = handleSubmit(async (values) => {
   try {

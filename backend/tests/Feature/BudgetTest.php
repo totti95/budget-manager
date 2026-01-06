@@ -15,7 +15,7 @@ test('user can list their budgets', function () {
     $response->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'month', 'user_id'],
+                '*' => ['id', 'name', 'month', 'userId'],
             ],
         ]);
 });
@@ -38,7 +38,7 @@ test('user can generate budget from default template', function () {
             'id', 'name', 'month', 'categories',
         ]);
 
-    expect(Budget::where('user_id', $user->id)->where('month', $month.'-01')->exists())->toBeTrue();
+    expect(Budget::where('user_id', $user->id)->where('month', $month . '-01')->exists())->toBeTrue();
 });
 
 test('user can view budget details', function () {

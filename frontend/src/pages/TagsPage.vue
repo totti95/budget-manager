@@ -2,9 +2,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Gestion des Tags</h1>
-      <button @click="openCreateModal" class="btn btn-primary">
-        + Nouveau tag
-      </button>
+      <button @click="openCreateModal" class="btn btn-primary">+ Nouveau tag</button>
     </div>
 
     <!-- Barre de recherche -->
@@ -28,10 +26,7 @@
     </div>
 
     <!-- No Results -->
-    <div
-      v-else-if="filteredTags.length === 0"
-      class="text-center py-8 text-gray-500"
-    >
+    <div v-else-if="filteredTags.length === 0" class="text-center py-8 text-gray-500">
       <p>
         {{
           searchQuery
@@ -43,11 +38,7 @@
 
     <!-- Tags Grid -->
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div
-        v-for="tag in filteredTags"
-        :key="tag.id"
-        class="card hover:shadow-md transition-shadow"
-      >
+      <div v-for="tag in filteredTags" :key="tag.id" class="card hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between mb-3">
           <TagBadge :tag="tag" />
           <div class="flex gap-2">
@@ -106,9 +97,7 @@
                 placeholder="#3B82F6"
               />
             </div>
-            <p class="text-xs text-gray-500 mt-1">
-              Format hexadécimal (ex: #3B82F6)
-            </p>
+            <p class="text-xs text-gray-500 mt-1">Format hexadécimal (ex: #3B82F6)</p>
           </div>
           <div v-if="createError" class="text-red-600 text-sm">
             {{ createError }}
@@ -200,12 +189,10 @@
         <h2 class="text-xl font-bold mb-4">Supprimer le tag ?</h2>
         <p class="mb-4 text-gray-700">
           Voulez-vous vraiment supprimer le tag
-          <strong>"{{ deletingTag.name }}"</strong> ? Cette action est
-          irréversible.
+          <strong>"{{ deletingTag.name }}"</strong> ? Cette action est irréversible.
         </p>
         <p class="mb-6 text-sm text-gray-600">
-          Note : Les dépenses associées ne seront pas supprimées, seul le tag
-          sera retiré.
+          Note : Les dépenses associées ne seront pas supprimées, seul le tag sera retiré.
         </p>
         <div v-if="deleteError" class="text-red-600 text-sm mb-4">
           {{ deleteError }}
@@ -342,8 +329,7 @@ async function handleDelete() {
     await tagsStore.deleteTag(deletingTag.value.id);
     closeDeleteModal();
   } catch (error: any) {
-    deleteError.value =
-      error.response?.data?.message || "Erreur lors de la suppression";
+    deleteError.value = error.response?.data?.message || "Erreur lors de la suppression";
   } finally {
     deleting.value = false;
   }
