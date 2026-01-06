@@ -7,10 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Budget Manager is a personal budget management web application built with Laravel 11 (backend API) and Vue 3 + TypeScript (frontend SPA), running on Docker.
 
 **Key Features:**
-- Budget templates with categories and subcategories
+- Budget templates with categories, subcategories, and revenue tracking
 - Monthly budget generation from templates
-- Expense tracking with CSV import/export
-- Asset/wealth management (savings, investments, real estate)
+- Expense tracking with CSV import/export, tags, and recurring expenses
+- Asset/wealth management (savings, investments, real estate) with liability support
+- Savings goals with contribution tracking
+- Wealth history tracking over time
+- Notification system with customizable settings
+- Customizable dashboard layouts
 - Statistics and charts
 - Multi-user support with role-based access control
 
@@ -53,7 +57,7 @@ Budget Manager is a personal budget management web application built with Larave
 **Key Architectural Patterns:**
 
 1. **State Management (Pinia):**
-   - Separate stores: `auth`, `budget`, `expense`, `template`, `assets`, `stats`, `users`
+   - Separate stores: `auth`, `budget`, `expense`, `template`, `assets`, `savingsPlans`, `savingsGoals`, `tags`, `recurringExpenses`, `notifications`, `dashboard`, `stats`, `users`
    - Each store handles loading states, errors, and API calls
    - Stores use camelCase for all properties
 
@@ -61,7 +65,7 @@ Budget Manager is a personal budget management web application built with Larave
    - `frontend/src/api/axios.ts`: Centralized axios instance with interceptors
    - Request interceptor: Adds Bearer token to all requests
    - Response interceptor: Handles 401 (redirect to login), 422 (validation), 429 (rate limit), 5xx (server errors)
-   - Individual API modules: `auth.ts`, `budgets.ts`, `expenses.ts`, `templates.ts`, `assets.ts`, `users.ts`, `stats.ts`
+   - Individual API modules: `auth.ts`, `budgets.ts`, `expenses.ts`, `templates.ts`, `assets.ts`, `savingsPlans.ts`, `savingsGoals.ts`, `tags.ts`, `recurringExpenses.ts`, `notifications.ts`, `dashboard.ts`, `wealthHistory.ts`, `users.ts`, `stats.ts`, `password-reset.ts`
 
 3. **Form Validation:**
    - Uses VeeValidate + Zod schemas
@@ -296,6 +300,37 @@ php artisan test --filter=AuthTest  # Specific test
 - **Access:** Port 3306, credentials in `backend/.env`
 - **Migration strategy:** Sequential migrations, never modify existing migrations
 - **Seeder:** `DatabaseSeeder.php` creates complete demo dataset
+
+### Database Data Protection (CRITICAL)
+
+**NEVER delete or truncate database data without explicit user permission.**
+
+This includes:
+- `php artisan migrate:fresh` (drops all tables and data)
+- `php artisan db:wipe` (drops all tables)
+- `TRUNCATE` SQL commands
+- `DELETE FROM` SQL commands without WHERE clause
+- Dropping Docker volumes containing database data
+- Any operation that results in data loss
+
+**Always ask the user for explicit permission before:**
+1. Running any command that will delete existing data
+2. Executing migrations that drop tables or columns
+3. Resetting the database
+4. Clearing cache that contains important state
+
+**Safe operations (no permission needed):**
+- `make migrate` (only adds new tables/columns)
+- `make seed` (only adds data, doesn't delete)
+- Reading/querying database data
+- Running tests (uses separate test database)
+
+**If data loss occurred accidentally:**
+- Inform the user immediately
+- Use `make seed` to restore demo data
+- Check if database backups exist
+
+The user's data is valuable. When in doubt, always ask before executing destructive operations.
 
 ## Additional Notes
 
