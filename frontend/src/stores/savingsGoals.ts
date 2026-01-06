@@ -22,8 +22,7 @@ export const useSavingsGoalsStore = defineStore("savingsGoals", () => {
     try {
       goals.value = await savingsGoalsApi.list();
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Erreur de chargement";
+      const message = err.response?.data?.message || "Erreur de chargement";
       error.value = message;
       errorToast(message);
       throw err;
@@ -39,8 +38,7 @@ export const useSavingsGoalsStore = defineStore("savingsGoals", () => {
       success("Objectif créé avec succès");
       return newGoal;
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Erreur de création";
+      const message = err.response?.data?.message || "Erreur de création";
       errorToast(message);
       throw err;
     }
@@ -56,8 +54,7 @@ export const useSavingsGoalsStore = defineStore("savingsGoals", () => {
       success("Objectif mis à jour");
       return updated;
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Erreur de modification";
+      const message = err.response?.data?.message || "Erreur de modification";
       errorToast(message);
       throw err;
     }
@@ -69,8 +66,7 @@ export const useSavingsGoalsStore = defineStore("savingsGoals", () => {
       goals.value = goals.value.filter((g) => g.id !== id);
       success("Objectif supprimé");
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Erreur de suppression";
+      const message = err.response?.data?.message || "Erreur de suppression";
       errorToast(message);
       throw err;
     }
@@ -86,17 +82,13 @@ export const useSavingsGoalsStore = defineStore("savingsGoals", () => {
       success("Objectif synchronisé avec l'actif");
       return updated;
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Erreur de synchronisation";
+      const message = err.response?.data?.message || "Erreur de synchronisation";
       errorToast(message);
       throw err;
     }
   }
 
-  async function addContribution(
-    goalId: number,
-    data: CreateContributionData
-  ) {
+  async function addContribution(goalId: number, data: CreateContributionData) {
     try {
       await savingsGoalsApi.addContribution(goalId, data);
       // Recharger l'objectif pour avoir le montant à jour

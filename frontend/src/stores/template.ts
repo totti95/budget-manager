@@ -87,7 +87,7 @@ export const useTemplateStore = defineStore("template", () => {
           sortOrder?: number;
         }>;
       }>;
-    },
+    }
   ) {
     loading.value = true;
     error.value = null;

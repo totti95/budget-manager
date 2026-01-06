@@ -5,16 +5,14 @@
     <div v-else-if="chartData" class="h-96">
       <canvas ref="chartCanvas"></canvas>
     </div>
-    <div v-else class="text-gray-500 text-center py-8">
-      Aucune donnée d'historique disponible
-    </div>
+    <div v-else class="text-gray-500 text-center py-8">Aucune donnée d'historique disponible</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {nextTick, onMounted, ref, watch} from "vue";
-import {Chart, registerables, type TooltipItem} from "chart.js";
-import {statsApi} from "@/api/stats";
+import { nextTick, onMounted, ref, watch } from "vue";
+import { Chart, registerables, type TooltipItem } from "chart.js";
+import { statsApi } from "@/api/stats";
 
 Chart.register(...registerables);
 
@@ -101,9 +99,7 @@ const renderChart = () => {
         tooltip: {
           callbacks: {
             label: (context: TooltipItem<"line">) => {
-              const label = context.dataset.label
-                ? `${context.dataset.label}: `
-                : "";
+              const label = context.dataset.label ? `${context.dataset.label}: ` : "";
               return (
                 label +
                 new Intl.NumberFormat("fr-FR", {

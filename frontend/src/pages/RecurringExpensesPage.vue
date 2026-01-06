@@ -1,9 +1,7 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-        Dépenses récurrentes
-      </h1>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Dépenses récurrentes</h1>
       <button
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         @click="openCreateModal"
@@ -24,9 +22,7 @@
       v-else-if="store.recurringExpenses.length === 0"
       class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow"
     >
-      <p class="text-gray-600 dark:text-gray-400 mb-4">
-        Aucune dépense récurrente configurée
-      </p>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">Aucune dépense récurrente configurée</p>
       <button
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         @click="openCreateModal"
@@ -52,10 +48,7 @@
             </p>
           </div>
           <div class="flex gap-2">
-            <button
-              @click="editExpense(expense)"
-              class="text-sm text-blue-600 hover:text-blue-700"
-            >
+            <button @click="editExpense(expense)" class="text-sm text-blue-600 hover:text-blue-700">
               Modifier
             </button>
             <button
@@ -74,14 +67,10 @@
         </div>
 
         <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-          <p>
-            <strong>Fréquence:</strong> {{ formatFrequency(expense) }}
-          </p>
+          <p><strong>Fréquence:</strong> {{ formatFrequency(expense) }}</p>
           <p v-if="expense.templateSubcategory">
             <strong>Catégorie:</strong>
-            {{
-              expense.templateSubcategory.templateCategory?.name || "-"
-            }}
+            {{ expense.templateSubcategory.templateCategory?.name || "-" }}
             / {{ expense.templateSubcategory.name }}
           </p>
           <p>
@@ -197,9 +186,7 @@ function formatFrequency(expense: RecurringExpense): string {
   }
 
   if (expense.frequency === "yearly") {
-    const month = expense.monthOfYear
-      ? monthNames[expense.monthOfYear - 1]
-      : "";
+    const month = expense.monthOfYear ? monthNames[expense.monthOfYear - 1] : "";
     const day = expense.dayOfMonth ? ` le ${expense.dayOfMonth}` : "";
     return `Annuelle (${month}${day})`;
   }

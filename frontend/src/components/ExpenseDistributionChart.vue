@@ -13,14 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import {nextTick, onMounted, ref, watch} from "vue";
-import {
-  Chart,
-  registerables,
-  type ChartConfiguration,
-  type TooltipItem,
-} from "chart.js";
-import {statsApi} from "@/api/stats";
+import { nextTick, onMounted, ref, watch } from "vue";
+import { Chart, registerables, type ChartConfiguration, type TooltipItem } from "chart.js";
+import { statsApi } from "@/api/stats";
 
 Chart.register(...registerables);
 
@@ -112,13 +107,9 @@ const renderChart = () => {
             label: (context: TooltipItem<"pie">) => {
               const label = context.label ?? "";
               const value = context.parsed; // number pour un pie
-              const total = (context.dataset.data as number[]).reduce(
-                (sum, v) => sum + v,
-                0,
-              );
+              const total = (context.dataset.data as number[]).reduce((sum, v) => sum + v, 0);
 
-              const percentage =
-                total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
+              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
 
               return `${label}: ${new Intl.NumberFormat("fr-FR", {
                 style: "currency",
@@ -142,7 +133,7 @@ watch(
   () => props.budgetId,
   () => {
     loadData();
-  },
+  }
 );
 </script>
 

@@ -11,10 +11,7 @@
         <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">
           {{ isEditing ? "Modifier" : "Ajouter" }} une dépense récurrente
         </h3>
-        <button
-          @click="close"
-          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-        >
+        <button @click="close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           ✕
         </button>
       </div>
@@ -184,11 +181,7 @@
               :key="category.id"
               :label="category.name"
             >
-              <option
-                v-for="subcat in category.subcategories"
-                :key="subcat.id"
-                :value="subcat.id"
-              >
+              <option v-for="subcat in category.subcategories" :key="subcat.id" :value="subcat.id">
                 {{ subcat.name }}
               </option>
             </optgroup>

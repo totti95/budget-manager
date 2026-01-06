@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4"
-  >
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
     <div class="max-w-md w-full">
       <div class="card">
         <div class="text-center mb-6">
@@ -59,8 +57,8 @@
                 Lien invalide ou expiré
               </p>
               <p class="mt-1 text-sm text-red-700 dark:text-red-300">
-                Ce lien de réinitialisation n'est pas valide ou a expiré. Veuillez
-                demander un nouveau lien.
+                Ce lien de réinitialisation n'est pas valide ou a expiré. Veuillez demander un
+                nouveau lien.
               </p>
             </div>
           </div>
@@ -115,12 +113,7 @@
         </form>
 
         <div v-if="invalidToken" class="space-y-3">
-          <FormButton
-            variant="primary"
-            size="md"
-            full-width
-            @click="goToForgotPassword"
-          >
+          <FormButton variant="primary" size="md" full-width @click="goToForgotPassword">
             Demander un nouveau lien
           </FormButton>
         </div>

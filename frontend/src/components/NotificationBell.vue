@@ -26,11 +26,7 @@
         v-if="notificationsStore.unreadCount > 0"
         class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"
       >
-        {{
-          notificationsStore.unreadCount > 99
-            ? "99+"
-            : notificationsStore.unreadCount
-        }}
+        {{ notificationsStore.unreadCount > 99 ? "99+" : notificationsStore.unreadCount }}
       </span>
     </button>
 
@@ -45,9 +41,7 @@
         <div
           class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
         >
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
-            Notifications
-          </h3>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
           <button
             v-if="notificationsStore.unreadCount > 0"
             @click="handleMarkAllRead"
@@ -68,10 +62,7 @@
 
           <div v-else>
             <NotificationItem
-              v-for="notification in notificationsStore.unreadNotifications.slice(
-                0,
-                5
-              )"
+              v-for="notification in notificationsStore.unreadNotifications.slice(0, 5)"
               :key="notification.id"
               :notification="notification"
               @click="handleNotificationClick(notification)"

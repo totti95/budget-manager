@@ -89,12 +89,8 @@
       v-else-if="!budgetStore.loading && !currentBudget"
       class="card text-center py-12"
     >
-      <p class="text-gray-600 dark:text-gray-400 mb-4">
-        Aucun budget pour ce mois
-      </p>
-      <button @click="handleGenerateBudget" class="btn btn-primary">
-        Générer le budget
-      </button>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">Aucun budget pour ce mois</p>
+      <button @click="handleGenerateBudget" class="btn btn-primary">Générer le budget</button>
     </div>
 
     <!-- Loading state -->

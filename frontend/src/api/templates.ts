@@ -67,7 +67,7 @@ export const templatesApi = {
           sortOrder?: number;
         }>;
       }>;
-    },
+    }
   ): Promise<BudgetTemplate> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload: any = {};

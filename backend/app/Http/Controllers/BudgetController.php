@@ -18,7 +18,7 @@ class BudgetController extends Controller
 
         if ($request->has('month')) {
             // Convert Y-m format to full date for comparison
-            $monthDate = Carbon::parse($request->month.'-01');
+            $monthDate = Carbon::parse($request->month . '-01');
             $query->whereYear('month', $monthDate->year)
                 ->whereMonth('month', $monthDate->month);
         }
@@ -34,7 +34,7 @@ class BudgetController extends Controller
             'month' => 'required|date_format:Y-m',
         ]);
 
-        $month = Carbon::parse($validated['month'].'-01');
+        $month = Carbon::parse($validated['month'] . '-01');
 
         // Check if budget already exists
         $existing = $request->user()->budgets()->where('month', $month)->first();
@@ -68,7 +68,7 @@ class BudgetController extends Controller
         // Create budget from template
         $budget = $request->user()->budgets()->create([
             'month' => $month,
-            'name' => 'Budget '.$month->isoFormat('MMMM YYYY'),
+            'name' => 'Budget ' . $month->isoFormat('MMMM YYYY'),
             'generated_from_template_id' => $template->id,
             'revenue_cents' => $revenueCents,
         ]);
@@ -180,7 +180,7 @@ class BudgetController extends Controller
         $categoryData = [];
 
         foreach ($validated['months'] as $month) {
-            $monthDate = Carbon::parse($month.'-01');
+            $monthDate = Carbon::parse($month . '-01');
             $budget = $user->budgets()
                 ->where('month', $monthDate)
                 ->with(['categories.subcategories.expenses'])
@@ -288,7 +288,7 @@ class BudgetController extends Controller
 
         // Return PDF download response
         // Add 2 hours to handle timezone (DB stores last day of previous month at 23:00 UTC = first day of next month)
-        $filename = 'budget-'.$budget->month->copy()->addHours(2)->format('Y-m').'.pdf';
+        $filename = 'budget-' . $budget->month->copy()->addHours(2)->format('Y-m') . '.pdf';
 
         return $pdf->download($filename);
     }

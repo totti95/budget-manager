@@ -52,9 +52,7 @@ export const usersApi = {
   },
 
   async restore(id: number): Promise<User> {
-    const response = await api.put<{ user: User; message: string }>(
-      `/admin/users/${id}/restore`,
-    );
+    const response = await api.put<{ user: User; message: string }>(`/admin/users/${id}/restore`);
     return response.data.user;
   },
 };

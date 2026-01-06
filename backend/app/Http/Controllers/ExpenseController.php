@@ -29,7 +29,7 @@ class ExpenseController extends Controller
 
         // Search
         if ($request->has('q')) {
-            $query->where('label', 'ILIKE', '%'.$request->q.'%');
+            $query->where('label', 'ILIKE', '%' . $request->q . '%');
         }
 
         // Date range
@@ -157,7 +157,7 @@ class ExpenseController extends Controller
                     ->first();
 
                 if (! $subcategory) {
-                    $errors[] = 'Ligne '.($index + 2).": Sous-catégorie '{$data['subcategory']}' non trouvée";
+                    $errors[] = 'Ligne ' . ($index + 2) . ": Sous-catégorie '{$data['subcategory']}' non trouvée";
 
                     continue;
                 }
@@ -173,7 +173,7 @@ class ExpenseController extends Controller
 
                 $imported++;
             } catch (\Exception $e) {
-                $errors[] = 'Ligne '.($index + 2).': '.$e->getMessage();
+                $errors[] = 'Ligne ' . ($index + 2) . ': ' . $e->getMessage();
             }
         }
 
@@ -194,17 +194,17 @@ class ExpenseController extends Controller
         foreach ($expenses as $expense) {
             $csv .= implode(',', [
                 $expense->date->format('Y-m-d'),
-                '"'.str_replace('"', '""', $expense->label).'"',
+                '"' . str_replace('"', '""', $expense->label) . '"',
                 $expense->amount_cents,
-                '"'.str_replace('"', '""', $expense->subcategory->budgetCategory->name).'"',
-                '"'.str_replace('"', '""', $expense->subcategory->name).'"',
-                '"'.str_replace('"', '""', $expense->payment_method ?? '').'"',
-                '"'.str_replace('"', '""', $expense->notes ?? '').'"',
-            ])."\n";
+                '"' . str_replace('"', '""', $expense->subcategory->budgetCategory->name) . '"',
+                '"' . str_replace('"', '""', $expense->subcategory->name) . '"',
+                '"' . str_replace('"', '""', $expense->payment_method ?? '') . '"',
+                '"' . str_replace('"', '""', $expense->notes ?? '') . '"',
+            ]) . "\n";
         }
 
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', 'attachment; filename="expenses-'.$budget->month->format('Y-m').'.csv"');
+            ->header('Content-Disposition', 'attachment; filename="expenses-' . $budget->month->format('Y-m') . '.csv"');
     }
 }

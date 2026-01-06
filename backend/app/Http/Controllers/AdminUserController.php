@@ -180,7 +180,7 @@ class AdminUserController extends Controller
         $numbers = '0123456789';
         $symbols = '!@#$%^&*-_+=';
 
-        $allChars = $uppercase.$lowercase.$numbers.$symbols;
+        $allChars = $uppercase . $lowercase . $numbers . $symbols;
 
         // Garantir au moins un caractère de chaque type
         $password = '';

@@ -8,21 +8,15 @@
         <h2 class="text-xl font-semibold mb-4">Informations personnelles</h2>
         <div class="space-y-3">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Nom
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"> Nom </label>
             <p class="text-gray-900">{{ authStore.user?.name }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"> Email </label>
             <p class="text-gray-900">{{ authStore.user?.email }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Rôle
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"> Rôle </label>
             <p class="text-gray-900">
               {{ authStore.user?.role?.label === "admin" ? "Administrateur" : "Utilisateur" }}
             </p>

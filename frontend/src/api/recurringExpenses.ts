@@ -24,28 +24,17 @@ export const recurringExpensesApi = {
   },
 
   async get(id: number): Promise<RecurringExpense> {
-    const response = await api.get<RecurringExpense>(
-      `/recurring-expenses/${id}`
-    );
+    const response = await api.get<RecurringExpense>(`/recurring-expenses/${id}`);
     return response.data;
   },
 
   async create(data: CreateRecurringExpenseData): Promise<RecurringExpense> {
-    const response = await api.post<RecurringExpense>(
-      "/recurring-expenses",
-      data
-    );
+    const response = await api.post<RecurringExpense>("/recurring-expenses", data);
     return response.data;
   },
 
-  async update(
-    id: number,
-    data: Partial<CreateRecurringExpenseData>
-  ): Promise<RecurringExpense> {
-    const response = await api.put<RecurringExpense>(
-      `/recurring-expenses/${id}`,
-      data
-    );
+  async update(id: number, data: Partial<CreateRecurringExpenseData>): Promise<RecurringExpense> {
+    const response = await api.put<RecurringExpense>(`/recurring-expenses/${id}`, data);
     return response.data;
   },
 
@@ -54,9 +43,7 @@ export const recurringExpensesApi = {
   },
 
   async toggleActive(id: number): Promise<RecurringExpense> {
-    const response = await api.patch<RecurringExpense>(
-      `/recurring-expenses/${id}/toggle-active`
-    );
+    const response = await api.patch<RecurringExpense>(`/recurring-expenses/${id}/toggle-active`);
     return response.data;
   },
 };

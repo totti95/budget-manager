@@ -17,10 +17,7 @@ export const savingsPlansApi = {
     return response.data;
   },
 
-  async update(
-    id: number,
-    data: UpdateSavingsPlanData,
-  ): Promise<SavingsPlan> {
+  async update(id: number, data: UpdateSavingsPlanData): Promise<SavingsPlan> {
     const response = await api.put(`/savings/${id}`, {
       planned_cents: data.plannedCents,
     });

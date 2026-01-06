@@ -48,7 +48,7 @@ class RecurringExpense extends Model
     /**
      * Determine if this recurring expense should create an expense for the given month.
      *
-     * @param  Carbon  $month  The budget month (Y-m-01 format)
+     * @param Carbon $month The budget month (Y-m-01 format)
      */
     public function shouldCreateForMonth(Carbon $month): bool
     {

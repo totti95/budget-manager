@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center"
-    @keydown.esc="close"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center" @keydown.esc="close">
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-black bg-opacity-50" @click="close" />
 
@@ -11,20 +8,13 @@
       class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6 max-h-[90vh] overflow-y-auto"
     >
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-bold">
-          Historique des versements - {{ goal.name }}
-        </h3>
+        <h3 class="text-xl font-bold">Historique des versements - {{ goal.name }}</h3>
         <button
           type="button"
           @click="close"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -39,17 +29,13 @@
       <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Nombre de versements
-            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Nombre de versements</p>
             <p class="text-2xl font-bold">
               {{ contributions.length }}
             </p>
           </div>
           <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Total versé
-            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Total versé</p>
             <p class="text-2xl font-bold">
               {{ formatEuros(totalContributed) }}
             </p>
@@ -73,10 +59,7 @@
                 {{ formatDate(contribution.contributionDate) }}
               </span>
             </div>
-            <p
-              v-if="contribution.note"
-              class="text-sm text-gray-600 dark:text-gray-300 mt-1"
-            >
+            <p v-if="contribution.note" class="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {{ contribution.note }}
             </p>
           </div>
@@ -90,9 +73,7 @@
         </div>
       </div>
 
-      <div v-else class="text-center py-8 text-gray-500">
-        Aucun versement enregistré
-      </div>
+      <div v-else class="text-center py-8 text-gray-500">Aucun versement enregistré</div>
 
       <!-- Bouton fermer -->
       <div class="mt-6">
@@ -127,18 +108,12 @@ const contributions = computed(() => props.goal.contributions || []);
 
 const sortedContributions = computed(() => {
   return [...contributions.value].sort((a, b) => {
-    return (
-      new Date(b.contributionDate).getTime() -
-      new Date(a.contributionDate).getTime()
-    );
+    return new Date(b.contributionDate).getTime() - new Date(a.contributionDate).getTime();
   });
 });
 
 const totalContributed = computed(() => {
-  return contributions.value.reduce(
-    (sum, contrib) => sum + contrib.amountCents,
-    0
-  );
+  return contributions.value.reduce((sum, contrib) => sum + contrib.amountCents, 0);
 });
 
 function formatEuros(cents: number): string {

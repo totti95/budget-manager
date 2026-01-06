@@ -40,7 +40,7 @@ class PasswordResetController extends Controller
             'created_at' => now(),
         ]);
 
-        $resetUrl = env('FRONTEND_URL', 'http://localhost:5173').'/reset-password?token='.$token.'&email='.urlencode($request->email);
+        $resetUrl = env('FRONTEND_URL', 'http://localhost:5173') . '/reset-password?token=' . $token . '&email=' . urlencode($request->email);
 
         try {
             Mail::send('emails.password-reset', [
@@ -51,7 +51,7 @@ class PasswordResetController extends Controller
                     ->subject('Réinitialisation de votre mot de passe - Budget Manager');
             });
         } catch (\Exception $e) {
-            \Log::warning('Failed to send password reset email: '.$e->getMessage());
+            \Log::warning('Failed to send password reset email: ' . $e->getMessage());
         }
 
         return response()->json([

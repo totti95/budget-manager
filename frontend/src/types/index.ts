@@ -377,8 +377,7 @@ export interface CreateSavingsGoalData {
   suggestedMonthlyAmountCents?: number | null;
 }
 
-export interface UpdateSavingsGoalData
-  extends Partial<CreateSavingsGoalData> {
+export interface UpdateSavingsGoalData extends Partial<CreateSavingsGoalData> {
   status?: "active" | "completed" | "abandoned" | "paused";
 }
 

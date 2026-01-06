@@ -23,10 +23,7 @@ export const savingsGoalsApi = {
     return response.data;
   },
 
-  async update(
-    id: number,
-    data: UpdateSavingsGoalData
-  ): Promise<SavingsGoal> {
+  async update(id: number, data: UpdateSavingsGoalData): Promise<SavingsGoal> {
     const response = await api.put(`/savings-goals/${id}`, data);
     return response.data;
   },
@@ -41,9 +38,7 @@ export const savingsGoalsApi = {
   },
 
   // Contributions
-  async listContributions(
-    goalId: number
-  ): Promise<SavingsGoalContribution[]> {
+  async listContributions(goalId: number): Promise<SavingsGoalContribution[]> {
     const response = await api.get(`/savings-goals/${goalId}/contributions`);
     return response.data;
   },
@@ -52,19 +47,11 @@ export const savingsGoalsApi = {
     goalId: number,
     data: CreateContributionData
   ): Promise<SavingsGoalContribution> {
-    const response = await api.post(
-      `/savings-goals/${goalId}/contributions`,
-      data
-    );
+    const response = await api.post(`/savings-goals/${goalId}/contributions`, data);
     return response.data;
   },
 
-  async deleteContribution(
-    goalId: number,
-    contributionId: number
-  ): Promise<void> {
-    await api.delete(
-      `/savings-goals/${goalId}/contributions/${contributionId}`
-    );
+  async deleteContribution(goalId: number, contributionId: number): Promise<void> {
+    await api.delete(`/savings-goals/${goalId}/contributions/${contributionId}`);
   },
 };

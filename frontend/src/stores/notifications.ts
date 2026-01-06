@@ -1,11 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { notificationsApi, notificationSettingsApi } from "@/api/notifications";
-import type {
-  Notification,
-  NotificationSettings,
-  UpdateNotificationSettingsData,
-} from "@/types";
+import type { Notification, NotificationSettings, UpdateNotificationSettingsData } from "@/types";
 import { errorHandler } from "@/utils/errorHandler";
 
 export const useNotificationsStore = defineStore("notifications", () => {
@@ -19,9 +15,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
   let pollingInterval: number | null = null;
 
   // Computed
-  const unreadNotifications = computed(() =>
-    notifications.value.filter((n) => !n.read)
-  );
+  const unreadNotifications = computed(() => notifications.value.filter((n) => !n.read));
 
   // Fetch paginated notifications
   async function fetchNotifications(page: number = 1, read?: boolean) {
@@ -32,10 +26,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
       currentPage.value = response.current_page;
       totalPages.value = response.last_page;
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors du chargement des notifications"
-      );
+      errorHandler.handle(error, "Erreur lors du chargement des notifications");
     } finally {
       loading.value = false;
     }
@@ -65,10 +56,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
       // Update count
       await fetchUnreadCount();
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors du marquage de la notification"
-      );
+      errorHandler.handle(error, "Erreur lors du marquage de la notification");
     }
   }
 
@@ -85,10 +73,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
 
       unreadCount.value = 0;
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors du marquage des notifications"
-      );
+      errorHandler.handle(error, "Erreur lors du marquage des notifications");
     }
   }
 
@@ -103,10 +88,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
       // Update count
       await fetchUnreadCount();
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors de la suppression de la notification"
-      );
+      errorHandler.handle(error, "Erreur lors de la suppression de la notification");
     }
   }
 
@@ -117,10 +99,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
       notifications.value = [];
       unreadCount.value = 0;
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors de la suppression des notifications"
-      );
+      errorHandler.handle(error, "Erreur lors de la suppression des notifications");
     }
   }
 
@@ -130,10 +109,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
     try {
       settings.value = await notificationSettingsApi.get();
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors du chargement des paramètres"
-      );
+      errorHandler.handle(error, "Erreur lors du chargement des paramètres");
     } finally {
       loading.value = false;
     }
@@ -145,10 +121,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
     try {
       settings.value = await notificationSettingsApi.update(data);
     } catch (error) {
-      errorHandler.handle(
-        error,
-        "Erreur lors de la mise à jour des paramètres"
-      );
+      errorHandler.handle(error, "Erreur lors de la mise à jour des paramètres");
       throw error;
     } finally {
       loading.value = false;

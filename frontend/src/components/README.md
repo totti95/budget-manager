@@ -5,25 +5,28 @@ Ce dossier contient des composants de formulaire réutilisables pour garantir un
 ## 📦 Composants Disponibles
 
 ### FormInput
+
 Champ de saisie avec gestion d'erreurs intégrée.
 
 **Props** :
+
 ```typescript
 interface Props {
-  id?: string;                 // ID unique (auto-généré si absent)
-  label?: string;              // Libellé du champ
-  type?: string;               // Type d'input (défaut: "text")
+  id?: string; // ID unique (auto-généré si absent)
+  label?: string; // Libellé du champ
+  type?: string; // Type d'input (défaut: "text")
   modelValue?: string | number; // Valeur v-model
-  placeholder?: string;        // Texte de placeholder
-  error?: string;              // Message d'erreur
-  hint?: string;               // Texte d'aide
-  disabled?: boolean;          // Désactivation
-  required?: boolean;          // Champ requis (affiche *)
-  autocomplete?: string;       // Attribut autocomplete
+  placeholder?: string; // Texte de placeholder
+  error?: string; // Message d'erreur
+  hint?: string; // Texte d'aide
+  disabled?: boolean; // Désactivation
+  required?: boolean; // Champ requis (affiche *)
+  autocomplete?: string; // Attribut autocomplete
 }
 ```
 
 **Exemple** :
+
 ```vue
 <FormInput
   v-model="email"
@@ -37,6 +40,7 @@ interface Props {
 ```
 
 **Avec hint** :
+
 ```vue
 <FormInput
   v-model="password"
@@ -50,15 +54,17 @@ interface Props {
 ---
 
 ### FormSelect
+
 Liste déroulante avec style cohérent.
 
 **Props** :
+
 ```typescript
 interface Props {
   id?: string;
   label?: string;
   modelValue?: string | number;
-  placeholder?: string;        // Option vide initiale
+  placeholder?: string; // Option vide initiale
   error?: string;
   hint?: string;
   disabled?: boolean;
@@ -67,6 +73,7 @@ interface Props {
 ```
 
 **Exemple** :
+
 ```vue
 <FormSelect
   v-model="roleId"
@@ -81,12 +88,9 @@ interface Props {
 ```
 
 **Avec données dynamiques** :
+
 ```vue
-<FormSelect
-  v-model="selectedRole"
-  label="Rôle"
-  placeholder="Tous les rôles"
->
+<FormSelect v-model="selectedRole" label="Rôle" placeholder="Tous les rôles">
   <option
     v-for="role in roles"
     :key="role.id"
@@ -100,18 +104,20 @@ interface Props {
 ---
 
 ### FormButton
+
 Bouton avec indicateur de chargement et variantes de style.
 
 **Props** :
+
 ```typescript
 interface Props {
-  type?: "button" | "submit" | "reset";  // Défaut: "button"
+  type?: "button" | "submit" | "reset"; // Défaut: "button"
   variant?: "primary" | "secondary" | "danger" | "success" | "warning" | "ghost";
-  size?: "sm" | "md" | "lg";             // Défaut: "md"
+  size?: "sm" | "md" | "lg"; // Défaut: "md"
   disabled?: boolean;
-  loading?: boolean;                     // Affiche spinner
-  loadingText?: string;                  // Texte pendant loading
-  fullWidth?: boolean;                   // Largeur 100%
+  loading?: boolean; // Affiche spinner
+  loadingText?: string; // Texte pendant loading
+  fullWidth?: boolean; // Largeur 100%
 }
 ```
 
@@ -173,10 +179,7 @@ interface Props {
 **Largeur complète** :
 
 ```vue
-<FormButton
-  variant="primary"
-  full-width
->
+<FormButton variant="primary" full-width>
   Se connecter
 </FormButton>
 ```
@@ -223,12 +226,12 @@ interface Props {
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import FormInput from '@/components/FormInput.vue';
-import FormButton from '@/components/FormButton.vue';
-import { errorHandler } from '@/utils/errorHandler';
+import { ref } from "vue";
+import FormInput from "@/components/FormInput.vue";
+import FormButton from "@/components/FormButton.vue";
+import { errorHandler } from "@/utils/errorHandler";
 
-const form = ref({ email: '', password: '' });
+const form = ref({ email: "", password: "" });
 const errors = ref<Record<string, string>>({});
 const isSubmitting = ref(false);
 
@@ -255,12 +258,7 @@ const handleSubmit = async () => {
 ```vue
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-4">
-    <FormInput
-      v-model="form.name"
-      label="Nom"
-      :error="errors.name"
-      required
-    />
+    <FormInput v-model="form.name" label="Nom" :error="errors.name" required />
 
     <FormSelect
       v-model="form.roleId"
@@ -274,20 +272,10 @@ const handleSubmit = async () => {
     </FormSelect>
 
     <div class="flex gap-3">
-      <FormButton
-        type="submit"
-        variant="primary"
-        :loading="isSubmitting"
-        class="flex-1"
-      >
+      <FormButton type="submit" variant="primary" :loading="isSubmitting" class="flex-1">
         Créer
       </FormButton>
-      <FormButton
-        type="button"
-        variant="secondary"
-        @click="cancel"
-        class="flex-1"
-      >
+      <FormButton type="button" variant="secondary" @click="cancel" class="flex-1">
         Annuler
       </FormButton>
     </div>
@@ -300,20 +288,8 @@ const handleSubmit = async () => {
 ```vue
 <template>
   <td class="space-x-2">
-    <FormButton
-      variant="ghost"
-      size="sm"
-      @click="edit(item)"
-    >
-      Modifier
-    </FormButton>
-    <FormButton
-      variant="danger"
-      size="sm"
-      @click="confirmDelete(item)"
-    >
-      Supprimer
-    </FormButton>
+    <FormButton variant="ghost" size="sm" @click="edit(item)"> Modifier </FormButton>
+    <FormButton variant="danger" size="sm" @click="confirmDelete(item)"> Supprimer </FormButton>
   </td>
 </template>
 ```
@@ -325,6 +301,7 @@ const handleSubmit = async () => {
 ### 1. Gestion des Erreurs
 
 **✅ À FAIRE** :
+
 ```vue
 <FormInput
   v-model="email"
@@ -333,24 +310,25 @@ const handleSubmit = async () => {
 ```
 
 **❌ À ÉVITER** :
+
 ```vue
 <input v-model="email" />
-<div v-if="errors.email">{{ errors.email }}</div>  <!-- Séparé du champ -->
+<div v-if="errors.email">{{ errors.email }}</div>
+<!-- Séparé du champ -->
 ```
 
 ### 2. États de Chargement
 
 **✅ À FAIRE** :
+
 ```vue
-<FormButton
-  :loading="isSubmitting"
-  loading-text="Enregistrement..."
->
+<FormButton :loading="isSubmitting" loading-text="Enregistrement...">
   Enregistrer
 </FormButton>
 ```
 
 **❌ À ÉVITER** :
+
 ```vue
 <button :disabled="isSubmitting">
   {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
@@ -359,14 +337,14 @@ const handleSubmit = async () => {
 
 ### 3. Variantes de Boutons
 
-| Action | Variante |
-|--------|----------|
-| Action principale (soumettre, créer) | `primary` |
-| Action secondaire (annuler, fermer) | `secondary` |
-| Action destructive (supprimer, désactiver) | `danger` |
-| Action positive (valider, activer) | `success` |
-| Avertissement | `warning` |
-| Action légère dans tableau | `ghost` |
+| Action                                     | Variante    |
+| ------------------------------------------ | ----------- |
+| Action principale (soumettre, créer)       | `primary`   |
+| Action secondaire (annuler, fermer)        | `secondary` |
+| Action destructive (supprimer, désactiver) | `danger`    |
+| Action positive (valider, activer)         | `success`   |
+| Avertissement                              | `warning`   |
+| Action légère dans tableau                 | `ghost`     |
 
 ### 4. Autocomplete
 
@@ -436,11 +414,7 @@ Vous pouvez ajouter des classes TailwindCSS :
 Les composants émettent des événements standard :
 
 ```vue
-<FormInput
-  v-model="search"
-  @input="handleSearch"
-  @blur="handleBlur"
-/>
+<FormInput v-model="search" @input="handleSearch" @blur="handleBlur" />
 
 <FormButton @click="handleClick">
   Cliquer

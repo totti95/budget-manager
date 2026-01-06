@@ -83,8 +83,7 @@ const buttonClasses = computed(() => {
       "bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md",
     secondary:
       "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 focus:ring-gray-500",
-    danger:
-      "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-sm hover:shadow-md",
+    danger: "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-sm hover:shadow-md",
     success:
       "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500 shadow-sm hover:shadow-md",
     warning:
@@ -95,12 +94,7 @@ const buttonClasses = computed(() => {
 
   const widthClass = props.fullWidth ? "w-full" : "";
 
-  return [
-    ...baseClasses,
-    sizeClasses[props.size],
-    variantClasses[props.variant],
-    widthClass,
-  ];
+  return [...baseClasses, sizeClasses[props.size], variantClasses[props.variant], widthClass];
 });
 </script>
 

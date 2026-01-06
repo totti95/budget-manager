@@ -79,9 +79,7 @@ function centsToEuros(cents: number): string {
 
     <!-- Selection des mois -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4">
-        Sélectionnez 2 ou 3 mois à comparer
-      </h2>
+      <h2 class="text-xl font-semibold mb-4">Sélectionnez 2 ou 3 mois à comparer</h2>
 
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
         <button
@@ -95,7 +93,7 @@ function centsToEuros(cents: number): string {
               : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400',
             selectedMonths.length >= 3 && !selectedMonths.includes(month.value)
               ? 'opacity-50 cursor-not-allowed'
-              : 'cursor-pointer'
+              : 'cursor-pointer',
           ]"
           :disabled="selectedMonths.length >= 3 && !selectedMonths.includes(month.value)"
         >
@@ -122,16 +120,13 @@ function centsToEuros(cents: number): string {
         </button>
 
         <p class="text-sm text-gray-600">
-          {{ selectedMonths.length }} mois sélectionné{{ selectedMonths.length > 1 ? 's' : '' }}
+          {{ selectedMonths.length }} mois sélectionné{{ selectedMonths.length > 1 ? "s" : "" }}
         </p>
       </div>
     </div>
 
     <!-- Error message -->
-    <div
-      v-if="error"
-      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6"
-    >
+    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
       {{ error }}
     </div>
 
@@ -140,12 +135,14 @@ function centsToEuros(cents: number): string {
       <!-- Cartes de statistiques -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div
-          v-for="(budget, index) in comparison.budgets"
+          v-for="budget in comparison.budgets"
           :key="budget.id"
           class="bg-white rounded-lg shadow-md p-6"
         >
           <h3 class="text-lg font-semibold mb-3 capitalize">
-            {{ new Date(budget.month).toLocaleDateString("fr-FR", { month: "long", year: "numeric" }) }}
+            {{
+              new Date(budget.month).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
+            }}
           </h3>
 
           <div v-if="budget.stats" class="space-y-2">
@@ -158,16 +155,28 @@ function centsToEuros(cents: number): string {
 
             <div>
               <p class="text-sm text-gray-600">Dépenses réelles</p>
-              <p class="text-xl font-bold" :class="budget.stats.totalActualCents > budget.stats.totalPlannedCents ? 'text-red-600' : 'text-green-600'">
+              <p
+                class="text-xl font-bold"
+                :class="
+                  budget.stats.totalActualCents > budget.stats.totalPlannedCents
+                    ? 'text-red-600'
+                    : 'text-green-600'
+                "
+              >
                 {{ centsToEuros(budget.stats.totalActualCents) }} €
               </p>
             </div>
 
             <div>
               <p class="text-sm text-gray-600">Différence</p>
-              <p class="text-lg font-semibold" :class="budget.stats.varianceCents > 0 ? 'text-red-600' : 'text-green-600'">
-                {{ budget.stats.varianceCents > 0 ? '+' : '' }}{{ centsToEuros(budget.stats.varianceCents) }} €
-                ({{ budget.stats.variancePercent > 0 ? '+' : '' }}{{ budget.stats.variancePercent }}%)
+              <p
+                class="text-lg font-semibold"
+                :class="budget.stats.varianceCents > 0 ? 'text-red-600' : 'text-green-600'"
+              >
+                {{ budget.stats.varianceCents > 0 ? "+" : ""
+                }}{{ centsToEuros(budget.stats.varianceCents) }} € ({{
+                  budget.stats.variancePercent > 0 ? "+" : ""
+                }}{{ budget.stats.variancePercent }}%)
               </p>
             </div>
           </div>
@@ -196,12 +205,8 @@ function centsToEuros(cents: number): string {
           d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
         />
       </svg>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">
-        Aucune comparaison
-      </h3>
-      <p class="text-gray-600">
-        Sélectionnez 2 ou 3 mois ci-dessus pour comparer vos budgets.
-      </p>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune comparaison</h3>
+      <p class="text-gray-600">Sélectionnez 2 ou 3 mois ci-dessus pour comparer vos budgets.</p>
     </div>
   </div>
 </template>

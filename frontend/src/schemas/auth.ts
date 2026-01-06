@@ -9,9 +9,7 @@ export const registerSchema = z
   .object({
     name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
     email: z.email(),
-    password: z
-      .string()
-      .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {

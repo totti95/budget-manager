@@ -108,10 +108,7 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  async function updatePassword(
-    id: number,
-    data: UpdatePasswordData,
-  ): Promise<void> {
+  async function updatePassword(id: number, data: UpdatePasswordData): Promise<void> {
     loading.value = true;
     error.value = null;
 

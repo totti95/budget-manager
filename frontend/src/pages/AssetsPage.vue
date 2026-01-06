@@ -16,9 +16,7 @@
         </p>
       </div>
       <div class="card text-center">
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-          Patrimoine net
-        </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Patrimoine net</p>
         <p class="text-3xl font-bold text-primary-600">
           <MoneyDisplay :cents="assetsStore.netWorthCents" />
         </p>
@@ -29,9 +27,7 @@
     <div class="card mb-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Actifs</h2>
-        <button class="btn btn-primary" @click="openCreateModal(false)">
-          Ajouter un actif
-        </button>
+        <button class="btn btn-primary" @click="openCreateModal(false)">Ajouter un actif</button>
       </div>
 
       <div v-if="assetsStore.loading" class="text-center py-8">
@@ -42,10 +38,7 @@
         <p>{{ assetsStore.error }}</p>
       </div>
 
-      <div
-        v-else-if="assetsStore.assets.length === 0"
-        class="text-center py-8 text-gray-600"
-      >
+      <div v-else-if="assetsStore.assets.length === 0" class="text-center py-8 text-gray-600">
         <p>Aucun actif enregistré</p>
       </div>
 
@@ -104,9 +97,7 @@
     <div class="card">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Passifs</h2>
-        <button class="btn btn-secondary" @click="openCreateModal(true)">
-          Ajouter un passif
-        </button>
+        <button class="btn btn-secondary" @click="openCreateModal(true)">Ajouter un passif</button>
       </div>
 
       <div

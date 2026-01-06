@@ -51,10 +51,7 @@ export const useStatsStore = defineStore("stats", () => {
     loading.value = true;
     error.value = null;
     try {
-      subcategoryStats.value = await statsApi.bySubcategory(
-        budgetId,
-        categoryId,
-      );
+      subcategoryStats.value = await statsApi.bySubcategory(budgetId, categoryId);
       return subcategoryStats.value;
     } catch (err) {
       error.value = "Erreur lors du chargement des stats";

@@ -25,18 +25,11 @@
         :class="{ 'border-red-500': !selectedCategoryId && hasTriedSubmit }"
       >
         <option value="">Sélectionner une catégorie</option>
-        <option
-          v-for="category in categories"
-          :key="category.id"
-          :value="category.id"
-        >
+        <option v-for="category in categories" :key="category.id" :value="category.id">
           {{ category.name }}
         </option>
       </select>
-      <p
-        v-if="!selectedCategoryId && hasTriedSubmit"
-        class="mt-1 text-sm text-red-600"
-      >
+      <p v-if="!selectedCategoryId && hasTriedSubmit" class="mt-1 text-sm text-red-600">
         Veuillez sélectionner une catégorie
       </p>
     </div>
@@ -50,11 +43,7 @@
           @click="showNewSubcategoryInput = !showNewSubcategoryInput"
           class="text-sm text-blue-600 hover:text-blue-700"
         >
-          {{
-            showNewSubcategoryInput
-              ? "↩ Choisir existante"
-              : "+ Nouvelle sous-catégorie"
-          }}
+          {{ showNewSubcategoryInput ? "↩ Choisir existante" : "+ Nouvelle sous-catégorie" }}
         </button>
       </div>
 
@@ -76,10 +65,7 @@
             {{ subcategory.name }}
           </option>
         </select>
-        <p
-          v-if="errors.budget_subcategory_id"
-          class="mt-1 text-sm text-red-600"
-        >
+        <p v-if="errors.budget_subcategory_id" class="mt-1 text-sm text-red-600">
           {{ errors.budget_subcategory_id }}
         </p>
       </div>
@@ -150,15 +136,8 @@
     </div>
 
     <div>
-      <label for="payment_method" class="label"
-        >Moyen de paiement (optionnel)</label
-      >
-      <select
-        id="payment_method"
-        v-model="paymentMethod"
-        v-bind="paymentMethodAttrs"
-        class="input"
-      >
+      <label for="payment_method" class="label">Moyen de paiement (optionnel)</label>
+      <select id="payment_method" v-model="paymentMethod" v-bind="paymentMethodAttrs" class="input">
         <option value="">Aucun</option>
         <option value="CB">Carte bancaire</option>
         <option value="Espèces">Espèces</option>
@@ -181,11 +160,7 @@
       />
     </div>
 
-    <TagInput
-      v-model="tagIds"
-      label="Tags (optionnel)"
-      :error="errors.tag_ids"
-    />
+    <TagInput v-model="tagIds" label="Tags (optionnel)" :error="errors.tag_ids" />
 
     <div class="flex gap-2">
       <button
@@ -193,20 +168,9 @@
         :disabled="isSubmitting || isCreatingSubcategory"
         class="flex-1 btn btn-primary"
       >
-        {{
-          isSubmitting
-            ? "Enregistrement..."
-            : expense
-              ? "Modifier"
-              : "Ajouter la dépense"
-        }}
+        {{ isSubmitting ? "Enregistrement..." : expense ? "Modifier" : "Ajouter la dépense" }}
       </button>
-      <button
-        v-if="onCancel"
-        type="button"
-        @click="onCancel"
-        class="flex-1 btn btn-secondary"
-      >
+      <button v-if="onCancel" type="button" @click="onCancel" class="flex-1 btn btn-secondary">
         Annuler
       </button>
     </div>
@@ -293,9 +257,7 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
 });
 
 const [date, dateAttrs] = defineField("date");
-const [budgetSubcategoryId, budgetSubcategoryIdAttrs] = defineField(
-  "budget_subcategory_id",
-);
+const [budgetSubcategoryId, budgetSubcategoryIdAttrs] = defineField("budget_subcategory_id");
 const [label, labelAttrs] = defineField("label");
 const [paymentMethod, paymentMethodAttrs] = defineField("payment_method");
 const [notes, notesAttrs] = defineField("notes");
@@ -312,8 +274,7 @@ const tagIds = computed({
 // Handle amount separately to convert between euros and cents
 const [amountCents, amountAttrs] = defineField("amount_cents");
 const amount = computed({
-  get: () =>
-    amountCents.value ? centsToAmount(amountCents.value as number) : 0,
+  get: () => (amountCents.value ? centsToAmount(amountCents.value as number) : 0),
   set: (value) => {
     amountCents.value = amountToCents(Number(value));
   },
@@ -322,9 +283,7 @@ const amount = computed({
 // Computed: Sous-catégories disponibles pour la catégorie sélectionnée
 const availableSubcategories = computed(() => {
   if (!selectedCategoryId.value) return [];
-  const category = props.categories.find(
-    (c) => c.id === selectedCategoryId.value,
-  );
+  const category = props.categories.find((c) => c.id === selectedCategoryId.value);
   return category?.subcategories || [];
 });
 
@@ -334,14 +293,14 @@ watch(
   (expense) => {
     if (expense) {
       const category = props.categories.find((c) =>
-        c.subcategories?.some((s) => s.id === expense.budgetSubcategoryId),
+        c.subcategories?.some((s) => s.id === expense.budgetSubcategoryId)
       );
       if (category) {
         selectedCategoryId.value = category.id;
       }
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 // Reset subcategory quand on change de catégorie
@@ -377,7 +336,7 @@ async function addNewSubcategory() {
         name: newSubcategoryName.value,
         planned_amount_cents: Math.round(newSubcategoryAmount.value * 100),
         sort_order: availableSubcategories.value.length,
-      },
+      }
     );
 
     // Informer le parent que les catégories ont changé

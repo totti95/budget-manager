@@ -30,11 +30,7 @@
         <option value="deleted">Désactivés</option>
       </FormSelect>
 
-      <FormButton
-        variant="primary"
-        size="md"
-        @click="openCreateModal"
-      >
+      <FormButton variant="primary" size="md" @click="openCreateModal">
         Créer un utilisateur
       </FormButton>
     </div>
@@ -57,31 +53,13 @@
       <table class="min-w-full">
         <thead class="bg-gray-100">
           <tr>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-            >
-              Nom
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-            >
-              Email
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-            >
-              Rôle
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-            >
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Nom</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Rôle</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">
               Date de création
             </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-            >
-              Actions
-            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
@@ -101,11 +79,7 @@
                     : 'bg-gray-100 text-gray-800',
                 ]"
               >
-                {{
-                  user.role?.label === "admin"
-                    ? "Administrateur"
-                    : "Utilisateur"
-                }}
+                {{ user.role?.label === "admin" ? "Administrateur" : "Utilisateur" }}
               </span>
             </td>
             <td class="px-6 py-4 text-sm text-gray-600">
@@ -114,35 +88,19 @@
             <td class="px-6 py-4 space-x-2">
               <template v-if="user.deletedAt">
                 <!-- Utilisateur désactivé : afficher bouton Réactiver -->
-                <FormButton
-                  variant="success"
-                  size="sm"
-                  @click="confirmRestore(user)"
-                >
+                <FormButton variant="success" size="sm" @click="confirmRestore(user)">
                   Réactiver
                 </FormButton>
               </template>
               <template v-else>
                 <!-- Utilisateur actif : afficher boutons normaux -->
-                <FormButton
-                  variant="ghost"
-                  size="sm"
-                  @click="openEditModal(user)"
-                >
+                <FormButton variant="ghost" size="sm" @click="openEditModal(user)">
                   Modifier
                 </FormButton>
-                <FormButton
-                  variant="ghost"
-                  size="sm"
-                  @click="openPasswordModal(user)"
-                >
+                <FormButton variant="ghost" size="sm" @click="openPasswordModal(user)">
                   Mot de passe
                 </FormButton>
-                <FormButton
-                  variant="danger"
-                  size="sm"
-                  @click="confirmDelete(user)"
-                >
+                <FormButton variant="danger" size="sm" @click="confirmDelete(user)">
                   Désactiver
                 </FormButton>
               </template>
@@ -171,10 +129,7 @@
         <FormButton
           variant="secondary"
           size="sm"
-          :disabled="
-            usersStore.paginationInfo.currentPage ===
-            usersStore.paginationInfo.lastPage
-          "
+          :disabled="usersStore.paginationInfo.currentPage === usersStore.paginationInfo.lastPage"
           @click="handlePageChange(usersStore.paginationInfo.currentPage + 1)"
         >
           Suivant
@@ -219,11 +174,7 @@
             required
             class="mb-4"
           >
-            <option
-              v-for="role in usersStore.roles"
-              :key="role.id"
-              :value="role.id"
-            >
+            <option v-for="role in usersStore.roles" :key="role.id" :value="role.id">
               {{ role.label === "admin" ? "Administrateur" : "Utilisateur" }}
             </option>
           </FormSelect>
@@ -270,10 +221,9 @@
             Attention: notez ce mot de passe, il ne sera plus affiché
           </p>
           <div class="flex items-center gap-2">
-            <code
-              class="flex-1 text-xl font-mono bg-gray-100 px-3 py-2 rounded"
-              >{{ generatedPassword }}</code
-            >
+            <code class="flex-1 text-xl font-mono bg-gray-100 px-3 py-2 rounded">{{
+              generatedPassword
+            }}</code>
             <button
               @click="copyPassword"
               class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -283,12 +233,7 @@
           </div>
         </div>
 
-        <FormButton
-          variant="success"
-          size="md"
-          full-width
-          @click="closeGeneratedPasswordModal"
-        >
+        <FormButton variant="success" size="md" full-width @click="closeGeneratedPasswordModal">
           J'ai noté le mot de passe
         </FormButton>
       </div>

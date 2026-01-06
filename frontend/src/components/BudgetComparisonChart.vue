@@ -13,15 +13,7 @@ import {
 import type { BudgetComparison } from "@/types";
 
 // Register Chart.js components
-Chart.register(
-  BarController,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend
-);
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 interface Props {
   comparison: BudgetComparison;
@@ -65,9 +57,7 @@ const chartData = computed(() => {
 
     // Get actual amounts for each category
     const data = categories.map((categoryName) => {
-      const category = budget.stats?.byCategory.find(
-        (c) => c.name === categoryName
-      );
+      const category = budget.stats?.byCategory.find((c) => c.name === categoryName);
       return category ? category.actualCents / 100 : 0;
     });
 
@@ -171,7 +161,7 @@ watch(
   <div class="bg-white rounded-lg shadow-md p-6">
     <h2 class="text-xl font-semibold mb-4">Graphique Comparatif</h2>
 
-    <div class="relative" style="height: 400px;">
+    <div class="relative" style="height: 400px">
       <canvas ref="chartCanvas"></canvas>
     </div>
   </div>

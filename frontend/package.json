@@ -10,7 +10,8 @@
     "lint:check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "prepare": "cd .. && husky frontend/.husky"
   },
   "dependencies": {
     "@vee-validate/zod": "^4.15.1",
@@ -35,6 +36,8 @@
     "autoprefixer": "^10.4.17",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.20.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "npm-run-all2": "^6.1.1",
     "postcss": "^8.4.33",
     "prettier": "^3.2.4",

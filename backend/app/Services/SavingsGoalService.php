@@ -51,10 +51,10 @@ class SavingsGoalService
     protected function createMilestoneNotification(SavingsGoal $goal, int $milestone): void
     {
         $messages = [
-            25 => "Vous avez atteint 25% de votre objectif !",
-            50 => "Vous êtes à mi-chemin de votre objectif !",
-            75 => "Plus que 25% pour atteindre votre objectif !",
-            100 => "Félicitations ! Objectif atteint !",
+            25 => 'Vous avez atteint 25% de votre objectif !',
+            50 => 'Vous êtes à mi-chemin de votre objectif !',
+            75 => 'Plus que 25% pour atteindre votre objectif !',
+            100 => 'Félicitations ! Objectif atteint !',
         ];
 
         Notification::create([
@@ -71,7 +71,7 @@ class SavingsGoalService
             ],
         ]);
 
-        Log::info("Savings goal milestone notification created", [
+        Log::info('Savings goal milestone notification created', [
             'goal_id' => $goal->id,
             'milestone' => $milestone,
         ]);
@@ -141,7 +141,7 @@ class SavingsGoalService
             ],
         ]);
 
-        Log::info("Savings goal risk notification created", [
+        Log::info('Savings goal risk notification created', [
             'goal_id' => $goal->id,
             'progress' => $goal->progress_percentage,
         ]);
@@ -173,7 +173,7 @@ class SavingsGoalService
             }
         }
 
-        Log::info("Monthly savings goal reminders sent", ['count' => $sent]);
+        Log::info('Monthly savings goal reminders sent', ['count' => $sent]);
 
         return $sent;
     }

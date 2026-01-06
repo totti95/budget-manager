@@ -16,9 +16,7 @@ export const assetsApi = {
     return response.data.types;
   },
 
-  async list(
-    type?: AssetType,
-  ): Promise<{
+  async list(type?: AssetType): Promise<{
     assets: Asset[];
     liabilities: Asset[];
     totalAssetsCents: number;

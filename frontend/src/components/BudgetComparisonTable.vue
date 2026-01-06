@@ -70,9 +70,7 @@ const tableData = computed(() => {
 
 // Get evolution for a category
 function getEvolution(categoryName: string): CategoryEvolution | undefined {
-  return props.comparison.comparison.evolution.find(
-    (e) => e.categoryName === categoryName
-  );
+  return props.comparison.comparison.evolution.find((e) => e.categoryName === categoryName);
 }
 
 // Get month label
@@ -122,7 +120,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
               </th>
 
               <th
-                v-for="(budget, index) in comparison.budgets"
+                v-for="budget in comparison.budgets"
                 :key="budget.id"
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -159,7 +157,9 @@ function calculateEvolution(fromValue: number, toValue: number): number {
               :key="category.name"
               class="hover:bg-gray-50"
             >
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white">
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white"
+              >
                 {{ category.name }}
               </td>
 
@@ -177,7 +177,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                       'font-semibold',
                       budgetData.actualCents > budgetData.plannedCents
                         ? 'text-red-600'
-                        : 'text-green-600'
+                        : 'text-green-600',
                     ]"
                   >
                     Réel: {{ centsToEuros(budgetData.actualCents) }} €
@@ -185,13 +185,13 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                   <div
                     :class="[
                       'text-xs',
-                      budgetData.varianceCents > 0
-                        ? 'text-red-500'
-                        : 'text-green-500'
+                      budgetData.varianceCents > 0 ? 'text-red-500' : 'text-green-500',
                     ]"
                   >
-                    {{ budgetData.varianceCents > 0 ? '+' : '' }}{{ centsToEuros(budgetData.varianceCents) }} €
-                    ({{ budgetData.variancePercent > 0 ? '+' : '' }}{{ budgetData.variancePercent }}%)
+                    {{ budgetData.varianceCents > 0 ? "+" : ""
+                    }}{{ centsToEuros(budgetData.varianceCents) }} € ({{
+                      budgetData.variancePercent > 0 ? "+" : ""
+                    }}{{ budgetData.variancePercent }}%)
                   </div>
                 </div>
               </td>
@@ -210,7 +210,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                         category.budgets[evolutionIndex - 1].actualCents,
                         category.budgets[evolutionIndex].actualCents
                       )
-                    )
+                    ),
                   ]"
                 >
                   <span class="text-xl">
@@ -238,10 +238,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
               </td>
 
               <!-- Global evolution (for 3+ budgets) -->
-              <td
-                v-if="comparison.budgets.length >= 3"
-                class="px-6 py-4 whitespace-nowrap text-sm"
-              >
+              <td v-if="comparison.budgets.length >= 3" class="px-6 py-4 whitespace-nowrap text-sm">
                 <div
                   :class="[
                     'flex items-center gap-2 font-semibold',
@@ -250,7 +247,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                         category.budgets[0].actualCents,
                         category.budgets[category.budgets.length - 1].actualCents
                       )
-                    )
+                    ),
                   ]"
                 >
                   <span class="text-xl">
@@ -280,7 +277,9 @@ function calculateEvolution(fromValue: number, toValue: number): number {
 
             <!-- Total row -->
             <tr class="bg-gray-100 font-bold">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky left-0 bg-gray-100">
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky left-0 bg-gray-100"
+              >
                 {{ tableData.totals.name }}
               </td>
 
@@ -298,7 +297,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                       'font-bold text-base',
                       budgetData.actualCents > budgetData.plannedCents
                         ? 'text-red-600'
-                        : 'text-green-600'
+                        : 'text-green-600',
                     ]"
                   >
                     Réel: {{ centsToEuros(budgetData.actualCents) }} €
@@ -306,13 +305,13 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                   <div
                     :class="[
                       'text-xs',
-                      budgetData.varianceCents > 0
-                        ? 'text-red-500'
-                        : 'text-green-500'
+                      budgetData.varianceCents > 0 ? 'text-red-500' : 'text-green-500',
                     ]"
                   >
-                    {{ budgetData.varianceCents > 0 ? '+' : '' }}{{ centsToEuros(budgetData.varianceCents) }} €
-                    ({{ budgetData.variancePercent > 0 ? '+' : '' }}{{ budgetData.variancePercent }}%)
+                    {{ budgetData.varianceCents > 0 ? "+" : ""
+                    }}{{ centsToEuros(budgetData.varianceCents) }} € ({{
+                      budgetData.variancePercent > 0 ? "+" : ""
+                    }}{{ budgetData.variancePercent }}%)
                   </div>
                 </div>
               </td>
@@ -331,7 +330,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                         tableData.totals.budgets[evolutionIndex - 1].actualCents,
                         tableData.totals.budgets[evolutionIndex].actualCents
                       )
-                    )
+                    ),
                   ]"
                 >
                   <span class="text-xl">
@@ -359,10 +358,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
               </td>
 
               <!-- Global evolution for totals (for 3+ budgets) -->
-              <td
-                v-if="comparison.budgets.length >= 3"
-                class="px-6 py-4 whitespace-nowrap text-sm"
-              >
+              <td v-if="comparison.budgets.length >= 3" class="px-6 py-4 whitespace-nowrap text-sm">
                 <div
                   :class="[
                     'flex items-center gap-2',
@@ -371,7 +367,7 @@ function calculateEvolution(fromValue: number, toValue: number): number {
                         tableData.totals.budgets[0].actualCents,
                         tableData.totals.budgets[tableData.totals.budgets.length - 1].actualCents
                       )
-                    )
+                    ),
                   ]"
                 >
                   <span class="text-xl">

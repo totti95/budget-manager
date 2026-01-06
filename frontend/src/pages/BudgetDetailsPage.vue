@@ -1,10 +1,7 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
-      <router-link
-        to="/"
-        class="text-primary-600 hover:text-primary-700 mb-2 inline-block"
-      >
+      <router-link to="/" class="text-primary-600 hover:text-primary-700 mb-2 inline-block">
         ← Retour au dashboard
       </router-link>
       <div class="flex items-center justify-between">
@@ -57,10 +54,7 @@
       </div>
     </div>
 
-    <div
-      v-if="budgetStore.loading || expenseStore.loading"
-      class="text-center py-12"
-    >
+    <div v-if="budgetStore.loading || expenseStore.loading" class="text-center py-12">
       <p>Chargement...</p>
     </div>
 
@@ -121,10 +115,7 @@
         <!-- Restant -->
         <div class="card text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Restant</p>
-          <p
-            class="text-2xl font-bold"
-            :class="remaining >= 0 ? 'text-green-600' : 'text-red-600'"
-          >
+          <p class="text-2xl font-bold" :class="remaining >= 0 ? 'text-green-600' : 'text-red-600'">
             <MoneyDisplay :cents="remaining" />
           </p>
         </div>
@@ -146,20 +137,13 @@
       </div>
 
       <!-- Expenses by Tag Chart -->
-      <ExpensesByTagChart
-        v-if="currentBudget"
-        :budget-id="currentBudget.id"
-      />
+      <ExpensesByTagChart v-if="currentBudget" :budget-id="currentBudget.id" />
 
       <!-- Add Expense Form -->
       <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold">Ajouter une dépense</h2>
-          <button
-            v-if="!showExpenseForm"
-            @click="showExpenseForm = true"
-            class="btn btn-primary"
-          >
+          <button v-if="!showExpenseForm" @click="showExpenseForm = true" class="btn btn-primary">
             Nouvelle dépense
           </button>
         </div>
@@ -191,11 +175,7 @@
             class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option :value="null">Tous les tags</option>
-            <option
-              v-for="tag in tagsStore.tags"
-              :key="tag.id"
-              :value="tag.id"
-            >
+            <option v-for="tag in tagsStore.tags" :key="tag.id" :value="tag.id">
               {{ tag.name }}
             </option>
           </select>
@@ -208,10 +188,7 @@
           </button>
         </div>
 
-        <div
-          v-if="expenseStore.expenses.length === 0"
-          class="text-center py-8 text-gray-600"
-        >
+        <div v-if="expenseStore.expenses.length === 0" class="text-center py-8 text-gray-600">
           <p>Aucune dépense enregistrée</p>
         </div>
 
@@ -266,7 +243,9 @@
                       :tag="tag"
                       :removable="false"
                     />
-                    <span v-if="!expense.tags || expense.tags.length === 0" class="text-gray-400">-</span>
+                    <span v-if="!expense.tags || expense.tags.length === 0" class="text-gray-400"
+                      >-</span
+                    >
                   </div>
                 </td>
                 <td>
@@ -340,10 +319,7 @@ const totalPlanned = computed(() => {
   return currentBudget.value.categories.reduce((total, category) => {
     return (
       total +
-      (category.subcategories || []).reduce(
-        (catTotal, sub) => catTotal + sub.plannedAmountCents,
-        0,
-      )
+      (category.subcategories || []).reduce((catTotal, sub) => catTotal + sub.plannedAmountCents, 0)
     );
   }, 0);
 });
@@ -351,10 +327,7 @@ const totalPlanned = computed(() => {
 const totalSpent = computed(() => {
   if (!currentBudget.value?.categories) return 0;
   // Calculer à partir des expenses réelles
-  return expenseStore.expenses.reduce(
-    (total, expense) => total + expense.amountCents,
-    0,
-  );
+  return expenseStore.expenses.reduce((total, expense) => total + expense.amountCents, 0);
 });
 
 const remaining = computed(() => totalPlanned.value - totalSpent.value);
@@ -363,9 +336,7 @@ const filteredExpenses = computed(() => {
   let expenses = expenseStore.expenses;
 
   if (selectedTagFilter.value) {
-    expenses = expenses.filter((e) =>
-      e.tags?.some((tag) => tag.id === selectedTagFilter.value),
-    );
+    expenses = expenses.filter((e) => e.tags?.some((tag) => tag.id === selectedTagFilter.value));
   }
 
   return expenses;
@@ -469,8 +440,7 @@ async function handleExportPdf() {
     toast.success("PDF téléchargé avec succès");
   } catch (err) {
     console.error("Erreur lors de l'export PDF:", err);
-    const errorMessage =
-      err instanceof Error ? err.message : "Erreur inconnue";
+    const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
     toast.error(`Erreur lors de la génération du PDF: ${errorMessage}`);
   } finally {
     isExportingPdf.value = false;
@@ -490,9 +460,7 @@ function getCategoryName(subcategoryId: number): string {
 function getSubcategoryName(subcategoryId: number): string {
   if (!currentBudget.value?.categories) return "";
   for (const category of currentBudget.value.categories) {
-    const subcategory = category.subcategories?.find(
-      (sub) => sub.id === subcategoryId,
-    );
+    const subcategory = category.subcategories?.find((sub) => sub.id === subcategoryId);
     if (subcategory) return subcategory.name;
   }
   return "";
