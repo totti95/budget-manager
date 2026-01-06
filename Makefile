@@ -66,3 +66,37 @@ artisan: ## Run artisan command (use: make artisan CMD="migrate")
 
 npm: ## Run npm command (use: make npm CMD="install package")
 	@docker compose run --rm node npm $(CMD)
+
+# Code Quality Commands
+
+lint-front: ## Run frontend ESLint check
+	@docker compose run --rm node npm run lint:check
+
+lint-front-fix: ## Run frontend ESLint with auto-fix
+	@docker compose run --rm node npm run lint
+
+lint-back: ## Run backend Laravel Pint check
+	@docker compose run --rm php ./vendor/bin/pint --test
+
+lint-back-fix: ## Run backend Laravel Pint with auto-fix
+	@docker compose run --rm php ./vendor/bin/pint
+
+format-front: ## Run frontend Prettier check
+	@docker compose run --rm node npm run format:check
+
+format-front-fix: ## Run frontend Prettier with auto-fix
+	@docker compose run --rm node npm run format
+
+lint-all: ## Run all linters (check only)
+	@echo "🔍 Running all linters..."
+	@$(MAKE) lint-back
+	@$(MAKE) lint-front
+	@$(MAKE) format-front
+	@echo "✅ All linters passed!"
+
+fix-all: ## Auto-fix all code style issues
+	@echo "🔧 Auto-fixing code style..."
+	@$(MAKE) lint-back-fix
+	@$(MAKE) lint-front-fix
+	@$(MAKE) format-front-fix
+	@echo "✅ All fixes applied!"

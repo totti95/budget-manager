@@ -1,0 +1,19 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+dist-ssr
+coverage
+
+# Generated files
+*.min.js
+*.min.css
+
+# Config files
+pnpm-lock.yaml
+package-lock.json
+
+# IDE
+.idea
+.vscode
