@@ -35,6 +35,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          show_full_output: true  # Enable full logs for debugging
 
           # Optional: Customize the trigger phrase (default: @claude)
           # trigger_phrase: "/claude"
@@ -44,10 +45,8 @@ jobs:
 
           # Optional: Configure Claude's behavior with CLI arguments
           # claude_args: |
-          #   --model claude-opus-4-1-20250805
-          #   --max-turns 10
-          #   --allowedTools "Bash(npm install),Bash(npm run build),Bash(npm run test:*),Bash(npm run lint:*)"
-          #   --system-prompt "Follow our coding standards. Ensure all new code has tests. Use TypeScript for new files."
+          #   --max-turns 15
+          #   --allowedTools "Bash(make *),Bash(docker compose *),Bash(php artisan *),Bash(npm run *),Bash(curl *),Read,Edit,Write,Glob,Grep"
 
           # Optional: Advanced settings configuration
           # settings: |
