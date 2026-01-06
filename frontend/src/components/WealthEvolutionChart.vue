@@ -1,6 +1,5 @@
 <template>
   <div class="wealth-evolution-chart">
-    <h3 class="text-lg font-semibold mb-4">Évolution du Patrimoine</h3>
     <div v-if="loading" class="text-center py-8">Chargement...</div>
     <div v-else-if="error" class="text-red-600">{{ error }}</div>
     <div v-else-if="chartData" class="h-96">

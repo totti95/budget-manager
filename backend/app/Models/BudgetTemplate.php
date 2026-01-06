@@ -15,10 +15,12 @@ class BudgetTemplate extends Model
         'user_id',
         'name',
         'is_default',
+        'revenue_cents',
     ];
 
     protected $casts = [
         'is_default' => 'boolean',
+        'revenue_cents' => 'integer',
     ];
 
     public function user(): BelongsTo

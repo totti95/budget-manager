@@ -58,7 +58,10 @@ export const useBudgetStore = defineStore("budget", () => {
     }
   }
 
-  async function updateBudget(id: number, data: { name: string }) {
+  async function updateBudget(
+    id: number,
+    data: { name?: string; revenueCents?: number },
+  ) {
     loading.value = true;
     error.value = null;
     try {

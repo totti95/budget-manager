@@ -7,6 +7,7 @@ use App\Http\Controllers\BudgetCategoryController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetSubcategoryController;
 use App\Http\Controllers\BudgetTemplateController;
+use App\Http\Controllers\DashboardLayoutController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RecurringExpenseController;
@@ -144,6 +145,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notification Settings
     Route::get('notification-settings', [NotificationSettingController::class, 'show']);
     Route::put('notification-settings', [NotificationSettingController::class, 'update']);
+
+    // Dashboard Layout
+    Route::get('dashboard/layout', [DashboardLayoutController::class, 'show']);
+    Route::put('dashboard/layout', [DashboardLayoutController::class, 'update']);
+    Route::delete('dashboard/layout', [DashboardLayoutController::class, 'destroy']);
+
+    // Enhanced Stats
+    Route::get('budgets/{budget}/stats/top-categories', [StatsController::class, 'topCategories']);
+    Route::get('stats/savings-rate-evolution', [StatsController::class, 'savingsRateEvolution']);
 });
 
 // Admin routes

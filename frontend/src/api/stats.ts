@@ -1,5 +1,11 @@
 import api from "./axios";
-import type { BudgetStats, CategoryStats, TagStats } from "@/types";
+import type {
+  BudgetStats,
+  CategoryStats,
+  TagStats,
+  TopCategoryStats,
+  SavingsRateDataPoint,
+} from "@/types";
 
 export interface WealthEvolutionData {
   labels: string[];
@@ -66,6 +72,29 @@ export const statsApi = {
   async byTag(budgetId: number): Promise<TagStats[]> {
     const response = await api.get<TagStats[]>(
       `/budgets/${budgetId}/stats/by-tag`,
+    );
+    return response.data;
+  },
+
+  async topCategories(
+    budgetId: number,
+    limit: number = 5,
+  ): Promise<TopCategoryStats[]> {
+    const response = await api.get<TopCategoryStats[]>(
+      `/budgets/${budgetId}/stats/top-categories`,
+      { params: { limit } },
+    );
+    return response.data;
+  },
+
+  async savingsRateEvolution(params?: {
+    from?: string;
+    to?: string;
+    months?: number;
+  }): Promise<SavingsRateDataPoint[]> {
+    const response = await api.get<SavingsRateDataPoint[]>(
+      "/stats/savings-rate-evolution",
+      { params },
     );
     return response.data;
   },

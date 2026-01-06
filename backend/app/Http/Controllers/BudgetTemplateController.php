@@ -22,6 +22,7 @@ class BudgetTemplateController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'is_default' => 'boolean',
+            'revenue_cents' => 'nullable|integer|min:0',
             'categories' => 'array',
             'categories.*.name' => 'required|string|max:255',
             'categories.*.planned_amount_cents' => 'required|integer|min:0',
@@ -35,6 +36,7 @@ class BudgetTemplateController extends Controller
         $template = $request->user()->budgetTemplates()->create([
             'name' => $validated['name'],
             'is_default' => $validated['is_default'] ?? false,
+            'revenue_cents' => $validated['revenue_cents'] ?? null,
         ]);
 
         if (isset($validated['categories'])) {
@@ -74,6 +76,7 @@ class BudgetTemplateController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'is_default' => 'sometimes|boolean',
+            'revenue_cents' => 'sometimes|nullable|integer|min:0',
             'categories' => 'sometimes|array',
             'categories.*.id' => 'sometimes|exists:template_categories,id',
             'categories.*.name' => 'required_with:categories|string|max:255',
@@ -90,6 +93,7 @@ class BudgetTemplateController extends Controller
         $template->update([
             'name' => $validated['name'] ?? $template->name,
             'is_default' => $validated['is_default'] ?? $template->is_default,
+            'revenue_cents' => $validated['revenue_cents'] ?? $template->revenue_cents,
         ]);
 
         // Si des catégories sont fournies, les gérer

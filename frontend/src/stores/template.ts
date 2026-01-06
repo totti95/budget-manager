@@ -42,6 +42,7 @@ export const useTemplateStore = defineStore("template", () => {
   async function createTemplate(data: {
     name: string;
     isDefault?: boolean;
+    revenueCents?: number | null;
     categories?: Array<{
       name: string;
       plannedAmountCents: number;
@@ -73,6 +74,7 @@ export const useTemplateStore = defineStore("template", () => {
     data: {
       name?: string;
       isDefault?: boolean;
+      revenueCents?: number | null;
       categories?: Array<{
         id?: number;
         name: string;

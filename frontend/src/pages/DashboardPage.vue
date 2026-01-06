@@ -1,129 +1,94 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-4">Tableau de bord</h1>
-
-      <div class="flex items-center gap-4 mb-6">
-        <select
-          v-model="selectedMonth"
-          @change="loadBudget"
-          class="input max-w-xs"
-        >
+    <!-- Header -->
+    <div
+      class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+    >
+      <div>
+        <h1 class="text-3xl font-bold mb-2">Tableau de bord</h1>
+        <select v-model="selectedMonth" @change="loadBudget" class="input max-w-xs">
           <option v-for="month in availableMonths" :key="month" :value="month">
             {{ formatMonth(month) }}
           </option>
         </select>
+      </div>
 
-        <button
-          v-if="!currentBudget"
-          @click="handleGenerateBudget"
+      <div class="flex gap-2 flex-wrap">
+        <router-link
+          v-if="selectedMonth && currentBudget"
+          :to="`/budgets/${selectedMonth}`"
           class="btn btn-primary"
-          :disabled="budgetStore.loading"
         >
-          Générer le budget
+          Voir les détails
+        </router-link>
+        <button
+          v-if="dashboardStore.hasUnsavedChanges"
+          @click="saveDashboardLayout"
+          class="btn btn-primary"
+          :disabled="dashboardStore.loading"
+        >
+          Enregistrer
+        </button>
+        <button @click="toggleEditMode" class="btn btn-secondary">
+          {{ editMode ? "Terminer" : "Personnaliser" }}
+        </button>
+        <button v-if="editMode" @click="openWidgetSelector" class="btn btn-primary">
+          Ajouter
+        </button>
+        <button v-if="editMode" @click="resetDashboard" class="btn btn-danger">
+          Réinitialiser
         </button>
       </div>
     </div>
 
-    <div v-if="budgetStore.loading" class="text-center py-12">
-      <p>Chargement...</p>
-    </div>
+    <!-- Grid Layout -->
+    <grid-layout
+      v-if="currentBudget && dashboardStore.layout.length > 0"
+      v-model:layout="dashboardStore.layout"
+      :col-num="12"
+      :row-height="30"
+      :is-draggable="editMode"
+      :is-resizable="editMode"
+      :vertical-compact="true"
+      :use-css-transforms="true"
+      @layout-updated="onLayoutUpdated"
+    >
+      <grid-item
+        v-for="item in dashboardStore.layout"
+        :key="item.i"
+        :x="item.x"
+        :y="item.y"
+        :w="item.w"
+        :h="item.h"
+        :i="item.i"
+        :min-w="getWidgetMinSize(item.i).w"
+        :min-h="getWidgetMinSize(item.i).h"
+        class="relative"
+      >
+        <component :is="getWidgetComponent(item.i)" v-bind="getWidgetProps(item.i)" />
 
-    <div v-else-if="currentBudget" class="space-y-6">
-      <!-- Stats Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="card">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Prévu</p>
-          <p class="text-2xl font-bold">
-            <MoneyDisplay :cents="statsStore.summary?.totalPlannedCents || 0" />
-          </p>
-        </div>
-
-        <div class="card">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Réel</p>
-          <p class="text-2xl font-bold">
-            <MoneyDisplay :cents="statsStore.summary?.totalActualCents || 0" />
-          </p>
-        </div>
-
-        <div class="card">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Économie</p>
-          <p class="text-2xl font-bold">
-            <MoneyDisplay
-              :cents="-(statsStore.summary?.varianceCents || 0)"
-              :colorize="true"
-              :show-sign="true"
+        <button
+          v-if="editMode"
+          @click="removeWidget(item.i)"
+          class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 z-10"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
             />
-          </p>
-        </div>
+          </svg>
+        </button>
+      </grid-item>
+    </grid-layout>
 
-        <div class="card">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Dépenses</p>
-          <p class="text-2xl font-bold">
-            {{ statsStore.summary?.expenseCount || 0 }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ExpenseDistributionChart
-          v-if="currentBudget"
-          :budgetId="currentBudget.id"
-        />
-        <WealthEvolutionChart />
-      </div>
-
-      <!-- Categories Table -->
-      <div class="card">
-        <h2 class="text-xl font-bold mb-4">Catégories</h2>
-        <div class="overflow-x-auto">
-          <table class="table">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th>Catégorie</th>
-                <th>Prévu</th>
-                <th>Réel</th>
-                <th>Économie</th>
-                <th>%</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr v-for="cat in statsStore.categoryStats" :key="cat.id">
-                <td class="font-medium">{{ cat.name }}</td>
-                <td><MoneyDisplay :cents="cat.plannedAmountCents" /></td>
-                <td><MoneyDisplay :cents="cat.actualAmountCents" /></td>
-                <td>
-                  <MoneyDisplay
-                    :cents="-cat.varianceCents"
-                    :colorize="true"
-                    :show-sign="true"
-                  />
-                </td>
-                <td>
-                  <span
-                    v-if="cat.variancePercentage !== null"
-                    :class="
-                      -cat.varianceCents > 0 ? 'text-green-600' : 'text-red-600'
-                    "
-                  >
-                    {{ (-cat.variancePercentage).toFixed(1) }}%
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="flex justify-center">
-        <router-link :to="`/budgets/${selectedMonth}`" class="btn btn-primary">
-          Voir le détail du budget
-        </router-link>
-      </div>
-    </div>
-
-    <div v-else class="card text-center py-12">
+    <!-- No budget state -->
+    <div
+      v-else-if="!budgetStore.loading && !currentBudget"
+      class="card text-center py-12"
+    >
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Aucun budget pour ce mois
       </p>
@@ -131,22 +96,39 @@
         Générer le budget
       </button>
     </div>
+
+    <!-- Loading state -->
+    <div v-else-if="budgetStore.loading" class="text-center py-12">
+      <p>Chargement...</p>
+    </div>
+
+    <!-- Widget Selector Modal -->
+    <WidgetSelectorModal
+      v-if="showWidgetSelector"
+      :existing-widgets="existingWidgetIds"
+      @add-widget="addWidget"
+      @close="showWidgetSelector = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useBudgetStore } from "@/stores/budget";
 import { useStatsStore } from "@/stores/stats";
-import MoneyDisplay from "@/components/MoneyDisplay.vue";
-import ExpenseDistributionChart from "@/components/ExpenseDistributionChart.vue";
-import WealthEvolutionChart from "@/components/WealthEvolutionChart.vue";
+import { useDashboardStore } from "@/stores/dashboard";
+import { getWidgetDefinition } from "@/components/widgets/widgetRegistry";
+import type { WidgetType, WidgetLayoutItem } from "@/types";
+import WidgetSelectorModal from "@/components/WidgetSelectorModal.vue";
 
 const budgetStore = useBudgetStore();
 const statsStore = useStatsStore();
+const dashboardStore = useDashboardStore();
 
 const selectedMonth = ref(new Date().toISOString().slice(0, 7));
 const currentBudget = computed(() => budgetStore.currentBudget);
+const editMode = ref(false);
+const showWidgetSelector = ref(false);
 
 const availableMonths = computed(() => {
   const months = [];
@@ -157,6 +139,10 @@ const availableMonths = computed(() => {
   }
   return months;
 });
+
+const existingWidgetIds = computed(() =>
+  dashboardStore.layout.map((item) => item.i),
+);
 
 function formatMonth(month: string): string {
   const [year, monthNum] = month.split("-");
@@ -189,7 +175,83 @@ async function handleGenerateBudget() {
   }
 }
 
-onMounted(() => {
-  loadBudget();
+async function saveDashboardLayout() {
+  try {
+    await dashboardStore.saveLayout();
+    // TODO: Afficher toast de succès
+  } catch (err) {
+    // TODO: Afficher toast d'erreur
+    console.error(err);
+  }
+}
+
+function toggleEditMode() {
+  editMode.value = !editMode.value;
+}
+
+function openWidgetSelector() {
+  showWidgetSelector.value = true;
+}
+
+function addWidget(widgetType: WidgetType) {
+  const definition = getWidgetDefinition(widgetType);
+  const newItem: WidgetLayoutItem = {
+    i: widgetType,
+    x: 0,
+    y: Infinity,
+    w: definition.defaultSize.w,
+    h: definition.defaultSize.h,
+    minW: definition.minSize?.w,
+    minH: definition.minSize?.h,
+  };
+  dashboardStore.layout.push(newItem);
+  dashboardStore.hasUnsavedChanges = true;
+  showWidgetSelector.value = false;
+}
+
+function removeWidget(widgetId: WidgetType) {
+  dashboardStore.layout = dashboardStore.layout.filter((item) => item.i !== widgetId);
+  dashboardStore.hasUnsavedChanges = true;
+}
+
+function onLayoutUpdated(newLayout: WidgetLayoutItem[]) {
+  dashboardStore.updateLayout(newLayout);
+}
+
+function getWidgetComponent(widgetType: WidgetType) {
+  return getWidgetDefinition(widgetType).component;
+}
+
+function getWidgetMinSize(widgetType: WidgetType) {
+  const definition = getWidgetDefinition(widgetType);
+  return definition.minSize || { w: 2, h: 2 };
+}
+
+function getWidgetProps(widgetType: WidgetType) {
+  const baseProps: any = {};
+
+  if (currentBudget.value) {
+    baseProps.budgetId = currentBudget.value.id;
+  }
+
+  const settings = dashboardStore.widgetSettings[widgetType] || {};
+
+  return { ...baseProps, ...settings };
+}
+
+async function resetDashboard() {
+  if (confirm("Réinitialiser la disposition du tableau de bord ?")) {
+    try {
+      await dashboardStore.resetLayout();
+      editMode.value = false;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+
+onMounted(async () => {
+  await dashboardStore.fetchLayout();
+  await loadBudget();
 });
 </script>
