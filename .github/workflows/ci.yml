@@ -90,6 +90,9 @@ jobs:
           cd backend
           cp .env.example .env
           sed -i 's/DB_HOST=postgres/DB_HOST=localhost/' .env
+          sed -i 's/DB_DATABASE=budget_manager/DB_DATABASE=budget_manager_test/' .env
+          sed -i 's/DB_USERNAME=budget_user/DB_USERNAME=postgres/' .env
+          sed -i 's/DB_PASSWORD=budget_pass/DB_PASSWORD=secret/' .env
           sed -i 's/REDIS_HOST=redis/REDIS_HOST=localhost/' .env
 
       - name: Install Dependencies
