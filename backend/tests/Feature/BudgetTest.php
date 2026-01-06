@@ -15,7 +15,7 @@ test('user can list their budgets', function () {
     $response->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'month', 'user_id'],
+                '*' => ['id', 'name', 'month', 'userId'],
             ],
         ]);
 });
