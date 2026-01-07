@@ -25,6 +25,7 @@ services:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=budget_manager
+      - DB_DATABASE_TEST=budget_manager_test
       - DB_USERNAME=budget_user
       - DB_PASSWORD=budget_pass
       - REDIS_HOST=redis
