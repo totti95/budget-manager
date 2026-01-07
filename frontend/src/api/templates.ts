@@ -32,16 +32,16 @@ export const templatesApi = {
   }): Promise<BudgetTemplate> {
     const response = await apiClient.post("/templates", {
       name: data.name,
-      is_default: data.isDefault,
-      revenue_cents: data.revenueCents,
+      isDefault: data.isDefault,
+      revenueCents: data.revenueCents,
       categories: data.categories?.map((cat, catIndex) => ({
         name: cat.name,
-        planned_amount_cents: cat.plannedAmountCents,
-        sort_order: cat.sortOrder ?? catIndex,
+        plannedAmountCents: cat.plannedAmountCents,
+        sortOrder: cat.sortOrder ?? catIndex,
         subcategories: cat.subcategories?.map((sub, subIndex) => ({
           name: sub.name,
-          planned_amount_cents: sub.plannedAmountCents,
-          sort_order: sub.sortOrder ?? subIndex,
+          plannedAmountCents: sub.plannedAmountCents,
+          sortOrder: sub.sortOrder ?? subIndex,
         })),
       })),
     });
@@ -73,20 +73,20 @@ export const templatesApi = {
     const payload: any = {};
 
     if (data.name !== undefined) payload.name = data.name;
-    if (data.isDefault !== undefined) payload.is_default = data.isDefault;
-    if (data.revenueCents !== undefined) payload.revenue_cents = data.revenueCents;
+    if (data.isDefault !== undefined) payload.isDefault = data.isDefault;
+    if (data.revenueCents !== undefined) payload.revenueCents = data.revenueCents;
 
     if (data.categories) {
       payload.categories = data.categories.map((cat, catIndex) => ({
         ...(cat.id && { id: cat.id }),
         name: cat.name,
-        planned_amount_cents: cat.plannedAmountCents,
-        sort_order: cat.sortOrder ?? catIndex,
+        plannedAmountCents: cat.plannedAmountCents,
+        sortOrder: cat.sortOrder ?? catIndex,
         subcategories: cat.subcategories?.map((sub, subIndex) => ({
           ...(sub.id && { id: sub.id }),
           name: sub.name,
-          planned_amount_cents: sub.plannedAmountCents,
-          sort_order: sub.sortOrder ?? subIndex,
+          plannedAmountCents: sub.plannedAmountCents,
+          sortOrder: sub.sortOrder ?? subIndex,
         })),
       }));
     }
