@@ -27,7 +27,7 @@ services:
       - DB_DATABASE=budget_manager
       - DB_DATABASE_TEST=budget_manager_test
       - DB_USERNAME=budget_user
-      - DB_PASSWORD=budget_pass
+      - DB_PASSWORD=${DB_PASSWORD:-budget_pass}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MAIL_HOST=mailhog
@@ -57,10 +57,10 @@ services:
     environment:
       - MYSQL_DATABASE=budget_manager
       - MYSQL_USER=budget_user
-      - MYSQL_PASSWORD=budget_pass
-      - MYSQL_ROOT_PASSWORD=root_pass
+      - MYSQL_PASSWORD=${DB_PASSWORD:-budget_pass}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_pass}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
@@ -77,7 +77,7 @@ services:
     image: redis:7-alpine
     container_name: budget_redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -105,11 +105,11 @@ services:
       - PMA_HOST=mysql
       - PMA_PORT=3306
       - PMA_USER=root
-      - PMA_PASSWORD=root_pass
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_pass}
       - PMA_ARBITRARY=0
       - UPLOAD_LIMIT=50M
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     depends_on:
       - mysql
     networks:
