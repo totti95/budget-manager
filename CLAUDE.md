@@ -68,9 +68,10 @@ Budget Manager is a personal budget management web application built with Larave
    - Individual API modules: `auth.ts`, `budgets.ts`, `expenses.ts`, `templates.ts`, `assets.ts`, `savingsPlans.ts`, `savingsGoals.ts`, `tags.ts`, `recurringExpenses.ts`, `notifications.ts`, `dashboard.ts`, `wealthHistory.ts`, `users.ts`, `stats.ts`, `password-reset.ts`
 
 3. **Form Validation:**
-   - Uses VeeValidate + Zod schemas
+   - Uses VeeValidate + Valibot schemas
    - Schemas in `frontend/src/schemas/`
    - All schemas use camelCase field names
+   - Valibot provides type-safe validation with better TypeScript integration than Zod
 
 4. **Notification System:**
    - `useToast` composable for global toast notifications

@@ -106,6 +106,7 @@ import { ref, computed, onMounted } from "vue";
 import { useBudgetStore } from "@/stores/budget";
 import { useStatsStore } from "@/stores/stats";
 import { useDashboardStore } from "@/stores/dashboard";
+import { useToast } from "@/composables/useToast";
 import { getWidgetDefinition } from "@/components/widgets/widgetRegistry";
 import type { WidgetType, WidgetLayoutItem } from "@/types";
 import WidgetSelectorModal from "@/components/WidgetSelectorModal.vue";
@@ -113,6 +114,7 @@ import WidgetSelectorModal from "@/components/WidgetSelectorModal.vue";
 const budgetStore = useBudgetStore();
 const statsStore = useStatsStore();
 const dashboardStore = useDashboardStore();
+const toast = useToast();
 
 const selectedMonth = ref(new Date().toISOString().slice(0, 7));
 const currentBudget = computed(() => budgetStore.currentBudget);
@@ -165,9 +167,9 @@ async function handleGenerateBudget() {
 async function saveDashboardLayout() {
   try {
     await dashboardStore.saveLayout();
-    // TODO: Afficher toast de succès
+    toast.success("Configuration du tableau de bord sauvegardée");
   } catch (err) {
-    // TODO: Afficher toast d'erreur
+    toast.error("Erreur lors de la sauvegarde de la configuration");
     console.error(err);
   }
 }
