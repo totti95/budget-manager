@@ -102,6 +102,7 @@
             v-bind="valueAttrs"
             type="number"
             min="0"
+            step="0.01"
             class="input"
             :class="{ 'border-red-500': errors.value_cents }"
             placeholder="0.00"
@@ -141,7 +142,7 @@
 <script setup lang="ts">
 import { computed, watch, ref, onMounted } from "vue";
 import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
+import { toTypedSchema } from "@vee-validate/valibot";
 import { assetSchema } from "@/schemas/asset";
 import { assetsApi } from "@/api/assets";
 import type { CreateAssetData } from "@/api/assets";

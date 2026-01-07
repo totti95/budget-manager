@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
+import { toTypedSchema } from "@vee-validate/valibot";
 import { forgotPasswordSchema } from "@/schemas/password-reset";
 import { passwordResetApi } from "@/api/password-reset";
 import { errorHandler } from "@/utils/errorHandler";

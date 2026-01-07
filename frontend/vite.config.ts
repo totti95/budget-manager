@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [vue()],
   resolve: {
     alias: {
@@ -16,5 +16,20 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
+  },
+  build: {
+    // Optimisations de production
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia'],
+          'charts': ['chart.js']
+        }
+      }
+    },
+    // Augmenter la limite de taille pour les chunks
+    chunkSizeWarningLimit: 1000,
+    sourcemap: mode !== 'production'
   }
-})
+}))

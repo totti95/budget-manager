@@ -27,9 +27,10 @@ class ExpenseController extends Controller
             });
         }
 
-        // Search
-        if ($request->has('q')) {
-            $query->where('label', 'ILIKE', '%' . $request->q . '%');
+        // Search (case-insensitive, MySQL compatible)
+        if ($request->has('q') && !empty($request->q)) {
+            $searchTerm = '%' . str_replace(['%', '_'], ['\%', '\_'], $request->q) . '%';
+            $query->whereRaw('LOWER(label) LIKE LOWER(?)', [$searchTerm]);
         }
 
         // Date range

@@ -43,10 +43,12 @@ class ErrorHandler {
       this.logs.shift();
     }
 
-    // Logger dans la console
-    const consoleMethod =
-      level === "error" ? console.error : level === "warning" ? console.warn : console.info;
-    consoleMethod(`[${level.toUpperCase()}] ${message}`, details || "");
+    // Logger dans la console (uniquement en développement)
+    if (import.meta.env.DEV) {
+      const consoleMethod =
+        level === "error" ? console.error : level === "warning" ? console.warn : console.info;
+      consoleMethod(`[${level.toUpperCase()}] ${message}`, details || "");
+    }
   }
 
   /**

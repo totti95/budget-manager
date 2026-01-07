@@ -135,7 +135,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
+import { toTypedSchema } from "@vee-validate/valibot";
 import { resetPasswordSchema } from "@/schemas/password-reset";
 import { passwordResetApi } from "@/api/password-reset";
 import { errorHandler } from "@/utils/errorHandler";

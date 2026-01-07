@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class AssetController extends Controller
 {
@@ -38,7 +37,7 @@ class AssetController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'type' => ['required', 'string', Rule::in(['immobilier', 'épargne', 'investissement', 'autre'])],
+            'type' => 'required|string|max:100',
             'is_liability' => 'sometimes|boolean',
             'label' => 'required|string|max:255',
             'institution' => 'nullable|string|max:255',
@@ -76,7 +75,7 @@ class AssetController extends Controller
         $this->authorize('update', $asset);
 
         $validated = $request->validate([
-            'type' => ['sometimes', 'string', Rule::in(['immobilier', 'épargne', 'investissement', 'autre'])],
+            'type' => 'sometimes|string|max:100',
             'is_liability' => 'sometimes|boolean',
             'label' => 'sometimes|string|max:255',
             'institution' => 'nullable|string|max:255',
