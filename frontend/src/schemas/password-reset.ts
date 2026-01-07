@@ -8,7 +8,10 @@ export const resetPasswordSchema = v.pipe(
   v.object({
     email: v.pipe(v.string(), v.email("Email invalide")),
     token: v.pipe(v.string(), v.minLength(1, "Token requis")),
-    password: v.pipe(v.string(), v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères")),
+    password: v.pipe(
+      v.string(),
+      v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères")
+    ),
     passwordConfirmation: v.string(),
   }),
   v.forward(

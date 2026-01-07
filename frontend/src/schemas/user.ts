@@ -7,14 +7,19 @@ export const createUserSchema = v.object({
 });
 
 export const updateUserSchema = v.object({
-  name: v.optional(v.pipe(v.string(), v.minLength(2, "Le nom doit contenir au moins 2 caractères"))),
+  name: v.optional(
+    v.pipe(v.string(), v.minLength(2, "Le nom doit contenir au moins 2 caractères"))
+  ),
   email: v.optional(v.pipe(v.string(), v.email("L'email est invalide"))),
   roleId: v.optional(v.pipe(v.number(), v.minValue(1, "Le rôle est requis"))),
 });
 
 export const updatePasswordSchema = v.pipe(
   v.object({
-    password: v.pipe(v.string(), v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères")),
+    password: v.pipe(
+      v.string(),
+      v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères")
+    ),
     password_confirmation: v.string(),
   }),
   v.forward(

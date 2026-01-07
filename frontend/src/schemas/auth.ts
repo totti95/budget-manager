@@ -9,7 +9,10 @@ export const registerSchema = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.minLength(2, "Le nom doit contenir au moins 2 caractères")),
     email: v.pipe(v.string(), v.email("L'email est invalide")),
-    password: v.pipe(v.string(), v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères")),
+    password: v.pipe(
+      v.string(),
+      v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères")
+    ),
     password_confirmation: v.string(),
   }),
   v.forward(
