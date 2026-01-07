@@ -83,7 +83,7 @@
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
+import { toTypedSchema } from "@vee-validate/valibot";
 import { registerSchema } from "@/schemas/auth";
 import { errorHandler } from "@/utils/errorHandler";
 import FormInput from "@/components/FormInput.vue";

@@ -49,11 +49,11 @@
               id="targetAmount"
               v-model="formData.targetAmountEuros"
               type="number"
-              step="1"
-              min="1"
+              step="0.01"
+              min="0.01"
               required
               class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
-              placeholder="Ex: 3000"
+              placeholder="Ex: 3000.50"
             />
           </div>
         </div>

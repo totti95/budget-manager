@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     freetype-dev \
     libzip-dev \
+    libxml2-dev \
     zip \
     unzip \
     git \
@@ -19,6 +20,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         mysqli \
         gd \
         zip \
+        dom \
+        xml \
         opcache
 
 # Install Redis extension

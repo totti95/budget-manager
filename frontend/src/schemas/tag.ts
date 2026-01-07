@@ -1,14 +1,14 @@
-import { z } from "zod";
+import * as v from "valibot";
 
-export const tagSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Le nom du tag est requis")
-    .max(100, "Le nom est trop long (max 100 caractères)"),
-  color: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Couleur invalide (format #RRGGBB attendu)")
-    .optional(),
+export const tagSchema = v.object({
+  name: v.pipe(
+    v.string(),
+    v.minLength(1, "Le nom du tag est requis"),
+    v.maxLength(100, "Le nom est trop long (max 100 caractères)")
+  ),
+  color: v.optional(
+    v.pipe(v.string(), v.regex(/^#[0-9A-Fa-f]{6}$/, "Couleur invalide (format #RRGGBB attendu)"))
+  ),
 });
 
-export type TagInput = z.infer<typeof tagSchema>;
+export type TagInput = v.InferOutput<typeof tagSchema>;

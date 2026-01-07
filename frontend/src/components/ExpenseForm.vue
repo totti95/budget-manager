@@ -180,7 +180,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from "vue";
 import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
+import { toTypedSchema } from "@vee-validate/valibot";
 import { expenseSchema } from "@/schemas/expense";
 import type { Expense, BudgetCategory } from "@/types";
 import apiClient from "@/api/axios";

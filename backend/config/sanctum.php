@@ -46,7 +46,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Tokens expire après 7 jours (10080 minutes) pour la sécurité en production
+    'expiration' => 60 * 24 * 7,
 
     /*
     |--------------------------------------------------------------------------
