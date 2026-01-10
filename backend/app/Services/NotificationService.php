@@ -15,10 +15,10 @@ class NotificationService
     public function checkBudgetExceeded(Expense $expense): void
     {
         // Load necessary relationships
-        $expense->load('budget.user', 'subcategory.budgetCategory');
+        $expense->load('budget.user', 'budgetSubcategory.budgetCategory');
 
         $user = $expense->budget->user;
-        $subcategory = $expense->subcategory;
+        $subcategory = $expense->budgetSubcategory;
 
         // Get user's notification settings
         $settings = $user->notificationSettings;

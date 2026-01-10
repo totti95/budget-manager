@@ -19,7 +19,7 @@ test('budget calculates variance correctly', function () {
     $budget = Budget::factory()->for($user)->create();
     $category = BudgetCategory::factory()->for($budget)->create(['planned_amount_cents' => 10000]);
     $subcategory = BudgetSubcategory::factory()->for($category, 'budgetCategory')->create();
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create(['amount_cents' => 8000]);
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create(['amount_cents' => 8000]);
 
     $budget = $budget->fresh();
     expect($budget->total_planned_cents)->toBe(10000);
@@ -32,7 +32,7 @@ test('subcategory calculates variance percentage correctly', function () {
     $budget = Budget::factory()->for($user)->create();
     $category = BudgetCategory::factory()->for($budget)->create();
     $subcategory = BudgetSubcategory::factory()->for($category, 'budgetCategory')->create(['planned_amount_cents' => 10000]);
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create(['amount_cents' => 12000]);
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create(['amount_cents' => 12000]);
 
     $subcategory = $subcategory->fresh();
     expect($subcategory->actual_amount_cents)->toBe(12000);

@@ -30,6 +30,7 @@ class ExpenseRepository implements ExpenseRepositoryInterface
     public function create(array $data): Expense
     {
         $expense = Expense::create([
+            'budget_id' => $data['budget_id'],
             'budget_subcategory_id' => $data['budget_subcategory_id'],
             'date' => $data['date'],
             'label' => $data['label'],

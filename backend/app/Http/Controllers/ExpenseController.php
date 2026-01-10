@@ -22,7 +22,7 @@ class ExpenseController extends Controller
     {
         $this->authorize('view', $budget);
 
-        $query = $budget->expenses()->with('subcategory.budgetCategory', 'tags');
+        $query = $budget->expenses()->with('budgetSubcategory.budgetCategory', 'tags');
 
         // Filter by subcategory
         if ($request->has('subcatId')) {
@@ -81,6 +81,9 @@ class ExpenseController extends Controller
             $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id')->toArray();
             $validated['tag_ids'] = $userTags;
         }
+
+        // Add budget_id to validated data
+        $validated['budget_id'] = $budget->id;
 
         $expense = $this->expenseRepository->create($validated);
 
@@ -210,7 +213,7 @@ class ExpenseController extends Controller
     {
         $this->authorize('view', $budget);
 
-        $expenses = $budget->expenses()->with('subcategory.budgetCategory')->get();
+        $expenses = $budget->expenses()->with('budgetSubcategory.budgetCategory')->get();
 
         $csv = "date,label,amount_cents,category,subcategory,payment_method,notes\n";
 
@@ -219,8 +222,8 @@ class ExpenseController extends Controller
                 $expense->date->format('Y-m-d'),
                 '"' . str_replace('"', '""', $expense->label) . '"',
                 $expense->amount_cents,
-                '"' . str_replace('"', '""', $expense->subcategory->budgetCategory->name) . '"',
-                '"' . str_replace('"', '""', $expense->subcategory->name) . '"',
+                '"' . str_replace('"', '""', $expense->budgetSubcategory->budgetCategory->name) . '"',
+                '"' . str_replace('"', '""', $expense->budgetSubcategory->name) . '"',
                 '"' . str_replace('"', '""', $expense->payment_method ?? '') . '"',
                 '"' . str_replace('"', '""', $expense->notes ?? '') . '"',
             ]) . "\n";

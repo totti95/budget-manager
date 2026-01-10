@@ -29,7 +29,7 @@ test('user can get budget summary stats', function () {
         'planned_amount_cents' => 100000,
     ]);
 
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create([
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create([
         'amount_cents' => 75000,
     ]);
 
@@ -65,10 +65,10 @@ test('user can get stats by category', function () {
         'planned_amount_cents' => 50000,
     ]);
 
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create([
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create([
         'amount_cents' => 30000,
     ]);
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create([
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create([
         'amount_cents' => 20000,
     ]);
 
@@ -108,7 +108,7 @@ test('user can get stats by subcategory', function () {
         'planned_amount_cents' => 15000,
     ]);
 
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create([
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create([
         'amount_cents' => 20000,
     ]);
 
@@ -150,7 +150,7 @@ test('variance percentage is calculated correctly for positive variance', functi
     ]);
 
     // Dépensé 120000 au lieu de 100000 = +20% de dépassement
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create([
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create([
         'amount_cents' => 120000,
     ]);
 
@@ -176,7 +176,7 @@ test('variance percentage is calculated correctly for negative variance', functi
     ]);
 
     // Dépensé 80000 au lieu de 100000 = -20% d'économie
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create([
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create([
         'amount_cents' => 80000,
     ]);
 
@@ -196,12 +196,12 @@ test('user can get top categories by spending', function () {
     // Catégorie 1 : 50000 dépensés
     $category1 = BudgetCategory::factory()->for($budget)->create(['name' => 'Catégorie A']);
     $subcategory1 = BudgetSubcategory::factory()->for($category1, 'budgetCategory')->create();
-    Expense::factory()->for($budget)->for($subcategory1, 'subcategory')->create(['amount_cents' => 50000]);
+    Expense::factory()->for($budget)->for($subcategory1, 'budgetSubcategory')->create(['amount_cents' => 50000]);
 
     // Catégorie 2 : 30000 dépensés
     $category2 = BudgetCategory::factory()->for($budget)->create(['name' => 'Catégorie B']);
     $subcategory2 = BudgetSubcategory::factory()->for($category2, 'budgetCategory')->create();
-    Expense::factory()->for($budget)->for($subcategory2, 'subcategory')->create(['amount_cents' => 30000]);
+    Expense::factory()->for($budget)->for($subcategory2, 'budgetSubcategory')->create(['amount_cents' => 30000]);
 
     $response = $this->actingAs($user, 'sanctum')
         ->getJson("/api/budgets/{$budget->id}/stats/top-categories?limit=5");
@@ -259,9 +259,9 @@ test('stats handle multiple expenses in same subcategory correctly', function ()
     ]);
 
     // Ajouter plusieurs dépenses
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create(['amount_cents' => 25000]);
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create(['amount_cents' => 30000]);
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create(['amount_cents' => 45000]);
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create(['amount_cents' => 25000]);
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create(['amount_cents' => 30000]);
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create(['amount_cents' => 45000]);
 
     $response = $this->actingAs($user, 'sanctum')
         ->getJson("/api/budgets/{$budget->id}/stats/summary");
