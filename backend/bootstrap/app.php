@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
 
-        $middleware->throttleApi('60,1');
+        //         Rate limiting désactivé temporairement pour le développement
+        $middleware->throttleApi('300,1');
 
         // Convertir les requêtes entrantes de camelCase en snake_case
         $middleware->append(\App\Http\Middleware\ConvertRequestToSnakeCase::class);

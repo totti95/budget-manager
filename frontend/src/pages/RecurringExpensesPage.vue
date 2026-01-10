@@ -112,11 +112,13 @@
 import { ref, onMounted } from "vue";
 import { useRecurringExpenseStore } from "@/stores/recurringExpenses";
 import RecurringExpenseFormModal from "@/components/RecurringExpenseFormModal.vue";
+import { useToast } from "@/composables/useToast";
 import type { RecurringExpense } from "@/types";
 
 const store = useRecurringExpenseStore();
 const showFormModal = ref(false);
 const selectedExpense = ref<RecurringExpense | undefined>();
+const { success, error } = useToast();
 
 onMounted(() => {
   store.fetchRecurringExpenses();
@@ -141,14 +143,16 @@ async function handleSubmit(data: any) {
   try {
     if (selectedExpense.value) {
       await store.updateRecurringExpense(selectedExpense.value.id, data);
-      alert("Dépense récurrente modifiée avec succès !");
+      closeFormModal();
+      success("Dépense récurrente modifiée avec succès !");
     } else {
       await store.createRecurringExpense(data);
-      alert("Dépense récurrente créée avec succès !");
+      closeFormModal();
+      success("Dépense récurrente créée avec succès !");
     }
+  } catch (err) {
     closeFormModal();
-  } catch (error) {
-    alert("Erreur lors de l'enregistrement de la dépense récurrente");
+    error("Erreur lors de l'enregistrement de la dépense récurrente");
   }
 }
 
@@ -197,8 +201,9 @@ function formatFrequency(expense: RecurringExpense): string {
 async function toggleActive(id: number) {
   try {
     await store.toggleActive(id);
-  } catch (error) {
-    alert("Erreur lors du changement de statut");
+    success("Statut modifié avec succès");
+  } catch (err) {
+    error("Erreur lors du changement de statut");
   }
 }
 
@@ -209,8 +214,9 @@ async function deleteExpense(id: number) {
 
   try {
     await store.deleteRecurringExpense(id);
-  } catch (error) {
-    alert("Erreur lors de la suppression");
+    success("Dépense récurrente supprimée avec succès");
+  } catch (err) {
+    error("Erreur lors de la suppression");
   }
 }
 </script>
