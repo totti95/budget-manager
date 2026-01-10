@@ -43,6 +43,7 @@
       v-model:layout="dashboardStore.layout"
       :col-num="12"
       :row-height="30"
+      :margin="[16, 16]"
       :is-draggable="editMode"
       :is-resizable="editMode"
       :vertical-compact="true"
@@ -62,12 +63,14 @@
         :min-h="getWidgetMinSize(item.i).h"
         class="relative"
       >
-        <component :is="getWidgetComponent(item.i)" v-bind="getWidgetProps(item.i)" />
+        <div class="h-full p-2">
+          <component :is="getWidgetComponent(item.i)" v-bind="getWidgetProps(item.i)" />
+        </div>
 
         <button
           v-if="editMode"
           @click="removeWidget(item.i)"
-          class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 z-10"
+          class="absolute top-4 right-4 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 z-10"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -144,7 +147,8 @@ async function loadBudget() {
   try {
     const response = await budgetStore.fetchBudgets(selectedMonth.value);
     if (response.data.length > 0) {
-      await budgetStore.fetchBudget(response.data[0].id);
+      // Définir directement le budget depuis la réponse (pas besoin de refaire une requête)
+      budgetStore.currentBudget = response.data[0];
       await statsStore.fetchSummary(response.data[0].id);
       await statsStore.fetchCategoryStats(response.data[0].id);
     } else {
@@ -185,16 +189,22 @@ function openWidgetSelector() {
 
 function addWidget(widgetType: WidgetType) {
   const definition = getWidgetDefinition(widgetType);
+
+  // Calculer la position Y en trouvant le point le plus bas du layout actuel
+  const maxY = dashboardStore.layout.reduce((max, item) => {
+    return Math.max(max, item.y + item.h);
+  }, 0);
+
   const newItem: WidgetLayoutItem = {
     i: widgetType,
     x: 0,
-    y: Infinity,
+    y: maxY,
     w: definition.defaultSize.w,
     h: definition.defaultSize.h,
     minW: definition.minSize?.w,
     minH: definition.minSize?.h,
   };
-  dashboardStore.layout.push(newItem);
+  dashboardStore.layout = [...dashboardStore.layout, newItem];
   dashboardStore.hasUnsavedChanges = true;
   showWidgetSelector.value = false;
 }

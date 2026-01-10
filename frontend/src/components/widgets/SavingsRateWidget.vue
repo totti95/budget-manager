@@ -121,9 +121,14 @@ function renderChart() {
 }
 
 onMounted(() => loadData());
+
 watch(
   () => props.months,
-  () => loadData()
+  (newMonths, oldMonths) => {
+    if (newMonths !== oldMonths) loadData();
+  },
+  { immediate: false }
 );
+
 onUnmounted(() => chartInstance?.destroy());
 </script>

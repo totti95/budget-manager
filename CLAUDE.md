@@ -304,34 +304,78 @@ php artisan test --filter=AuthTest  # Specific test
 
 ### Database Data Protection (CRITICAL)
 
-**NEVER delete or truncate database data without explicit user permission.**
+**⚠️ RÈGLE ABSOLUE : NEVER delete or truncate database data without EXPLICIT user permission.**
 
-This includes:
-- `php artisan migrate:fresh` (drops all tables and data)
-- `php artisan db:wipe` (drops all tables)
-- `TRUNCATE` SQL commands
-- `DELETE FROM` SQL commands without WHERE clause
-- Dropping Docker volumes containing database data
-- Any operation that results in data loss
+The user's data is valuable. Accidental data loss has occurred in the past. This section lists ALL dangerous commands that must NEVER be executed without explicit user confirmation.
 
-**Always ask the user for explicit permission before:**
-1. Running any command that will delete existing data
-2. Executing migrations that drop tables or columns
-3. Resetting the database
-4. Clearing cache that contains important state
+---
 
-**Safe operations (no permission needed):**
-- `make migrate` (only adds new tables/columns)
-- `make seed` (only adds data, doesn't delete)
+### ❌ FORBIDDEN COMMANDS (Require EXPLICIT User Permission)
+
+#### Via Make commands:
+- `make fresh` → Executes `php artisan migrate:fresh --seed` (DROPS ALL TABLES)
+- `make clean` → Executes `docker compose down -v` (DELETES DATABASE VOLUMES)
+- `make init` → First-time setup that runs migrations + seed (MAY CONFLICT with existing data)
+
+#### Via Make + Artisan:
+- `make artisan CMD="migrate:fresh"` → DROPS all tables and recreates schema
+- `make artisan CMD="migrate:fresh --seed"` → DROPS + recreates + seeds
+- `make artisan CMD="migrate:reset"` → Rolls back ALL migrations
+- `make artisan CMD="migrate:rollback"` → Rolls back last migration(s)
+- `make artisan CMD="db:wipe"` → DROPS all tables, views, types
+
+#### Via Docker directly:
+- `docker compose down -v` → DELETES all volumes including database
+- `docker volume rm projetpersobudget_postgres_data` → DELETES database volume
+- `docker compose exec php php artisan migrate:fresh` → DROPS tables
+- Any `docker compose run --rm php php artisan [destructive-command]`
+
+#### Via PHP container shell (`make shell-php`):
+- `php artisan migrate:fresh`
+- `php artisan migrate:fresh --seed`
+- `php artisan migrate:reset`
+- `php artisan db:wipe`
+
+#### Via SQL direct access:
+- `TRUNCATE [table_name];` → Empties a table
+- `DELETE FROM [table_name];` → Deletes all rows (without WHERE)
+- `DROP TABLE [table_name];` → Deletes a table
+- `DROP DATABASE [database_name];` → Deletes entire database
+
+#### Via scripts:
+- `./reset-data.sh` → Database reset script (if exists)
+
+---
+
+### ✅ SAFE OPERATIONS (No Permission Required)
+
+- `make migrate` → Only ADDS new tables/columns (safe)
+- `make seed` → Only ADDS data (doesn't delete)
+- `make up` / `make down` → Start/stop containers (preserves volumes)
+- `make test` → Uses separate test database
+- `make logs` → Read-only operation
 - Reading/querying database data
-- Running tests (uses separate test database)
+- Running SELECT queries
 
-**If data loss occurred accidentally:**
-- Inform the user immediately
-- Use `make seed` to restore demo data
-- Check if database backups exist
+---
 
-The user's data is valuable. When in doubt, always ask before executing destructive operations.
+### 🚨 CRITICAL RULES FOR CLAUDE
+
+1. **ALWAYS ask user permission** before running ANY command from the forbidden list
+2. **CLEARLY explain** what data will be deleted
+3. **NEVER assume** the user wants to reset data, even if they say "fix the database"
+4. **IF IN DOUBT** → Ask first, execute later
+5. **WATCH for flags**: `-v`, `fresh`, `wipe`, `reset`, `down -v`, `TRUNCATE`, `DROP`, `DELETE`
+
+### If Data Loss Occurred Accidentally:
+
+1. **Immediately inform** the user
+2. Apologize for the error
+3. Explain what was deleted
+4. Offer to restore demo data with `make seed` (if user confirms)
+5. Check if database backups exist
+
+**REMEMBER:** Lost user data cannot be recovered. Prevention is the only solution.
 
 ## Additional Notes
 

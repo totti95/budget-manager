@@ -126,14 +126,15 @@ const renderChart = () => {
 };
 
 onMounted(() => {
-  loadData();
+  if (props.budgetId) loadData();
 });
 
 watch(
   () => props.budgetId,
-  () => {
-    loadData();
-  }
+  (newId, oldId) => {
+    if (newId !== oldId && newId) loadData();
+  },
+  { immediate: false }
 );
 </script>
 

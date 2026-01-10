@@ -132,9 +132,15 @@ onMounted(() => {
   loadData();
 });
 
-watch([() => props.from, () => props.to], () => {
-  loadData();
-});
+watch(
+  [() => props.from, () => props.to],
+  ([newFrom, newTo], [oldFrom, oldTo]) => {
+    if (newFrom !== oldFrom || newTo !== oldTo) {
+      loadData();
+    }
+  },
+  { immediate: false }
+);
 </script>
 
 <style scoped>

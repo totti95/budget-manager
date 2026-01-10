@@ -151,9 +151,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('budgets/{budget}/stats/top-categories', [StatsController::class, 'topCategories']);
     // Route::get('stats/savings-rate-evolution', [StatsController::class, 'savingsRateEvolution']);
 
-    // ===== RATE-LIMITED ENDPOINTS (10 requests/minute) =====
+    // ===== RATE-LIMITED ENDPOINTS (100 requests/minute) =====
     // These endpoints are computationally expensive and need stricter rate limiting
-    Route::middleware('throttle:10,1')->group(function () {
+    Route::middleware('throttle:100,1')->group(function () {
         // Budget comparison (expensive operation)
         Route::get('budgets/compare', [BudgetController::class, 'compare']);
         Route::get('budgets/{budget}/export-pdf', [BudgetController::class, 'exportPdf']);

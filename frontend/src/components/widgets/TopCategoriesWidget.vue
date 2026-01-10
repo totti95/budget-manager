@@ -63,9 +63,15 @@ async function loadData() {
   }
 }
 
-onMounted(() => loadData());
+onMounted(() => {
+  if (props.budgetId) loadData();
+});
+
 watch(
   () => props.budgetId,
-  () => loadData()
+  (newId, oldId) => {
+    if (newId !== oldId && newId) loadData();
+  },
+  { immediate: false }
 );
 </script>
