@@ -56,7 +56,11 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="asset in assetsStore.assets" :key="asset.id">
+            <tr
+              v-for="asset in assetsStore.assets"
+              :key="asset.id"
+              v-memo="[asset.type, asset.label, asset.valueCents, asset.updatedAt]"
+            >
               <td>
                 <span
                   class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -121,7 +125,11 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="liability in assetsStore.liabilities" :key="liability.id">
+            <tr
+              v-for="liability in assetsStore.liabilities"
+              :key="liability.id"
+              v-memo="[liability.type, liability.label, liability.valueCents, liability.updatedAt]"
+            >
               <td>
                 <span
                   class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"

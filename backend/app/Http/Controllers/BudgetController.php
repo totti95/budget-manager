@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\BudgetRepositoryInterface;
 use App\Models\Budget;
 use App\Models\SavingsPlan;
 use App\Services\RecurringExpenseService;
@@ -12,20 +13,35 @@ use Illuminate\Support\Facades\Log;
 
 class BudgetController extends Controller
 {
+    protected BudgetRepositoryInterface $budgetRepository;
+
+    public function __construct(BudgetRepositoryInterface $budgetRepository)
+    {
+        $this->budgetRepository = $budgetRepository;
+    }
+
     public function index(Request $request)
     {
-        $query = $request->user()->budgets()->with('categories.subcategories');
-
+        // If filtering by specific month, use repository method
         if ($request->has('month')) {
-            // Convert Y-m format to full date for comparison
-            $monthDate = Carbon::parse($request->month . '-01');
-            $query->whereYear('month', $monthDate->year)
-                ->whereMonth('month', $monthDate->month);
+            $budget = $this->budgetRepository->findByUserAndMonth(
+                $request->user(),
+                $request->month
+            );
+
+            return response()->json([
+                'data' => $budget ? [$budget->load('categories.subcategories')] : [],
+                'total' => $budget ? 1 : 0,
+            ]);
         }
 
-        $budgets = $query->orderBy('month', 'desc')->paginate(12);
+        // Otherwise get all budgets for user
+        $budgets = $this->budgetRepository->getAllForUser($request->user());
 
-        return response()->json($budgets);
+        return response()->json([
+            'data' => $budgets->load('categories.subcategories'),
+            'total' => $budgets->count(),
+        ]);
     }
 
     public function generate(Request $request)
@@ -137,7 +153,7 @@ class BudgetController extends Controller
     {
         $this->authorize('view', $budget);
 
-        $budget->load([
+        $budget = $this->budgetRepository->findWithRelations($budget->id, [
             'categories.subcategories.expenses',
             'expenses',
         ]);
@@ -154,7 +170,7 @@ class BudgetController extends Controller
             'revenue_cents' => 'sometimes|required|integer|min:0',
         ]);
 
-        $budget->update($validated);
+        $budget = $this->budgetRepository->update($budget, $validated);
 
         return response()->json($budget);
     }
@@ -163,7 +179,7 @@ class BudgetController extends Controller
     {
         $this->authorize('delete', $budget);
 
-        $budget->delete();
+        $this->budgetRepository->delete($budget);
 
         return response()->json(null, 204);
     }
@@ -175,97 +191,17 @@ class BudgetController extends Controller
             'months.*' => 'required|date_format:Y-m',
         ]);
 
-        $user = $request->user();
-        $budgets = [];
-        $categoryData = [];
+        $comparisonService = new \App\Services\BudgetComparisonService();
+        $result = $comparisonService->compare($request->user(), $validated['months']);
 
-        foreach ($validated['months'] as $month) {
-            $monthDate = Carbon::parse($month . '-01');
-            $budget = $user->budgets()
-                ->where('month', $monthDate)
-                ->with(['categories.subcategories.expenses'])
-                ->first();
-
-            if ($budget) {
-                // Calculate stats for this budget
-                $totalPlanned = 0;
-                $totalActual = 0;
-                $byCategory = [];
-
-                foreach ($budget->categories as $category) {
-                    $categoryPlanned = $category->planned_amount_cents;
-                    $categoryActual = 0;
-
-                    foreach ($category->subcategories as $subcategory) {
-                        $subcategoryActual = $subcategory->expenses->sum('amount_cents');
-                        $categoryActual += $subcategoryActual;
-                    }
-
-                    $totalPlanned += $categoryPlanned;
-                    $totalActual += $categoryActual;
-
-                    $byCategory[] = [
-                        'name' => $category->name,
-                        'planned_cents' => $categoryPlanned,
-                        'actual_cents' => $categoryActual,
-                        'variance_cents' => $categoryActual - $categoryPlanned,
-                        'variance_percent' => $categoryPlanned > 0
-                            ? round((($categoryActual - $categoryPlanned) / $categoryPlanned) * 100, 2)
-                            : 0,
-                    ];
-
-                    // Store for evolution calculation
-                    if (! isset($categoryData[$category->name])) {
-                        $categoryData[$category->name] = [];
-                    }
-                    $categoryData[$category->name][] = $categoryActual;
-                }
-
-                $budget->stats = [
-                    'total_planned_cents' => $totalPlanned,
-                    'total_actual_cents' => $totalActual,
-                    'variance_cents' => $totalActual - $totalPlanned,
-                    'variance_percent' => $totalPlanned > 0
-                        ? round((($totalActual - $totalPlanned) / $totalPlanned) * 100, 2)
-                        : 0,
-                    'by_category' => $byCategory,
-                ];
-
-                $budgets[] = $budget;
-            }
-        }
-
-        // Calculate evolution across months
-        $evolution = [];
-        foreach ($categoryData as $categoryName => $values) {
-            if (count($values) >= 2) {
-                $firstValue = $values[0];
-                $lastValue = $values[count($values) - 1];
-                $evolutionPercent = $firstValue > 0
-                    ? round((($lastValue - $firstValue) / $firstValue) * 100, 2)
-                    : 0;
-
-                $evolution[] = [
-                    'category_name' => $categoryName,
-                    'values' => $values,
-                    'evolution_percent' => $evolutionPercent,
-                ];
-            }
-        }
-
-        return response()->json([
-            'budgets' => $budgets,
-            'comparison' => [
-                'evolution' => $evolution,
-            ],
-        ]);
+        return response()->json($result);
     }
 
     public function exportPdf(Request $request, Budget $budget)
     {
         $this->authorize('view', $budget);
 
-        $budget->load([
+        $budget = $this->budgetRepository->findWithRelations($budget->id, [
             'categories.subcategories.expenses',
             'expenses',
         ]);

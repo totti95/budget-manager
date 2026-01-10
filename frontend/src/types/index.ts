@@ -212,9 +212,9 @@ export interface AuthResponse {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
   total: number;
 }
 
@@ -407,8 +407,22 @@ export interface WidgetLayoutItem {
   maxH?: number;
 }
 
+// Widget configuration interface with common properties
+export interface WidgetConfig {
+  // Common widget settings
+  visible?: boolean;
+  refreshInterval?: number;
+  // Layout position (used by vue-grid-layout)
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
+  // Widget-specific settings can be added here
+  [key: string]: unknown;
+}
+
 export interface WidgetSettings {
-  [widgetId: string]: Record<string, any>;
+  [widgetId: string]: WidgetConfig;
 }
 
 export interface DashboardLayout {

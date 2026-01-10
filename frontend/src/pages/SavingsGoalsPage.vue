@@ -42,6 +42,7 @@
           <SavingsGoalCard
             v-for="goal in activeGoals"
             :key="goal.id"
+            v-memo="[goal.name, goal.currentAmountCents, goal.targetAmountCents, goal.status]"
             :goal="goal"
             @edit="openEditModal"
             @delete="handleDelete"
@@ -59,6 +60,7 @@
           <SavingsGoalCard
             v-for="goal in completedGoals"
             :key="goal.id"
+            v-memo="[goal.name, goal.currentAmountCents, goal.targetAmountCents, goal.status]"
             :goal="goal"
             @edit="openEditModal"
             @delete="handleDelete"

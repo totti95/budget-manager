@@ -52,9 +52,9 @@ export const useUsersStore = defineStore("users", () => {
       const response = await usersApi.list(filters);
 
       users.value = response.data;
-      currentPage.value = response.current_page;
-      lastPage.value = response.last_page;
-      perPage.value = response.per_page;
+      currentPage.value = response.currentPage;
+      lastPage.value = response.lastPage;
+      perPage.value = response.perPage;
       total.value = response.total;
     } catch (err) {
       error.value = "Erreur lors du chargement des utilisateurs";
