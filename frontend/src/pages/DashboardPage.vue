@@ -52,6 +52,7 @@
       <grid-item
         v-for="item in dashboardStore.layout"
         :key="item.i"
+        v-memo="[item.x, item.y, item.w, item.h, editMode, getWidgetProps(item.i)]"
         :x="item.x"
         :y="item.y"
         :w="item.w"

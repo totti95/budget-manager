@@ -63,11 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Budgets
     Route::get('budgets', [BudgetController::class, 'index']);
     Route::post('budgets/generate', [BudgetController::class, 'generate']);
-    Route::get('budgets/compare', [BudgetController::class, 'compare']);
     Route::get('budgets/{budget}', [BudgetController::class, 'show']);
     Route::put('budgets/{budget}', [BudgetController::class, 'update']);
     Route::delete('budgets/{budget}', [BudgetController::class, 'destroy']);
-    Route::get('budgets/{budget}/export-pdf', [BudgetController::class, 'exportPdf']);
 
     // Budget Categories (within a budget)
     Route::post('budgets/{budget}/categories', [BudgetCategoryController::class, 'store']);
@@ -84,8 +82,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('budgets/{budget}/expenses', [ExpenseController::class, 'store']);
     Route::put('expenses/{expense}', [ExpenseController::class, 'update']);
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
-    Route::post('budgets/{budget}/expenses/import-csv', [ExpenseController::class, 'importCsv']);
-    Route::get('budgets/{budget}/expenses/export-csv', [ExpenseController::class, 'exportCsv']);
 
     // Tags
     Route::get('tags', [TagController::class, 'index']);
@@ -101,13 +97,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('recurring-expenses/{recurringExpense}', [RecurringExpenseController::class, 'destroy']);
     Route::patch('recurring-expenses/{recurringExpense}/toggle-active', [RecurringExpenseController::class, 'toggleActive']);
 
-    // Stats
-    Route::get('budgets/{budget}/stats/summary', [StatsController::class, 'summary']);
-    Route::get('budgets/{budget}/stats/by-category', [StatsController::class, 'byCategory']);
-    Route::get('budgets/{budget}/stats/by-subcategory', [StatsController::class, 'bySubcategory']);
-    Route::get('budgets/{budget}/stats/by-tag', [StatsController::class, 'byTag']);
-    Route::get('budgets/{budget}/stats/expense-distribution', [StatsController::class, 'expenseDistribution']);
-    Route::get('stats/wealth-evolution', [StatsController::class, 'wealthEvolution']);
+    // Stats (moved to throttled group below)
+    // Route::get('budgets/{budget}/stats/summary', [StatsController::class, 'summary']);
+    // Route::get('budgets/{budget}/stats/by-category', [StatsController::class, 'byCategory']);
+    // Route::get('budgets/{budget}/stats/by-subcategory', [StatsController::class, 'bySubcategory']);
+    // Route::get('budgets/{budget}/stats/by-tag', [StatsController::class, 'byTag']);
+    // Route::get('budgets/{budget}/stats/expense-distribution', [StatsController::class, 'expenseDistribution']);
+    // Route::get('stats/wealth-evolution', [StatsController::class, 'wealthEvolution']);
 
     // Assets (Patrimoine)
     Route::get('assets/types', [AssetController::class, 'types']);
@@ -151,9 +147,31 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('dashboard/layout', [DashboardLayoutController::class, 'update']);
     Route::delete('dashboard/layout', [DashboardLayoutController::class, 'destroy']);
 
-    // Enhanced Stats
-    Route::get('budgets/{budget}/stats/top-categories', [StatsController::class, 'topCategories']);
-    Route::get('stats/savings-rate-evolution', [StatsController::class, 'savingsRateEvolution']);
+    // Enhanced Stats (moved to throttled group below)
+    // Route::get('budgets/{budget}/stats/top-categories', [StatsController::class, 'topCategories']);
+    // Route::get('stats/savings-rate-evolution', [StatsController::class, 'savingsRateEvolution']);
+
+    // ===== RATE-LIMITED ENDPOINTS (10 requests/minute) =====
+    // These endpoints are computationally expensive and need stricter rate limiting
+    Route::middleware('throttle:10,1')->group(function () {
+        // Budget comparison (expensive operation)
+        Route::get('budgets/compare', [BudgetController::class, 'compare']);
+        Route::get('budgets/{budget}/export-pdf', [BudgetController::class, 'exportPdf']);
+
+        // CSV Import/Export (file operations)
+        Route::post('budgets/{budget}/expenses/import-csv', [ExpenseController::class, 'importCsv']);
+        Route::get('budgets/{budget}/expenses/export-csv', [ExpenseController::class, 'exportCsv']);
+
+        // All statistics endpoints (database-intensive)
+        Route::get('budgets/{budget}/stats/summary', [StatsController::class, 'summary']);
+        Route::get('budgets/{budget}/stats/by-category', [StatsController::class, 'byCategory']);
+        Route::get('budgets/{budget}/stats/by-subcategory', [StatsController::class, 'bySubcategory']);
+        Route::get('budgets/{budget}/stats/by-tag', [StatsController::class, 'byTag']);
+        Route::get('budgets/{budget}/stats/expense-distribution', [StatsController::class, 'expenseDistribution']);
+        Route::get('budgets/{budget}/stats/top-categories', [StatsController::class, 'topCategories']);
+        Route::get('stats/wealth-evolution', [StatsController::class, 'wealthEvolution']);
+        Route::get('stats/savings-rate-evolution', [StatsController::class, 'savingsRateEvolution']);
+    });
 });
 
 // Admin routes

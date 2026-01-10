@@ -365,8 +365,8 @@ function resetForm() {
       dayOfWeek: props.recurringExpense.dayOfWeek,
       monthOfYear: props.recurringExpense.monthOfYear,
       templateSubcategoryId: props.recurringExpense.templateSubcategoryId,
-      startDate: props.recurringExpense.startDate,
-      endDate: props.recurringExpense.endDate,
+      startDate: props.recurringExpense.startDate.split("T")[0],
+      endDate: props.recurringExpense.endDate?.split("T")[0] ?? null,
       paymentMethod: props.recurringExpense.paymentMethod,
       notes: props.recurringExpense.notes,
       autoCreate: props.recurringExpense.autoCreate,
@@ -450,20 +450,21 @@ async function onSubmit() {
   isSubmitting.value = true;
 
   try {
+    // Utiliser camelCase - le middleware backend convertira en snake_case
     const data = {
       label: formData.value.label,
-      amount_cents: Math.round(formData.value.amount * 100),
+      amountCents: Math.round(formData.value.amount * 100),
       frequency: formData.value.frequency,
-      day_of_month: formData.value.dayOfMonth,
-      day_of_week: formData.value.dayOfWeek,
-      month_of_year: formData.value.monthOfYear,
-      template_subcategory_id: formData.value.templateSubcategoryId,
-      start_date: formData.value.startDate,
-      end_date: formData.value.endDate,
-      payment_method: formData.value.paymentMethod,
+      dayOfMonth: formData.value.dayOfMonth,
+      dayOfWeek: formData.value.dayOfWeek,
+      monthOfYear: formData.value.monthOfYear,
+      templateSubcategoryId: formData.value.templateSubcategoryId,
+      startDate: formData.value.startDate,
+      endDate: formData.value.endDate,
+      paymentMethod: formData.value.paymentMethod,
       notes: formData.value.notes,
-      auto_create: formData.value.autoCreate,
-      is_active: formData.value.isActive,
+      autoCreate: formData.value.autoCreate,
+      isActive: formData.value.isActive,
     };
 
     emit("submit", data);

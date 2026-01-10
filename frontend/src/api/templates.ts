@@ -69,8 +69,25 @@ export const templatesApi = {
       }>;
     }
   ): Promise<BudgetTemplate> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload: any = {};
+    interface UpdatePayload {
+      name?: string;
+      isDefault?: boolean;
+      revenueCents?: number | null;
+      categories?: Array<{
+        id?: number;
+        name: string;
+        plannedAmountCents: number;
+        sortOrder: number;
+        subcategories?: Array<{
+          id?: number;
+          name: string;
+          plannedAmountCents: number;
+          sortOrder: number;
+        }>;
+      }>;
+    }
+
+    const payload: UpdatePayload = {};
 
     if (data.name !== undefined) payload.name = data.name;
     if (data.isDefault !== undefined) payload.isDefault = data.isDefault;

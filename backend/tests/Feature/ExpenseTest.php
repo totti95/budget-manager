@@ -24,7 +24,7 @@ test('user can create expense', function () {
 
     $response->assertStatus(201)
         ->assertJsonStructure([
-            'id', 'label', 'amountCents', 'subcategory',
+            'id', 'label', 'amountCents', 'budgetSubcategory',
         ]);
 
     expect(Expense::where('budget_id', $budget->id)->exists())->toBeTrue();
@@ -35,7 +35,7 @@ test('user can list expenses', function () {
     $budget = Budget::factory()->for($user)->create();
     $category = BudgetCategory::factory()->for($budget)->create();
     $subcategory = BudgetSubcategory::factory()->for($category, 'budgetCategory')->create();
-    Expense::factory()->for($budget)->for($subcategory, 'subcategory')->count(3)->create();
+    Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->count(3)->create();
 
     $response = $this->actingAs($user, 'sanctum')
         ->getJson("/api/budgets/{$budget->id}/expenses");
@@ -49,7 +49,7 @@ test('user can update expense', function () {
     $budget = Budget::factory()->for($user)->create();
     $category = BudgetCategory::factory()->for($budget)->create();
     $subcategory = BudgetSubcategory::factory()->for($category, 'budgetCategory')->create();
-    $expense = Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create();
+    $expense = Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create();
 
     $response = $this->actingAs($user, 'sanctum')
         ->putJson("/api/expenses/{$expense->id}", [
@@ -66,7 +66,7 @@ test('user can delete expense', function () {
     $budget = Budget::factory()->for($user)->create();
     $category = BudgetCategory::factory()->for($budget)->create();
     $subcategory = BudgetSubcategory::factory()->for($category, 'budgetCategory')->create();
-    $expense = Expense::factory()->for($budget)->for($subcategory, 'subcategory')->create();
+    $expense = Expense::factory()->for($budget)->for($subcategory, 'budgetSubcategory')->create();
 
     $response = $this->actingAs($user, 'sanctum')
         ->deleteJson("/api/expenses/{$expense->id}");

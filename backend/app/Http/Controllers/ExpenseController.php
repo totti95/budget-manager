@@ -2,18 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\ExpenseRepositoryInterface;
 use App\Models\Budget;
 use App\Models\Expense;
+use App\Services\CsvImportService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+    protected ExpenseRepositoryInterface $expenseRepository;
+
+    public function __construct(ExpenseRepositoryInterface $expenseRepository)
+    {
+        $this->expenseRepository = $expenseRepository;
+    }
+
     public function index(Request $request, Budget $budget)
     {
         $this->authorize('view', $budget);
 
-        $query = $budget->expenses()->with('subcategory.budgetCategory', 'tags');
+        $query = $budget->expenses()->with('budgetSubcategory.budgetCategory', 'tags');
 
         // Filter by subcategory
         if ($request->has('subcatId')) {
@@ -67,19 +76,21 @@ class ExpenseController extends Controller
             return response()->json(['message' => 'Sous-catégorie invalide pour ce budget'], 422);
         }
 
-        $expense = $budget->expenses()->create($validated);
-
-        // Sync tags if provided
+        // Verify tags belong to the user and filter
         if (isset($validated['tag_ids'])) {
-            // Verify tags belong to the user
-            $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id');
-            $expense->tags()->sync($userTags);
+            $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id')->toArray();
+            $validated['tag_ids'] = $userTags;
         }
+
+        // Add budget_id to validated data
+        $validated['budget_id'] = $budget->id;
+
+        $expense = $this->expenseRepository->create($validated);
 
         // Check for budget exceeded notification
         app(NotificationService::class)->checkBudgetExceeded($expense);
 
-        return response()->json($expense->load('subcategory.budgetCategory', 'tags'), 201);
+        return response()->json($expense, 201);
     }
 
     public function update(Request $request, Expense $expense)
@@ -104,26 +115,25 @@ class ExpenseController extends Controller
             }
         }
 
-        $expense->update($validated);
-
-        // Sync tags if provided
+        // Verify tags belong to the user and filter
         if (isset($validated['tag_ids'])) {
-            // Verify tags belong to the user
-            $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id');
-            $expense->tags()->sync($userTags);
+            $userTags = $request->user()->tags()->whereIn('id', $validated['tag_ids'])->pluck('id')->toArray();
+            $validated['tag_ids'] = $userTags;
         }
+
+        $expense = $this->expenseRepository->update($expense, $validated);
 
         // Check for budget exceeded notification
         app(NotificationService::class)->checkBudgetExceeded($expense);
 
-        return response()->json($expense->load('subcategory.budgetCategory', 'tags'));
+        return response()->json($expense);
     }
 
     public function destroy(Request $request, Expense $expense)
     {
         $this->authorize('update', $expense->budget);
 
-        $expense->delete();
+        $this->expenseRepository->delete($expense);
 
         return response()->json(null, 204);
     }
@@ -133,62 +143,77 @@ class ExpenseController extends Controller
         $this->authorize('update', $budget);
 
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt|max:2048',
+            'file' => 'required|file',
         ]);
 
         $file = $request->file('file');
-        $csvData = array_map('str_getcsv', file($file->getRealPath()));
-        $header = array_shift($csvData);
+        $csvService = new CsvImportService();
 
-        $imported = 0;
-        $errors = [];
+        try {
+            // Valider le fichier
+            $csvService->validate($file);
 
-        foreach ($csvData as $index => $row) {
-            try {
-                $data = array_combine($header, $row);
+            // Parser et valider le contenu
+            $result = $csvService->parse($file);
+            $csvData = $result['data'];
+            $errors = $result['errors'];
 
-                // Find subcategory by name
-                $subcategory = $budget->categories()
-                    ->whereHas('subcategories', function ($q) use ($data) {
-                        $q->where('name', $data['subcategory'] ?? '');
-                    })
-                    ->first()
-                    ?->subcategories()
-                    ->where('name', $data['subcategory'] ?? '')
-                    ->first();
+            $imported = 0;
 
-                if (! $subcategory) {
-                    $errors[] = 'Ligne ' . ($index + 2) . ": Sous-catégorie '{$data['subcategory']}' non trouvée";
+            // Précharger toutes les sous-catégories pour éviter N+1
+            $budget->loadMissing('categories.subcategories');
 
-                    continue;
+            foreach ($csvData as $index => $data) {
+                try {
+                    // Trouver la sous-catégorie par nom
+                    $subcategory = null;
+                    foreach ($budget->categories as $category) {
+                        $found = $category->subcategories->firstWhere('name', $data['subcategory']);
+                        if ($found) {
+                            $subcategory = $found;
+                            break;
+                        }
+                    }
+
+                    if (!$subcategory) {
+                        $errors[] = 'Ligne ' . ($index + 2) . ": Sous-catégorie '{$data['subcategory']}' non trouvée";
+                        continue;
+                    }
+
+                    $budget->expenses()->create([
+                        'budget_subcategory_id' => $subcategory->id,
+                        'date' => $data['date'],
+                        'label' => $data['label'],
+                        'amount_cents' => $data['amount_cents'],
+                        'payment_method' => $data['payment_method'],
+                        'notes' => $data['notes'],
+                    ]);
+
+                    $imported++;
+                } catch (\Exception $e) {
+                    $errors[] = 'Ligne ' . ($index + 2) . ': ' . $e->getMessage();
                 }
-
-                $budget->expenses()->create([
-                    'budget_subcategory_id' => $subcategory->id,
-                    'date' => $data['date'] ?? now(),
-                    'label' => $data['label'] ?? 'Import CSV',
-                    'amount_cents' => (int) ($data['amount_cents'] ?? 0),
-                    'payment_method' => $data['payment_method'] ?? null,
-                    'notes' => $data['notes'] ?? null,
-                ]);
-
-                $imported++;
-            } catch (\Exception $e) {
-                $errors[] = 'Ligne ' . ($index + 2) . ': ' . $e->getMessage();
             }
-        }
 
-        return response()->json([
-            'imported' => $imported,
-            'errors' => $errors,
-        ]);
+            return response()->json([
+                'imported' => $imported,
+                'errors' => $errors,
+                'total_rows' => count($csvData),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'imported' => 0,
+                'errors' => [$e->getMessage()],
+                'total_rows' => 0,
+            ], 422);
+        }
     }
 
     public function exportCsv(Request $request, Budget $budget)
     {
         $this->authorize('view', $budget);
 
-        $expenses = $budget->expenses()->with('subcategory.budgetCategory')->get();
+        $expenses = $budget->expenses()->with('budgetSubcategory.budgetCategory')->get();
 
         $csv = "date,label,amount_cents,category,subcategory,payment_method,notes\n";
 
@@ -197,8 +222,8 @@ class ExpenseController extends Controller
                 $expense->date->format('Y-m-d'),
                 '"' . str_replace('"', '""', $expense->label) . '"',
                 $expense->amount_cents,
-                '"' . str_replace('"', '""', $expense->subcategory->budgetCategory->name) . '"',
-                '"' . str_replace('"', '""', $expense->subcategory->name) . '"',
+                '"' . str_replace('"', '""', $expense->budgetSubcategory->budgetCategory->name) . '"',
+                '"' . str_replace('"', '""', $expense->budgetSubcategory->name) . '"',
                 '"' . str_replace('"', '""', $expense->payment_method ?? '') . '"',
                 '"' . str_replace('"', '""', $expense->notes ?? '') . '"',
             ]) . "\n";

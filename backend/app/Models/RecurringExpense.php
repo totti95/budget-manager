@@ -11,6 +11,16 @@ class RecurringExpense extends Model
 {
     use HasFactory;
 
+    private const DAY_MAPPING = [
+        'monday' => Carbon::MONDAY,
+        'tuesday' => Carbon::TUESDAY,
+        'wednesday' => Carbon::WEDNESDAY,
+        'thursday' => Carbon::THURSDAY,
+        'friday' => Carbon::FRIDAY,
+        'saturday' => Carbon::SATURDAY,
+        'sunday' => Carbon::SUNDAY,
+    ];
+
     protected $fillable = [
         'user_id',
         'template_subcategory_id',
@@ -34,8 +44,8 @@ class RecurringExpense extends Model
         'month_of_year' => 'integer',
         'auto_create' => 'boolean',
         'is_active' => 'boolean',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
 
     public function user(): BelongsTo
@@ -95,17 +105,7 @@ class RecurringExpense extends Model
 
             case 'weekly':
                 // Return first occurrence in the month
-                $dayMapping = [
-                    'monday' => Carbon::MONDAY,
-                    'tuesday' => Carbon::TUESDAY,
-                    'wednesday' => Carbon::WEDNESDAY,
-                    'thursday' => Carbon::THURSDAY,
-                    'friday' => Carbon::FRIDAY,
-                    'saturday' => Carbon::SATURDAY,
-                    'sunday' => Carbon::SUNDAY,
-                ];
-
-                $targetDayOfWeek = $dayMapping[$this->day_of_week];
+                $targetDayOfWeek = self::DAY_MAPPING[$this->day_of_week];
                 $current = $month->copy()->startOfMonth();
 
                 while ($current->dayOfWeek !== $targetDayOfWeek) {
@@ -162,18 +162,7 @@ class RecurringExpense extends Model
             return false;
         }
 
-        // Convert enum to Carbon day constant (1=Monday, 7=Sunday)
-        $dayMapping = [
-            'monday' => Carbon::MONDAY,
-            'tuesday' => Carbon::TUESDAY,
-            'wednesday' => Carbon::WEDNESDAY,
-            'thursday' => Carbon::THURSDAY,
-            'friday' => Carbon::FRIDAY,
-            'saturday' => Carbon::SATURDAY,
-            'sunday' => Carbon::SUNDAY,
-        ];
-
-        $targetDayOfWeek = $dayMapping[$this->day_of_week];
+        $targetDayOfWeek = self::DAY_MAPPING[$this->day_of_week];
 
         // Find all occurrences of this day in the month
         $current = $month->copy()->startOfMonth();

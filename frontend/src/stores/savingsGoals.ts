@@ -7,111 +7,121 @@ import type {
   UpdateSavingsGoalData,
   CreateContributionData,
 } from "@/types";
-import { useToast } from "@/composables/useToast";
+import { executeStoreAction } from "@/composables/useStoreAction";
 
 export const useSavingsGoalsStore = defineStore("savingsGoals", () => {
   const goals = ref<SavingsGoal[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const { success, error: errorToast } = useToast();
-
   async function fetchGoals() {
-    loading.value = true;
-    error.value = null;
-    try {
-      goals.value = await savingsGoalsApi.list();
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur de chargement";
-      error.value = message;
-      errorToast(message);
-      throw err;
-    } finally {
-      loading.value = false;
-    }
+    return await executeStoreAction(
+      async () => {
+        goals.value = await savingsGoalsApi.list();
+      },
+      loading,
+      error,
+      { errorMessage: "Erreur de chargement" }
+    );
   }
 
   async function createGoal(data: CreateSavingsGoalData) {
-    try {
-      const newGoal = await savingsGoalsApi.create(data);
-      goals.value.push(newGoal);
-      success("Objectif créé avec succès");
-      return newGoal;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur de création";
-      errorToast(message);
-      throw err;
-    }
+    return await executeStoreAction(
+      async () => {
+        const newGoal = await savingsGoalsApi.create(data);
+        goals.value.push(newGoal);
+        return newGoal;
+      },
+      loading,
+      error,
+      {
+        successMessage: "Objectif créé avec succès",
+        errorMessage: "Erreur de création",
+      }
+    );
   }
 
   async function updateGoal(id: number, data: UpdateSavingsGoalData) {
-    try {
-      const updated = await savingsGoalsApi.update(id, data);
-      const index = goals.value.findIndex((g) => g.id === id);
-      if (index !== -1) {
-        goals.value[index] = updated;
+    return await executeStoreAction(
+      async () => {
+        const updated = await savingsGoalsApi.update(id, data);
+        const index = goals.value.findIndex((g) => g.id === id);
+        if (index !== -1) {
+          goals.value[index] = updated;
+        }
+        return updated;
+      },
+      loading,
+      error,
+      {
+        successMessage: "Objectif mis à jour",
+        errorMessage: "Erreur de modification",
       }
-      success("Objectif mis à jour");
-      return updated;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur de modification";
-      errorToast(message);
-      throw err;
-    }
+    );
   }
 
   async function deleteGoal(id: number) {
-    try {
-      await savingsGoalsApi.delete(id);
-      goals.value = goals.value.filter((g) => g.id !== id);
-      success("Objectif supprimé");
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur de suppression";
-      errorToast(message);
-      throw err;
-    }
+    return await executeStoreAction(
+      async () => {
+        await savingsGoalsApi.delete(id);
+        goals.value = goals.value.filter((g) => g.id !== id);
+      },
+      loading,
+      error,
+      {
+        successMessage: "Objectif supprimé",
+        errorMessage: "Erreur de suppression",
+      }
+    );
   }
 
   async function syncGoalWithAsset(id: number) {
-    try {
-      const updated = await savingsGoalsApi.syncAsset(id);
-      const index = goals.value.findIndex((g) => g.id === id);
-      if (index !== -1) {
-        goals.value[index] = updated;
+    return await executeStoreAction(
+      async () => {
+        const updated = await savingsGoalsApi.syncAsset(id);
+        const index = goals.value.findIndex((g) => g.id === id);
+        if (index !== -1) {
+          goals.value[index] = updated;
+        }
+        return updated;
+      },
+      loading,
+      error,
+      {
+        successMessage: "Objectif synchronisé avec l'actif",
+        errorMessage: "Erreur de synchronisation",
       }
-      success("Objectif synchronisé avec l'actif");
-      return updated;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur de synchronisation";
-      errorToast(message);
-      throw err;
-    }
+    );
   }
 
   async function addContribution(goalId: number, data: CreateContributionData) {
-    try {
-      await savingsGoalsApi.addContribution(goalId, data);
-      // Recharger l'objectif pour avoir le montant à jour
-      await fetchGoals();
-      success("Contribution ajoutée");
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur d'ajout";
-      errorToast(message);
-      throw err;
-    }
+    return await executeStoreAction(
+      async () => {
+        await savingsGoalsApi.addContribution(goalId, data);
+        await fetchGoals();
+      },
+      loading,
+      error,
+      {
+        successMessage: "Contribution ajoutée",
+        errorMessage: "Erreur d'ajout",
+      }
+    );
   }
 
   async function deleteContribution(goalId: number, contributionId: number) {
-    try {
-      await savingsGoalsApi.deleteContribution(goalId, contributionId);
-      // Recharger les objectifs pour avoir le montant à jour
-      await fetchGoals();
-      success("Contribution supprimée");
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erreur de suppression";
-      errorToast(message);
-      throw err;
-    }
+    return await executeStoreAction(
+      async () => {
+        await savingsGoalsApi.deleteContribution(goalId, contributionId);
+        await fetchGoals();
+      },
+      loading,
+      error,
+      {
+        successMessage: "Contribution supprimée",
+        errorMessage: "Erreur de suppression",
+      }
+    );
   }
 
   return {

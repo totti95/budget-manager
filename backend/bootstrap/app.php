@@ -32,5 +32,58 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(LogRequests::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Standardiser le format des erreurs pour les requêtes API JSON
+        $exceptions->render(function (\Throwable $e, $request) {
+            // Ne traiter que les requêtes API (Accept: application/json)
+            if (! $request->expectsJson()) {
+                return null; // Laisser le handler par défaut gérer
+            }
+
+            $statusCode = 500;
+            $message = 'Une erreur est survenue';
+            $errors = null;
+
+            // Validation errors (422)
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                $statusCode = 422;
+                $message = $e->getMessage();
+                $errors = $e->errors();
+            }
+            // Authentication errors (401)
+            elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                $statusCode = 401;
+                $message = 'Non authentifié';
+            }
+            // Authorization errors (403)
+            elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                $statusCode = 403;
+                $message = $e->getMessage() ?: 'Action non autorisée';
+            }
+            // Model not found (404)
+            elseif ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                $statusCode = 404;
+                $message = 'Ressource introuvable';
+            }
+            // Too many requests (429)
+            elseif ($e instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+                $statusCode = 429;
+                $message = 'Trop de requêtes. Veuillez réessayer plus tard.';
+            }
+            // HTTP exceptions
+            elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                $statusCode = $e->getStatusCode();
+                $message = $e->getMessage() ?: $message;
+            }
+            // En production, ne pas exposer les détails des erreurs serveur
+            elseif (config('app.debug')) {
+                $message = $e->getMessage();
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'errors' => $errors,
+                'code' => $statusCode,
+            ], $statusCode);
+        });
     })->create();

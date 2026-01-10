@@ -23,8 +23,8 @@ export const useNotificationsStore = defineStore("notifications", () => {
     try {
       const response = await notificationsApi.list(page, read);
       notifications.value = response.data;
-      currentPage.value = response.current_page;
-      totalPages.value = response.last_page;
+      currentPage.value = response.currentPage;
+      totalPages.value = response.lastPage;
     } catch (error) {
       errorHandler.handle(error, "Erreur lors du chargement des notifications");
     } finally {

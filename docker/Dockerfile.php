@@ -1,18 +1,18 @@
-FROM php:8.3-fpm-alpine
+# ============================================
+# Stage 1: Builder - Compile PHP extensions
+# ============================================
+FROM php:8.3-fpm-alpine AS builder
 
-# Install system dependencies
+# Install build dependencies
 RUN apk add --no-cache \
+    $PHPIZE_DEPS \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
     libzip-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl
+    libxml2-dev
 
-# Install PHP extensions
+# Configure and install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo \
@@ -25,16 +25,35 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         opcache
 
 # Install Redis extension
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del .build-deps
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
-# Install Composer
+# ============================================
+# Stage 2: Runtime - Production image
+# ============================================
+FROM php:8.3-fpm-alpine AS runtime
+
+# Install only runtime dependencies (no build tools)
+RUN apk add --no-cache \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libzip \
+    libxml2 \
+    curl
+
+# Copy compiled extensions from builder
+COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+
+# Install Composer from official image
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Configure PHP-FPM to run worker processes as www-data (already configured by default)
+# The master process runs as root, but workers run as www-data for security
 
 EXPOSE 9000
 

@@ -12,7 +12,13 @@ export const notificationsApi = {
     read?: boolean,
     type?: string
   ): Promise<PaginatedResponse<Notification>> {
-    const params: Record<string, any> = { page };
+    interface NotificationParams {
+      page: number;
+      read?: boolean;
+      type?: string;
+    }
+
+    const params: NotificationParams = { page };
     if (read !== undefined) params.read = read;
     if (type) params.type = type;
 
