@@ -62,8 +62,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Budgets
     Route::get('budgets', [BudgetController::class, 'index']);
+    // Routes spécifiques (AVANT routes paramétrées pour éviter les conflits de routing)
     Route::post('budgets/generate', [BudgetController::class, 'generate']);
+    Route::get('budgets/compare', [BudgetController::class, 'compare'])->middleware('throttle:100,1');
+    // Routes paramétrées (APRÈS routes spécifiques)
     Route::get('budgets/{budget}', [BudgetController::class, 'show']);
+    Route::get('budgets/{budget}/export-pdf', [BudgetController::class, 'exportPdf'])->middleware('throttle:100,1');
     Route::put('budgets/{budget}', [BudgetController::class, 'update']);
     Route::delete('budgets/{budget}', [BudgetController::class, 'destroy']);
 
@@ -153,11 +157,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ===== RATE-LIMITED ENDPOINTS (100 requests/minute) =====
     // These endpoints are computationally expensive and need stricter rate limiting
+    // NOTE: budgets/compare and budgets/{budget}/export-pdf moved to main budget routes section
     Route::middleware('throttle:100,1')->group(function () {
-        // Budget comparison (expensive operation)
-        Route::get('budgets/compare', [BudgetController::class, 'compare']);
-        Route::get('budgets/{budget}/export-pdf', [BudgetController::class, 'exportPdf']);
-
         // CSV Import/Export (file operations)
         Route::post('budgets/{budget}/expenses/import-csv', [ExpenseController::class, 'importCsv']);
         Route::get('budgets/{budget}/expenses/export-csv', [ExpenseController::class, 'exportCsv']);
