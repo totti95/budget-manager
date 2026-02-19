@@ -1,31 +1,52 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { budgetsApi } from "@/api/budgets";
+import { useBudgetStore } from "@/stores/budget";
 import type { BudgetComparison } from "@/types";
 import BudgetComparisonTable from "@/components/BudgetComparisonTable.vue";
 import BudgetComparisonChart from "@/components/BudgetComparisonChart.vue";
 
+const budgetStore = useBudgetStore();
+
 const selectedMonths = ref<string[]>([]);
 const comparison = ref<BudgetComparison | null>(null);
 const loading = ref(false);
+const loadingMonths = ref(true);
 const error = ref<string | null>(null);
 
-// Generate available months for selection (last 12 months)
-const availableMonths = computed(() => {
-  const months: { value: string; label: string }[] = [];
-  const today = new Date();
-
-  for (let i = 0; i < 12; i++) {
-    const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
-    const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const label = date.toLocaleDateString("fr-FR", {
-      month: "long",
-      year: "numeric",
-    });
-    months.push({ value, label });
+// Charger les budgets au montage
+onMounted(async () => {
+  try {
+    await budgetStore.fetchBudgets();
+  } finally {
+    loadingMonths.value = false;
   }
+});
 
-  return months;
+// Extraire les mois uniques des budgets existants
+const availableMonths = computed(() => {
+  // Extraire les mois uniques des budgets existants
+  const monthsSet = new Set(
+    budgetStore.budgets.map((budget) => {
+      const date = new Date(budget.month);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    })
+  );
+
+  // Convertir en tableau et trier (plus récent en premier)
+  return Array.from(monthsSet)
+    .sort((a, b) => b.localeCompare(a))
+    .map((value) => {
+      const [year, month] = value.split("-");
+      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+      return {
+        value,
+        label: date.toLocaleDateString("fr-FR", {
+          month: "long",
+          year: "numeric",
+        }),
+      };
+    });
 });
 
 const canCompare = computed(() => {
@@ -81,48 +102,79 @@ function centsToEuros(cents: number): string {
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
       <h2 class="text-xl font-semibold mb-4">Sélectionnez 2 ou 3 mois à comparer</h2>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
-        <button
-          v-for="month in availableMonths"
-          :key="month.value"
-          @click="toggleMonth(month.value)"
-          :class="[
-            'px-4 py-2 rounded-md border-2 transition-colors capitalize',
-            selectedMonths.includes(month.value)
-              ? 'border-blue-600 bg-blue-50 text-blue-700 font-semibold'
-              : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400',
-            selectedMonths.length >= 3 && !selectedMonths.includes(month.value)
-              ? 'opacity-50 cursor-not-allowed'
-              : 'cursor-pointer',
-          ]"
-          :disabled="selectedMonths.length >= 3 && !selectedMonths.includes(month.value)"
-        >
-          {{ month.label }}
-        </button>
+      <!-- État de chargement -->
+      <div v-if="loadingMonths" class="text-center py-8">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <p class="mt-2 text-gray-600">Chargement des budgets disponibles...</p>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button
-          @click="comparebudgets"
-          :disabled="!canCompare || loading"
-          class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+      <!-- Aucun budget disponible -->
+      <div v-else-if="availableMonths.length === 0" class="text-center py-8">
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400 mb-3"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
-          <span v-if="loading">Chargement...</span>
-          <span v-else>Comparer</span>
-        </button>
-
-        <button
-          v-if="selectedMonths.length > 0"
-          @click="clearComparison"
-          class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
-        >
-          Réinitialiser
-        </button>
-
-        <p class="text-sm text-gray-600">
-          {{ selectedMonths.length }} mois sélectionné{{ selectedMonths.length > 1 ? "s" : "" }}
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <p class="text-gray-600">
+          Aucun budget disponible pour la comparaison. Créez au moins 2 budgets pour commencer.
         </p>
       </div>
+
+      <!-- Grille de sélection des mois -->
+      <template v-else>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+          <button
+            v-for="month in availableMonths"
+            :key="month.value"
+            @click="toggleMonth(month.value)"
+            :class="[
+              'px-4 py-2 rounded-md border-2 transition-colors capitalize',
+              selectedMonths.includes(month.value)
+                ? 'border-blue-600 bg-blue-50 text-blue-700 font-semibold'
+                : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400',
+              selectedMonths.length >= 3 && !selectedMonths.includes(month.value)
+                ? 'opacity-50 cursor-not-allowed'
+                : 'cursor-pointer',
+            ]"
+            :disabled="selectedMonths.length >= 3 && !selectedMonths.includes(month.value)"
+          >
+            {{ month.label }}
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            @click="comparebudgets"
+            :disabled="!canCompare || loading"
+            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          >
+            <span v-if="loading">Chargement...</span>
+            <span v-else>Comparer</span>
+          </button>
+
+          <button
+            v-if="selectedMonths.length > 0"
+            @click="clearComparison"
+            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+          >
+            Réinitialiser
+          </button>
+
+          <p class="text-sm text-gray-600">
+            {{ selectedMonths.length }} mois sélectionné{{ selectedMonths.length > 1 ? "s" : "" }}
+          </p>
+        </div>
+      </template>
     </div>
 
     <!-- Error message -->
